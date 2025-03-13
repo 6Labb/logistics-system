@@ -1,0 +1,28 @@
+// 루트 프로젝트 이름 설정
+rootProject.name = 'logistics-system'
+
+// 공통 모듈 추가
+include 'common'
+project(':common').projectDir = file('common')
+
+
+// 비즈니스 서비스 포함
+include 'services:ai-service'
+include 'services:auth-service'
+include 'services:company-service'
+include 'services:delivery-service'
+include 'services:hub-service'
+include 'services:order-service'
+include 'services:product-service'
+include 'services:slack-service'
+include 'services:user-service'
+
+project(':services:ai-service').projectDir = file('services/ai-service')
+project(':services:auth-service').projectDir = file('services/auth-service')
+project(':services:company-service').projectDir = file('services/company-service')
+project(':services:delivery-service').projectDir = file('services/delivery-service')
+project(':services:hub-service').projectDir = file('services/hub-service')
+project(':services:order-service').projectDir = file('services/order-service')
+project(':services:product-service').projectDir = file('services/product-service')
+project(':services:slack-service').projectDir = file('services/slack-service')
+project(':services:user-service').projectDir = file('services/user-service')
