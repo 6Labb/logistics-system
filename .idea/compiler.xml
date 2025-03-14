@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel target="17">
+      <module name="ai-service" target="17" />
+      <module name="ai-service.main" target="17" />
+      <module name="ai-service.test" target="17" />
+      <module name="auth-service" target="17" />
+      <module name="auth-service.main" target="17" />
+      <module name="auth-service.test" target="17" />
+      <module name="company-service" target="17" />
+      <module name="company-service.main" target="17" />
+      <module name="company-service.test" target="17" />
+      <module name="delivery-service" target="17" />
+      <module name="delivery-service.main" target="17" />
+      <module name="delivery-service.test" target="17" />
+      <module name="hub-service" target="17" />
+      <module name="hub-service.main" target="17" />
+      <module name="hub-service.test" target="17" />
+      <module name="logistics-system.infra.eureka-service" target="17" />
+      <module name="logistics-system.infra.eureka-service.main" target="17" />
+      <module name="logistics-system.infra.eureka-service.test" target="17" />
+      <module name="order-service" target="17" />
+      <module name="order-service.main" target="17" />
+      <module name="order-service.test" target="17" />
+      <module name="product-service" target="17" />
+      <module name="product-service.main" target="17" />
+      <module name="product-service.test" target="17" />
+      <module name="slack-service" target="17" />
+      <module name="slack-service.main" target="17" />
+      <module name="slack-service.test" target="17" />
+      <module name="user-service" target="17" />
+      <module name="user-service.main" target="17" />
+      <module name="user-service.test" target="17" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
