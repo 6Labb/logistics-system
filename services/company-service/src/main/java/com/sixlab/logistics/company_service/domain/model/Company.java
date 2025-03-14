@@ -1,4 +1,4 @@
-package com.sixlab.logistics.company_service;
+package com.sixlab.logistics.company_service.domain.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -16,7 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Table(name = "store")
-public class Company extends BaseEntity {
+public class Company {
     @Id
     private UUID id;
 

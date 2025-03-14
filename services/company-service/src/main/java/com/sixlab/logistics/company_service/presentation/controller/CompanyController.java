@@ -1,5 +1,8 @@
-package com.sixlab.logistics.company_service;
+package com.sixlab.logistics.company_service.presentation.controller;
 
+import com.sixlab.logistics.company_service.presentation.dto.CompanyRequestDto;
+import com.sixlab.logistics.company_service.presentation.dto.CompanyResponseDto;
+import com.sixlab.logistics.company_service.application.service.CompanyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
