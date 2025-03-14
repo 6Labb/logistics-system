@@ -1,0 +1,6 @@
+# common ?? (?? ??? ??)
+server:
+  port: 0
+logging:
+  level:
+    root: INFO
