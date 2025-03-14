@@ -10,6 +10,8 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/common" />
+            <option value="$PROJECT_DIR$/infra" />
+            <option value="$PROJECT_DIR$/infra/gateway-service" />
             <option value="$PROJECT_DIR$/services" />
             <option value="$PROJECT_DIR$/services/ai-service" />
             <option value="$PROJECT_DIR$/services/auth-service" />
@@ -29,15 +31,6 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/infra/eureka-service" />
-          </set>
-        </option>
-      </GradleProjectSettings>
-      <GradleProjectSettings>
-        <option name="externalProjectPath" value="$PROJECT_DIR$/infra/gateway-service" />
-        <option name="gradleJvm" value="#JAVA_HOME" />
-        <option name="modules">
-          <set>
-            <option value="$PROJECT_DIR$/infra/gateway-service" />
           </set>
         </option>
       </GradleProjectSettings>

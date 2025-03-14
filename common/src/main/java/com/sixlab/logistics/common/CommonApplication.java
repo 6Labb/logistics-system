@@ -1,4 +1,4 @@
-package com.sparta.common;
+package com.sixlab.logistics.common;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

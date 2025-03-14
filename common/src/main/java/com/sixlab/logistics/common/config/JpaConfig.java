@@ -1,4 +1,4 @@
-package com.sparta.common.config;
+package com.sixlab.logistics.common.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
