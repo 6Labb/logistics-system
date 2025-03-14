@@ -1,5 +1,7 @@
-package com.sixlab.logistics.company_service;
+package com.sixlab.logistics.company_service.application.service;
 
+import com.sixlab.logistics.company_service.presentation.dto.CompanyRequestDto;
+import com.sixlab.logistics.company_service.presentation.dto.CompanyResponseDto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
