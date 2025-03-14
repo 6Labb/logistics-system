@@ -1,6 +1,6 @@
 package com.sixlab.logistics.ai_service.domain;
 
-import com.sparta.common.domain.BasicEntity;
+import com.sixlab.logistics.common.domain.BasicEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.Getter;

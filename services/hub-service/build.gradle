@@ -24,6 +24,7 @@ repositories {
 }
 
 ext {
+	set('querydslVersion', "5.0.0")  // QueryDSL 버전 명시적으로 설정
 	set('springCloudVersion', "2024.0.0")
 }
 tasks.register("prepareKotlinBuildScriptModel")
