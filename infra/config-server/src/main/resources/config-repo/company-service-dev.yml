@@ -1,0 +1,21 @@
+server:
+  port: 19094
+
+message: "company-service dev message updated 12:59"
+
+spring:
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+        default_schema: companies
+  datasource:
+    url: jdbc:postgresql://localhost:5432/logistics
+    username: postgres
+    password: 0000
+    driver-class-name: org.postgresql.Driver

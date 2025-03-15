@@ -1,0 +1,12 @@
+server:
+  port: 19090
+
+spring:
+  application:
+    name: eureka-server
+  config:
+    import: "configserver:http://localhost:18080"
+  cloud:
+    config:
+      name: eureka-server-dev
+      fail-fast: false

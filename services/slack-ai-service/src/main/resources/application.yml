@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: slack-ai-service
+  profiles:
+    active: dev
+  config:
+    import: "configserver:http://localhost:18080"
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        service-id: config-server  # Eureka를 통해 찾을 수도 있음
+
+server:
+  port: 0
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:19090/eureka/
+
+message: "default message" # config server를 통과하지 않을 때
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh
