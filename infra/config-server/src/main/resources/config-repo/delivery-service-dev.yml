@@ -1,0 +1,23 @@
+server:
+  port: 19097
+
+message: "service dev message updated 1:19"
+
+spring:
+  application:
+    name: delivery-service
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+        default_schema: deliveries
+  datasource:
+    url: jdbc:postgresql://localhost:5432/logistics
+    username: postgres
+    password: 0000
+    driver-class-name: org.postgresql.Driver
