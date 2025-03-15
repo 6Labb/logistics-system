@@ -41,20 +41,6 @@ subprojects {
         querydslVersion = '5.0.0'
     }
 
-    // 모든 하위 모듈에 필요한 의존성 목록
-    dependencies {
-        // Web
-        implementation 'org.springframework.boot:spring-boot-starter-web'
-        implementation 'org.springframework.boot:spring-boot-starter-webflux'
-
-        // Test
-        testImplementation 'org.springframework.boot:spring-boot-starter-test'
-        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    }
-
-    test {
-        useJUnitPlatform()
-    }
 
 }
 
