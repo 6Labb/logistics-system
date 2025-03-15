@@ -1,0 +1,51 @@
+plugins {
+    id 'java'
+    id 'java-library'
+    id 'org.springframework.boot' version '3.4.3'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+//모든 프로젝트 적용 (루트 포함)
+allprojects {
+    group = 'com.sixlab.logistics'
+    version = '0.0.1-SNAPSHOT'
+
+    // Maven Central 저장소 사용
+    repositories {
+        mavenCentral()
+    }
+
+}
+
+// 하위 모듈만 적용
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'java-library'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
+
+
+    // 하위모듈 라이브러리 설정 해제
+    bootJar.enabled = true
+    jar.enabled = false
+
+    // 의존성 버전관리
+    ext {
+        springCloudVersion = '2024.0.0'
+        querydslVersion = '5.0.0'
+    }
+
+
+}
+
+project(':common') { // common 라이브러리화
+    bootJar { enabled = false }
+    jar { enabled = true }
+}
+
