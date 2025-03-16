@@ -12,10 +12,10 @@ spring:
         locator:
           enabled: true
       routes:
-        #        - id: user-service-users # 라우트 식별자
-        #          uri: lb://user-service # 'user-service'라는 이름으로 로드 밸런싱된 서비스로 라우팅
-        #          predicates:
-        #            - Path=/users/** # /users/** 경로로 들어오는 요청을 이 라우트로 처리
+        - id: user-service-user # 라우트 식별자
+          uri: lb://user-service # 'user-service'라는 이름으로 로드 밸런싱된 서비스로 라우팅
+          predicates:
+            - Path=/users/** # /users/** 경로로 들어오는 요청을 이 라우트로 처리
 
         - id: user-service-auth
           uri: lb://user-service
@@ -47,12 +47,15 @@ spring:
           predicates:
             - Path=/deliveries/**
 
-        - id: slack-ai-service
+        - id: slack-ai-service-slack
           uri: lb://slack-ai-service
           predicates:
-            - Path=/api/slack/**, /api/ai/**
+            - Path=/api/slack/**
 
-
+        - id: slack-ai-service-ai
+          uri: lb://slack-ai-service
+          predicates:
+            - Path=/api/ai/**
 
 eureka:
   client:
