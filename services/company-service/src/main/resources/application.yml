@@ -11,6 +11,21 @@ spring:
         enabled: true
         service-id: config-server  # Eureka를 통해 찾을 수도 있음
 
+  datasource:
+    url: jdbc:postgresql://localhost:5432/company_service?currentSchema=company_schema
+    username: root  # 기존 컨테이너의 사용자 이름
+    password: 1234  # 기존 컨테이너의 비밀번호
+    driver-class-name: org.postgresql.Driver
+
+    jpa:
+      hibernate:
+        ddl-auto: update
+      show-sql: true
+      properties:
+        hibernate:
+          format_sql: true
+      database-platform: org.hibernate.dialect.PostgreSQLDialect
+
 server:
   port: 0
 eureka:

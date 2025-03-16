@@ -1,20 +1,16 @@
 package com.sixlab.logistics.company_service.presentation.controller;
 
+import com.sixlab.logistics.common.exception.ApiResponse;
+import com.sixlab.logistics.company_service.application.service.CompanyService;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyRequestDto;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyResponseDto;
-import com.sixlab.logistics.company_service.application.service.CompanyService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-@RefreshScope
 @RestController
 @RequestMapping("/companies")
 @RequiredArgsConstructor
@@ -23,48 +19,42 @@ public class CompanyController {
 
     // 업체 등록
     @PostMapping
-    public ResponseEntity<CompanyResponseDto> createCompany(
-            @RequestBody CompanyRequestDto request){
-        CompanyResponseDto responseDto = companyService.createCompany(request);
-        return ResponseEntity.ok().body(responseDto);
+    public ApiResponse<CompanyResponseDto> createCompany(
+            @RequestBody CompanyRequestDto requestDto){
+        CompanyResponseDto responseDto = companyService.createCompany(requestDto);
+        return ApiResponse.success(HttpStatus.CREATED, responseDto, "업체가 정상적으로 등록되었습니다.");
     }
 
     // 업체 목록 조회
     @GetMapping
-    public ResponseEntity<List<CompanyResponseDto>> getAllCompanies() {
+    public ApiResponse<List<CompanyResponseDto>> getAllCompanies() {
         List<CompanyResponseDto> companies = companyService.getAllCompanies();
-        return ResponseEntity.ok().body(companies);
+        return ApiResponse.success(companies, "업체 목록 조회 성공");
     }
-    @Value("${server.port}")
-    private String serverPort;
 
     // 업체 단건 조회
     @GetMapping("/{companyId}")
-    public ResponseEntity<CompanyResponseDto> getCompanyById(
+    public ApiResponse<CompanyResponseDto> getCompanyById(
             @PathVariable UUID companyId) {
         CompanyResponseDto company = companyService.getCompanyById(companyId);
-        return ResponseEntity.ok().body(company);
+        return ApiResponse.success(company, "업체 조회 성공");
     }
-    @Value("${message}")
-    private String message;
 
     // 업체 수정
     @PutMapping("/{companyId}")
-    public ResponseEntity<CompanyResponseDto> updateCompany(
-            @PathVariable UUID companyId){
-        CompanyResponseDto updatedCompany = companyService.updateCompany(companyId);
-        return ResponseEntity.ok().body(updatedCompany);
-    @GetMapping("/companies")
-    public String getCompany() {
-        return "info!!! From port : " + serverPort + "and message : " + message;
+    public ApiResponse<CompanyResponseDto> updateCompany(
+            @PathVariable UUID companyId,
+            @RequestBody CompanyRequestDto requestDto) {
+        CompanyResponseDto updatedCompany = companyService.updateCompany(companyId, requestDto);
+        return ApiResponse.success(updatedCompany, "업체 수정 성공");
     }
 
     // 업체 삭제
     @DeleteMapping("/{companyId}")
-    public ResponseEntity<CompanyResponseDto> deleteCompany(
+    public ApiResponse<Void> deleteCompany (
             @PathVariable UUID companyId){
         companyService.deleteCompany(companyId);
-        return ResponseEntity.noContent().build();
+        return ApiResponse.success(HttpStatus.OK, null, "업체가 정상적으로 삭제되었습니다.");
     }
 
 }
