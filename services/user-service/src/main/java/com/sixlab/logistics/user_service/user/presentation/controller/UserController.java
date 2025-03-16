@@ -1,4 +1,4 @@
-package com.sixlab.logistics.user_service;
+package com.sixlab.logistics.user_service.user.presentation.controller;
 
 
 import org.springframework.beans.factory.annotation.Value;
