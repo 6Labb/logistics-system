@@ -1,4 +1,4 @@
-package com.sixlab.logistics.common.exception;
+package com.sixlab.logistics.common.infrastructure.config.exception;
 
 import org.springframework.dao.DataAccessException;
 

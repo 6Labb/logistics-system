@@ -1,4 +1,4 @@
-package com.sixlab.logistics.common.config;
+package com.sixlab.logistics.common.infrastructure.config;
 
 
 import org.springframework.context.annotation.Configuration;

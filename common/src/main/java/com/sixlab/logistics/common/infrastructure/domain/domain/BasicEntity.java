@@ -1,4 +1,4 @@
-package com.sixlab.logistics.common.domain;
+package com.sixlab.logistics.common.infrastructure.domain.domain;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;

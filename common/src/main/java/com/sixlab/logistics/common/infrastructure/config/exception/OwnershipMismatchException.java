@@ -1,4 +1,4 @@
-package com.sixlab.logistics.common.exception;
+package com.sixlab.logistics.common.infrastructure.config.exception;
 
 /**
  * 리소스의 소유자와 다른 ID로 접근하려 할 때 발생하는 예외입니다. 주로 HTTP 403 (Forbidden) 응답과 매핑하여 처리합니다.

@@ -1,4 +1,4 @@
-package com.sixlab.logistics.common.exception;
+package com.sixlab.logistics.common.infrastructure.config.exception;
 
 import lombok.Builder;
 import lombok.Getter;

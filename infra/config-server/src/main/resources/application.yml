@@ -17,8 +17,8 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:19090/eureka/
-#    register-with-eureka: true #유레카에 등록
-#    fetch-registry: true # 다른 서비스 목록 가져오기
+    register-with-eureka: true #유레카에 등록
+    fetch-registry: true # 다른 서비스 목록 가져오기
 #eureka:
 #  client:
 #    register-with-eureka: false

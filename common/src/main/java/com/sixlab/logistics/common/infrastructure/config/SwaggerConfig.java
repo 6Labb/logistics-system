@@ -1,4 +1,4 @@
-package com.sixlab.logistics.common.config;
+package com.sixlab.logistics.common.infrastructure.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

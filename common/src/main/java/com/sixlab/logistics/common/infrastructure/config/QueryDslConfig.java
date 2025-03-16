@@ -1,4 +1,4 @@
-package com.sixlab.logistics.common.config;
+package com.sixlab.logistics.common.infrastructure.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
