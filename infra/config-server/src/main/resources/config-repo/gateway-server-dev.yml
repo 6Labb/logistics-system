@@ -47,15 +47,11 @@ spring:
           predicates:
             - Path=/deliveries/**
 
-        - id: slack-service
+        - id: slack-ai-service
           uri: lb://slack-ai-service
           predicates:
-            - Path=/api/slack/**
+            - Path=/api/slack/**, /api/ai/**
 
-        - id: ai-service
-          uri: lb://slack-ai-service
-          predicates:
-            - Path=/api/ai/**
 
 
 eureka:

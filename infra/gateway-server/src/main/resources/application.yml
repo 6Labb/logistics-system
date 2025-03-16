@@ -5,11 +5,6 @@ spring:
     active: dev
   config:
     import: "configserver:http://localhost:18080"  # Config Server 주소 명시
-  cloud:
-    config:
-      discovery:
-        enabled: true
-        service-id: config-server  # Eureka를 통해 찾을 수도 있음
 
 server:
   port: 0
