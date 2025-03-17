@@ -1,4 +1,4 @@
-package com.sixlab.logistics.common.infrastructure.config.exception;
+package com.sixlab.logistics.common.shared.exception;
 
 /**
  * 사용자가 필요한 권한을 보유하지 않은 경우 발생하는 예외입니다. HTTP 401 (Unauthorized) 또는 403 (Forbidden)으로 매핑할 수 있습니다.

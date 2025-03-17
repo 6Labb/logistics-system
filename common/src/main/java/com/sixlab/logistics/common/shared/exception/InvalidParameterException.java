@@ -1,4 +1,4 @@
-package com.sixlab.logistics.common.infrastructure.config.exception;
+package com.sixlab.logistics.common.shared.exception;
 
 /**
  * 메서드나 API 호출 시 잘못된 파라미터가 전달되었을 때 발생하는 예외입니다. 주로 HTTP 400 (Bad Request) 응답과 매핑하여 처리합니다.

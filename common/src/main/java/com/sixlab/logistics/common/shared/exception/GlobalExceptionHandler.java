@@ -1,5 +1,6 @@
-package com.sixlab.logistics.common.infrastructure.config.exception;
+package com.sixlab.logistics.common.shared.exception;
 
+import com.sixlab.logistics.common.shared.response.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

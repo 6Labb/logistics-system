@@ -1,4 +1,4 @@
-package com.sixlab.logistics.common.infrastructure.config.exception;
+package com.sixlab.logistics.common.shared.response;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
