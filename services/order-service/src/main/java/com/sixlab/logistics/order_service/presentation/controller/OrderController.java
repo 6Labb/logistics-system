@@ -1,16 +1,13 @@
 package com.sixlab.logistics.order_service.presentation.controller;
 
-import com.sixlab.logistics.common.exception.ApiResponse;
+import com.sixlab.logistics.common.shared.response.ApiResponse;
 import com.sixlab.logistics.order_service.application.dto.request.OrderCreateRequestDto;
 import com.sixlab.logistics.order_service.application.dto.response.OrderCreateResponseDto;
 import com.sixlab.logistics.order_service.application.service.OrderService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
