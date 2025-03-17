@@ -2,8 +2,6 @@ package com.sixlab.logistics.order_service.application.dto.response;
 
 import com.sixlab.logistics.order_service.domain.model.Order;
 import com.sixlab.logistics.order_service.domain.model.Status;
-import jakarta.persistence.Column;
-import lombok.Builder;
 import lombok.Getter;
 
 import java.util.UUID;
@@ -19,6 +17,8 @@ public class OrderCreateResponseDto {
     private final String message; // 요청사항
     private final Status status; // 주문 상태
     private final UUID userId; // 주문자 고유 id
+    private final String receiverSlackId; // 수령업체 slack id
+    private final String receiverCompanyName; // 수령업체 이름
 
     public OrderCreateResponseDto(Order order) {
         this.supplierId = order.getSupplierId();
@@ -30,9 +30,7 @@ public class OrderCreateResponseDto {
         this.message = order.getMessage();
         this.status = order.getStatus();
         this.userId = order.getUserId();
+        this.receiverSlackId = order.getReceiverSlackId();
+        this.receiverCompanyName = order.getReceiverCompanyName();
     }
-
-
-
-
 }
