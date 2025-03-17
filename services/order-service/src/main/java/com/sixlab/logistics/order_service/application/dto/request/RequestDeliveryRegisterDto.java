@@ -10,8 +10,9 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 public class RequestDeliveryRegisterDto {
-    private String deliveryAddress; // 배송지
-    private String receiveName; // 수령인
-    private UUID receiverCompanyId; // 수령업체 id
-    private UUID supplierCompanyId; // 공급업체 id
+    // 배송지, 주문 id, 수령업체이름(수령업체명), 수령인 slackid
+    private UUID orderId; // 주문 id;
+    private String address; // 배송지
+    private String receiverCompanyName; // 수령업체이름(수령업체명)
+    private String receiverCompanySlackId; // 수령업체의 slackId
 }
