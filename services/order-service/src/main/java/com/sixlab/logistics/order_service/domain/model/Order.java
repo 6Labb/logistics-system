@@ -1,8 +1,7 @@
 package com.sixlab.logistics.order_service.domain.model;
 
-import com.sixlab.logistics.common.domain.BasicEntity;
+import com.sixlab.logistics.common.shared.domain.BasicEntity;
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 
 import java.util.UUID;

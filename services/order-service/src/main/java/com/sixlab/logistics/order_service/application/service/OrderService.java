@@ -1,6 +1,6 @@
 package com.sixlab.logistics.order_service.application.service;
 
-import com.sixlab.logistics.common.exception.ResourceNotFoundException;
+import com.sixlab.logistics.common.shared.exception.ResourceNotFoundException;
 import com.sixlab.logistics.order_service.application.dto.request.OrderCreateRequestDto;
 import com.sixlab.logistics.order_service.application.dto.response.OrderCreateResponseDto;
 import lombok.extern.slf4j.Slf4j;
