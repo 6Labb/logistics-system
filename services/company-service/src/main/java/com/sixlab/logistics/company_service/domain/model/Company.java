@@ -28,10 +28,6 @@ public class Company extends BasicEntity {
     @Enumerated(EnumType.STRING)
     private CompanyType type;
 
-    /*@ManyToOne
-    @JoinColumn(name = "hub_id")
-    private Hub hub;*/
-
     // 엔티티에서 DTO로 변환
     public CompanyResponseDto toResponseDto() {
         return new CompanyResponseDto(this.id, this.name, this.address, this.type);
