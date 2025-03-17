@@ -2,13 +2,17 @@ package com.sixlab.logistics.order_service.domain.model;
 
 import com.sixlab.logistics.common.shared.domain.BasicEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.*;
 
 import java.util.UUID;
 
 @Entity
 @Table(name="p_order") // 1. p_order 인지 p_orders 인지 확인할 것
 @Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
 public class Order extends BasicEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -20,6 +24,12 @@ public class Order extends BasicEntity {
 
     @Column(name = "receiver_id", nullable = false)
     private UUID receiverId; // 수령업체 UUID
+
+    @Column(name = "receiver_name", nullable = false)
+    private String receiverCompanyName; // 클라이언트로부터 전달받은 수령업체 이름
+
+    @Column(name="receiver_salck_id", nullable = false)
+    private String receiverSlackId; // 수령업체(최종소비자의) slack id
 
     @Column(name = "delivery_id", nullable = false)
     private UUID deliveryId; // 배달 UUID
