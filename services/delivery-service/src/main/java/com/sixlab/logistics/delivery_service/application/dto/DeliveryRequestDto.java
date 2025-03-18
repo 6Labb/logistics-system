@@ -20,5 +20,4 @@ public class DeliveryRequestDto {
     private UUID toHubId;
     // private UUID 공급업체 ID;
     // private UUID 수령업체 ID;
-
 }

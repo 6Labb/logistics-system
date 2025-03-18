@@ -68,5 +68,4 @@ public class DeliveryRoute extends BasicEntity {
         this.arrivalHubId = UUID.randomUUID();;
         this.deliveryAgentId = UUID.randomUUID();;
     }
-
 }

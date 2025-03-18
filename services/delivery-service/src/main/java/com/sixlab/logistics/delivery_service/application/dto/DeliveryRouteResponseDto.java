@@ -23,5 +23,4 @@ public class DeliveryRouteResponseDto {
     private UUID depatureId;
     private UUID arrivalHubId;
     private UUID hubDeliveryAgentId;
-
 }
