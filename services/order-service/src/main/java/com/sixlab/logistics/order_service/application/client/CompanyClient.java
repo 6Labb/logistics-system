@@ -11,6 +11,6 @@ import java.util.UUID;
 
 @FeignClient(name="company-service")
 public interface CompanyClient {
-    @GetMapping("/{companyId}")
+    @GetMapping("/companies/{companyId}")
     ApiResponse<GetCompanyResponseDto> getCompanyById(@PathVariable UUID companyId);
 }

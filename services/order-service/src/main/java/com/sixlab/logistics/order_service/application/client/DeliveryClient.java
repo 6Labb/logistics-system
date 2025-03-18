@@ -10,6 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(name="delivery-service")
 public interface DeliveryClient {
     // 배송 생성 메서드 호출
-    @GetMapping
-    ApiResponse<GetProductResponseDto> getProductById(@RequestBody RequestDeliveryRegisterDto dto);
+    @GetMapping("/deliveries")
+    ApiResponse<GetProductResponseDto> requestDeliveryRegister(@RequestBody RequestDeliveryRegisterDto dto);
 }
