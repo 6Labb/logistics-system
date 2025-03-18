@@ -8,6 +8,7 @@ import java.util.UUID;
 
 @Getter
 public class OrderCreateResponseDto {
+    private UUID orderId;
     private final UUID supplierId; // 공급업체 UUID
     private final UUID receiverId; // 수령업체 UUID
     private final UUID deliveryId; // 배달 UUID
@@ -17,10 +18,10 @@ public class OrderCreateResponseDto {
     private final String message; // 요청사항
     private final Status status; // 주문 상태
     private final UUID userId; // 주문자 고유 id
-    // private final String receiverSlackId; // 수령업체 slack id
     private final String receiverName; // 수령인
 
     public OrderCreateResponseDto(Order order) {
+        this.orderId = getOrderId();
         this.supplierId = order.getSupplierId();
         this.receiverId = order.getReceiverId();
         this.deliveryId = order.getDeliveryId();
@@ -30,7 +31,6 @@ public class OrderCreateResponseDto {
         this.message = order.getMessage();
         this.status = order.getStatus();
         this.userId = order.getUserId();
-        // this.receiverSlackId = order.getReceiverSlackId();
         this.receiverName = order.getReceiverName();
     }
 }
