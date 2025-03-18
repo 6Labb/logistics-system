@@ -1,6 +1,6 @@
 package com.sixlab.logistics.company_service.domain.model;
 
-import com.sixlab.logistics.common.domain.BasicEntity;
+import com.sixlab.logistics.common.shared.domain.BasicEntity;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyRequestDto;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyResponseDto;
 import jakarta.persistence.*;
@@ -16,10 +16,9 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "p_company")
+@Table(name = "p_company", schema = "companies")
 public class Company extends BasicEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     private String name;
@@ -36,6 +35,7 @@ public class Company extends BasicEntity {
     // DTO를 엔티티로 변환하는 메소드
     public static Company toEntity(CompanyRequestDto requestDto) {
         return Company.builder()
+                .id(UUID.randomUUID())
                 .name(requestDto.getName())
                 .address(requestDto.getAddress())
                 .type(requestDto.getType()) // DTO에서 Enum을 그대로 받음
@@ -43,10 +43,17 @@ public class Company extends BasicEntity {
                 .build();
     }
 
+    // DTO로부터 엔티티를 업데이트하는 메소드
     public void updateFromDto(CompanyRequestDto dto) {
         this.name = dto.getName();
         this.address = dto.getAddress();
-        this.type = CompanyType.valueOf(String.valueOf(dto.getType()));
+
+        // DTO에서 받은 CompanyType이 유효한지 확인하여 업데이트
+        try {
+            this.type = CompanyType.valueOf(dto.getType().name()); // enum 값으로 매핑
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid company type: " + dto.getType());
+        }
     }
 
 }
