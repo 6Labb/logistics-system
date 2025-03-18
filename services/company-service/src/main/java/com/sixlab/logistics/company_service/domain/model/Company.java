@@ -27,6 +27,8 @@ public class Company extends BasicEntity {
     @Enumerated(EnumType.STRING)
     private CompanyType type;
 
+    private UUID hubId;
+
     // 엔티티에서 DTO로 변환
     public CompanyResponseDto toResponseDto() {
         return new CompanyResponseDto(this.id, this.name, this.address, this.type);
@@ -39,7 +41,7 @@ public class Company extends BasicEntity {
                 .name(requestDto.getName())
                 .address(requestDto.getAddress())
                 .type(requestDto.getType()) // DTO에서 Enum을 그대로 받음
-                //.hub(hub) // Hub는 외부에서 받아와야 함
+                .hubId(requestDto.getHubId())  // Hub UUID는 DTO에서 받음
                 .build();
     }
 
@@ -48,12 +50,13 @@ public class Company extends BasicEntity {
         this.name = dto.getName();
         this.address = dto.getAddress();
 
-        // DTO에서 받은 CompanyType이 유효한지 확인하여 업데이트
         try {
-            this.type = CompanyType.valueOf(dto.getType().name()); // enum 값으로 매핑
+            this.type = CompanyType.valueOf(dto.getType().name());  // enum 값으로 매핑
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid company type: " + dto.getType());
         }
+
+        this.hubId = dto.getHubId();  // 허브 UUID도 업데이트
     }
 
 }
