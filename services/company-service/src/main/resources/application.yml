@@ -6,8 +6,6 @@ spring:
   config:
     import: "configserver:http://localhost:18080"  # Config Server 주소 명시
 
-server:
-  port: 0
 eureka:
   client:
     service-url:
@@ -21,3 +19,5 @@ management:
       exposure:
         include: refresh
 
+server:
+  port: 19094
