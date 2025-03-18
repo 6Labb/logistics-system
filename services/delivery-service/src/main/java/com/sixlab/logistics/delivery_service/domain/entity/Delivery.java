@@ -57,5 +57,4 @@ public class Delivery extends BasicEntity {
     public void updateDeliveryStatus(DeliveryStatus status) {
         this.status = status;
     }
-
 }

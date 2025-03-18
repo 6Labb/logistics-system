@@ -1,6 +1,7 @@
 package com.sixlab.logistics.delivery_service.domain.entity;
 
 public enum DeliveryStatus {
+
     WAITING, // 배송대기
     PENDING_HUB, // 허브대기중
     MOVE_TO_HUB, // 허브이동중

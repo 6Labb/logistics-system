@@ -26,4 +26,5 @@ public class DeliveryResponseDto {
         this.receiveSlackId = delivery.getReceiveSlackId();
         this.companyDeliveryAgentId = delivery.getCompanyDeliveryAgentId();
     }
+    
 }

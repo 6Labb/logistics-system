@@ -1,6 +1,7 @@
 package com.sixlab.logistics.delivery_service.domain.entity;
 
 public enum DeliveryRouteStatus {
+
     PENDING_HUB, // 허브이동대기중
     MOVE_TO_HUB, // 허브이동중
     ARRIVED_HUB, // 경유허브도착
