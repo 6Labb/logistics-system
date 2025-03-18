@@ -1,6 +1,6 @@
 package com.sixlab.logistics.company_service.presentation.controller;
 
-import com.sixlab.logistics.common.exception.ApiResponse;
+import com.sixlab.logistics.common.shared.response.ApiResponse;
 import com.sixlab.logistics.company_service.application.service.CompanyService;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyRequestDto;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyResponseDto;
