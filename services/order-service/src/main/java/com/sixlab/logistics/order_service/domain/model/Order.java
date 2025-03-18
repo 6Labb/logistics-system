@@ -26,10 +26,10 @@ public class Order extends BasicEntity {
     private UUID receiverId; // 수령업체 UUID
 
     @Column(name = "receiver_name", nullable = false)
-    private String receiverCompanyName; // 클라이언트로부터 전달받은 수령업체 이름
+    private String receiverName; // 클라이언트로부터 전달받은 수령업체 이름
 
-    @Column(name="receiver_salck_id", nullable = false)
-    private String receiverSlackId; // 수령업체(최종소비자의) slack id
+    // @Column(name="receiver_salck_id", nullable = false)
+    // private String receiverSlackId; // 수령업체(최종소비자의) slack id
 
     @Column(name = "delivery_id", nullable = false)
     private UUID deliveryId; // 배달 UUID

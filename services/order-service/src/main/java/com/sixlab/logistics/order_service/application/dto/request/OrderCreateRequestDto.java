@@ -16,10 +16,13 @@ import java.util.UUID;
 @Setter
 @ToString
 public class OrderCreateRequestDto {
-    @Email
-    private String receiverSlackId; // 수령업체의(최종소비자) slackId
+    // @Email
+    // private String receiverSlackId; // 수령업체의(최종소비자) slackId
 
-    private String receiverCompanyName; // 수령업체의(최종소비자) 이름
+    // 수령인: 수령업체에서 받을 사람의 이름, 수령인은 달라질 수 있기에 클라이언트로부터 직접 전달받는다.
+    @NotBlank(message = "수령인 작성은 필수 입니다.")
+    private String receiverName;
+
     @NotNull
     private UUID receiverId; // 수령업체 UUID
     @NotNull
@@ -32,19 +35,20 @@ public class OrderCreateRequestDto {
     @NotBlank
     private String message; // 요청사항
 
-    public Order toEntity(UUID supplierId, UUID userId) {
+    public Order toEntity(UUID supplierId, UUID userId, UUID deliveryId) {
         return Order.builder()
                 .receiverId(receiverId)
                 .productId(productId)
                 .address(address)
                 .quantity(quantity)
                 .message(message)
-                .receiverSlackId(receiverSlackId)
+                // .receiverSlackId(receiverSlackId)
                 .status(Status.SUCCESS)
-                .receiverCompanyName(receiverCompanyName)
+                .receiverName(receiverName)
                 .supplierId(supplierId)
                 .quantity(quantity)
                 .userId(userId)
+                .deliveryId(deliveryId)
                 .build();
         // 배달 id 필드의 값은 null
     }
