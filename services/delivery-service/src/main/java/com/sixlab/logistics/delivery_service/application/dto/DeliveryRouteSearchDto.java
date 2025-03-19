@@ -10,6 +10,6 @@ import java.util.UUID;
 public class DeliveryRouteSearchDto {
 
     private UUID deliveryId;
-    private UUID hubDeliveryAgentId;
+    private Long deliveryAgentId;
 }
 

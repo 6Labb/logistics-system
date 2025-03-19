@@ -25,7 +25,7 @@ public class DeliveryRouteResponseDto {
     private UUID deliveryId;
     private UUID fromHubId;
     private UUID toHubId;
-    private UUID deliveryAgentId;
+    private Long deliveryAgentId;
 
     public DeliveryRouteResponseDto(DeliveryRoute deliveryRoute) {
         this.id = deliveryRoute.getId();
