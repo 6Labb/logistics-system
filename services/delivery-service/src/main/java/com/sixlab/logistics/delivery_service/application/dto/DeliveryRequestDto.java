@@ -14,7 +14,7 @@ public class DeliveryRequestDto {
     private DeliveryStatus status;
     private String deliveryAddress;
     private String receiveName;
-    private UUID companyDeliveryAgentId; // 업체배송담당자
+    private Long deliveryAgentId; // 업체배송담당자
     private UUID hubTotalRouteId;
     private UUID fromHubId;
     private UUID toHubId;

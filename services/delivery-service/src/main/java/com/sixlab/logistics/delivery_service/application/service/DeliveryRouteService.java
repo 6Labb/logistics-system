@@ -2,10 +2,8 @@ package com.sixlab.logistics.delivery_service.application.service;
 
 import com.sixlab.logistics.common.shared.exception.ResourceNotFoundException;
 import com.sixlab.logistics.delivery_service.application.dto.*;
-import com.sixlab.logistics.delivery_service.domain.entity.Delivery;
 import com.sixlab.logistics.delivery_service.domain.entity.DeliveryRoute;
 import com.sixlab.logistics.delivery_service.domain.entity.DeliveryRouteStatus;
-import com.sixlab.logistics.delivery_service.domain.entity.DeliveryStatus;
 import com.sixlab.logistics.delivery_service.domain.repository.DeliveryRepository;
 import com.sixlab.logistics.delivery_service.domain.repository.DeliveryRouteRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +19,6 @@ import java.util.UUID;
 public class DeliveryRouteService {
 
     private final DeliveryRouteRepository deliveryRouteRepository;
-    private final DeliveryRepository deliveryRepository;
 
     // 배송 경로 목록 조회
     public Page<DeliveryRouteResponseDto> getAllDeliveryRoute(DeliverySearchDto searchDto, Pageable pageable) {
@@ -104,6 +101,7 @@ public class DeliveryRouteService {
         return new DeliveryRouteResponseDto(deliveryRoute);
     }
 
+    // 배송경로 생성
 
 
 }

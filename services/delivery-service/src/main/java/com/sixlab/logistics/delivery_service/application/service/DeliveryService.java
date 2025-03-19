@@ -10,10 +10,8 @@ import com.sixlab.logistics.delivery_service.domain.entity.DeliveryStatus;
 import com.sixlab.logistics.delivery_service.domain.repository.DeliveryRepository;
 import com.sixlab.logistics.delivery_service.infrastructure.client.CompanyClient;
 import com.sixlab.logistics.delivery_service.infrastructure.client.HubClient;
-import com.sixlab.logistics.delivery_service.infrastructure.client.UserClient;
 import com.sixlab.logistics.delivery_service.infrastructure.client.dto.CompanyResponseDto;
 import com.sixlab.logistics.delivery_service.infrastructure.client.dto.HubTotalRouteResponseDto;
-import com.sixlab.logistics.delivery_service.infrastructure.client.dto.UserDeliveryAgentDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +26,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DeliveryService {
 
-    private final UserClient userClient;
     private final HubClient hubClient;
     private final CompanyClient companyClient;
     private final DeliveryRepository deliveryRepository;
@@ -141,16 +138,8 @@ public class DeliveryService {
         UUID hubTotalRouteId = hubTotalRoute.getHubTotalRouteId();
 
         // 배송담당자 조회
-        List<UserDeliveryAgentDto> agents = userClient.getDeliveryAgentsByHub(toHubId);
-        if (agents.isEmpty()) {
-            throw new ResourceNotFoundException("배송 담당자를 찾을 수 없습니다.");
-        }
 
         // 배송순번이 가장 낮은 담당자를 선택
-        UserDeliveryAgentDto deliveryAgent = agents.stream()
-                .sorted(Comparator.comparingInt(UserDeliveryAgentDto::getDeliverySequence))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("배송 담당자 배정 실패"));
 
         // 배송담당자 순환으로 선택
         // 알고리즘으로 처리
@@ -161,7 +150,7 @@ public class DeliveryService {
                 .fromHubId(fromHubId)
                 .toHubId(toHubId)
                 .hubTotalRouteId(hubTotalRouteId)
-                .companyDeliveryAgentId(deliveryAgent.getDeliveryAgentId())
+                .deliveryAgentId(Long.valueOf("12345"))
                 .build();
 
         // 배송 저장

@@ -11,5 +11,4 @@ public class DeliverySearchDto {
 
     private UUID deliveryId;
     private String receiveName;
-    private String receiveSlackId;
 }
