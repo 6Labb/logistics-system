@@ -61,22 +61,9 @@ public class OrderController {
     @GetMapping
     @Operation(summary = "주문 전체 조회")
     public ApiResponse<?> findAllOrders(UserInfo user) {
-
-        if(user.getRole().equals(UserInfo.Role.MASTER)) {
-            // user 의 권한이 MASTER 라면
-            List<OrderFindOneResponseDto> orderList = orderService.findAllOrders();
-            if(orderList.isEmpty()) return ApiResponse.success(null, "주문내역이 존재하지 않습니다.");
-            return ApiResponse.success(orderList, orderList.size()+" 건의 주문내역이 조회되었습니다.");
-        }
-
-        // 1. 허브 관리자는 담당 허브 조회만 가능하다는데 이걸 어떤 로직으로 풀어나가야할지...?
-
-        if(user.getRole().equals(UserInfo.Role.DELIVERY_AGENT) || user.getRole().equals(UserInfo.Role.TRADE_PARTNER)) {
-            List<OrderFindOneResponseDto> orderList = orderService.findAllOrders(user.getUserId());
-            if(orderList.isEmpty()) return ApiResponse.success(null, "주문내역이 존재하지 않습니다.");
-            return ApiResponse.success(orderList, orderList.size()+" 건의 주문내역이 조회되었습니다.");
-        }
-        return ApiResponse.fail(HttpStatus.BAD_REQUEST, null);
+        List<OrderFindOneResponseDto> dtoList = orderService.getOrderListByRole(user);
+        if(dtoList.isEmpty()) return ApiResponse.success(null, "주문내역이 존재하지 않습니다.");
+        return ApiResponse.success(dtoList, dtoList.size()+" 건의 주문내역이 조회되었습니다.");
     }
 
     @GetMapping("/{orderId}")

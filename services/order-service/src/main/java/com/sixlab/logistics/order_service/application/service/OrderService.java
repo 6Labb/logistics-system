@@ -7,6 +7,7 @@ import com.sixlab.logistics.order_service.application.client.CompanyClient;
 import com.sixlab.logistics.order_service.application.client.DeliveryClient;
 import com.sixlab.logistics.order_service.application.client.HubClient;
 import com.sixlab.logistics.order_service.application.client.ProductClient;
+import com.sixlab.logistics.order_service.application.dto.UserInfo;
 import com.sixlab.logistics.order_service.application.dto.request.OrderCreateRequestDto;
 
 import com.sixlab.logistics.order_service.application.dto.request.OrderInfoUpdateRequestDto;
@@ -229,29 +230,28 @@ public class OrderService {
     }
 
     // --------------------------------------------------------------
-    // 모든 주문내역 조회: MASTER
-    public List<OrderFindOneResponseDto> findAllOrders() {
-        List<Order> findOrderList = orderJpaRepository.findAll();
-        List<OrderFindOneResponseDto> orderList = new ArrayList<>();
-
-        if(!findOrderList.isEmpty()) {
-            for(Order order : findOrderList) {
-                orderList.add(new OrderFindOneResponseDto(order));
-            }
-        }
-        return orderList;
+    public List<OrderFindOneResponseDto> getOrderListByRole(UserInfo user) {
+            switch(user.getRole()) {
+                case MASTER:
+                    return transDtoList(orderJpaRepository.findAll());
+                // 1. 허브 관리자는 담당 허브 조회만 가능하다는데 이걸 어떤 로직으로 풀어나가야할지...?
+                // case HUB_MANAGER:
+                case DELIVERY_AGENT:
+                case TRADE_PARTNER:
+            }    // 허브 매니저 로직을 추가하기 전이라 허브 매니저도 하기와 같은 코드가 작동됨.
+        return transDtoList(orderJpaRepository.findAllByUserId(user.getUserId())
+        );
     }
 
-    // 모든 주문내역 조회: DELIVERY_AGENT, TRADE_PARTNER
-    public List<OrderFindOneResponseDto> findAllOrders(Long userId) {
-        List<Order> findOrderList = orderJpaRepository.findAllByUserId(userId);
-        List<OrderFindOneResponseDto> orderList = new ArrayList<>();
-
-        if(!findOrderList.isEmpty()) {
-            for(Order order : findOrderList) {
-                orderList.add(new OrderFindOneResponseDto(order));
+    private List<OrderFindOneResponseDto> transDtoList(List<Order> orderList) {
+        List<OrderFindOneResponseDto> dtoList = new ArrayList<>();
+        if(!orderList.isEmpty()) {
+            for(Order order : orderList) {
+                dtoList.add(new OrderFindOneResponseDto(order));
             }
         }
-        return orderList;
+        // 데이터베이스로부터 반환된 행이 0 이라면 비어있는 리스트가 반환됨.
+        return dtoList;
     }
 }
+

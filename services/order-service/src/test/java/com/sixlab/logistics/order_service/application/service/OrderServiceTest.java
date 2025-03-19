@@ -1,6 +1,7 @@
 package com.sixlab.logistics.order_service.application.service;
 
 import com.sixlab.logistics.order_service.OrderServiceApplication;
+import com.sixlab.logistics.order_service.application.dto.UserInfo;
 import com.sixlab.logistics.order_service.application.dto.request.OrderCreateRequestDto;
 import com.sixlab.logistics.order_service.application.dto.request.OrderInfoUpdateRequestDto;
 import com.sixlab.logistics.order_service.application.dto.response.OrderCreateResponseDto;
@@ -111,9 +112,9 @@ class OrderServiceTest {
     @Rollback(value = false)
     void test5() {
         // given
-        Long userId = 1L;
+        UserInfo user = new UserInfo(1L, UserInfo.Role.MASTER);
         // when
-        List<OrderFindOneResponseDto> orderList = orderService.findAllOrders(userId);
+        List<OrderFindOneResponseDto> orderList = orderService.getOrderListByRole(user);
 
         // then
         Assertions.assertThat(orderList.size()).isEqualTo(2);
