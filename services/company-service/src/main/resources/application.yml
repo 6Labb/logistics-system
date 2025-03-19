@@ -21,3 +21,8 @@ management:
 
 server:
   port: 19094
+
+
+feign:
+  circuitbreaker:
+    enabled: true  # Fallback 기능을 활성화

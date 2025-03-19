@@ -2,7 +2,9 @@ package com.sixlab.logistics.company_service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
+@EnableFeignClients(basePackages = "com.sixlab.logistics")
 @SpringBootApplication
 public class CompanyServiceApplication {
 

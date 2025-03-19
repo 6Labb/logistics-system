@@ -6,6 +6,7 @@ import com.sixlab.logistics.company_service.domain.model.Company;
 import com.sixlab.logistics.company_service.domain.repository.CompanyRepository;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyRequestDto;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyResponseDto;
+import com.sixlab.logistics.company_service.presentation.dto.ExternalCompanyResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,11 +21,17 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CompanyServiceImpl implements CompanyService {
     private final CompanyRepository companyRepository;
-    //private final HubClient hubClient;
+    private final HubClient hubClient;
 
     @Transactional
     @Override
     public CompanyResponseDto createCompany(CompanyRequestDto requestDto) {
+        // hubId가 실제 Hub 서비스에 존재하는지 검증
+//        ExternalCompanyResponse hubResponse = hubClient.getHubById(requestDto.getHubId());
+//        if (hubResponse == null) {
+//            throw new ResourceNotFoundException("해당 hubId가 존재하지 않습니다.");
+//        }
+
         // 중복 검사
         if (companyRepository.existsByName(requestDto.getName())) {
             throw new DuplicateResourceException("이미 존재하는 회사입니다.");
