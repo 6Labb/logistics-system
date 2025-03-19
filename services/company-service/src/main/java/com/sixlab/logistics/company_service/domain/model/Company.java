@@ -29,34 +29,27 @@ public class Company extends BasicEntity {
 
     private UUID hubId;
 
-    // 엔티티에서 DTO로 변환
+    // Company 엔티티 -> CompanyResponseDto로 변환
     public CompanyResponseDto toResponseDto() {
         return new CompanyResponseDto(this.id, this.name, this.address, this.type);
     }
-
-    // DTO를 엔티티로 변환하는 메소드
+    // CompanyRequestDto를 받아 Company 엔티티로 변환하는 메소드
     public static Company toEntity(CompanyRequestDto requestDto) {
         return Company.builder()
                 .id(UUID.randomUUID())
                 .name(requestDto.getName())
                 .address(requestDto.getAddress())
-                .type(requestDto.getType()) // DTO에서 Enum을 그대로 받음
+                .type(requestDto.getType())
                 .hubId(requestDto.getHubId())  // Hub UUID는 DTO에서 받음
                 .build();
     }
 
-    // DTO로부터 엔티티를 업데이트하는 메소드
-    public void updateFromDto(CompanyRequestDto dto) {
-        this.name = dto.getName();
-        this.address = dto.getAddress();
-
-        try {
-            this.type = CompanyType.valueOf(dto.getType().name());  // enum 값으로 매핑
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid company type: " + dto.getType());
-        }
-
-        this.hubId = dto.getHubId();  // 허브 UUID도 업데이트
+    public void updateCompany(String name, String address, CompanyType type, UUID hubId) {
+        this.name = name;
+        this.address = address;
+        this.type = type;
+        this.hubId = hubId;
     }
+
 
 }

@@ -6,13 +6,11 @@ import com.sixlab.logistics.company_service.domain.model.Company;
 import com.sixlab.logistics.company_service.domain.repository.CompanyRepository;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyRequestDto;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyResponseDto;
-import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -22,7 +20,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CompanyServiceImpl implements CompanyService {
     private final CompanyRepository companyRepository;
-    private final HubClient hubClient;
+    //private final HubClient hubClient;
 
     @Transactional
     @Override
@@ -31,12 +29,15 @@ public class CompanyServiceImpl implements CompanyService {
         if (companyRepository.existsByName(requestDto.getName())) {
             throw new DuplicateResourceException("이미 존재하는 회사입니다.");
         }
-        // CompanyRequestDto를 Entity로 변환
+
+        // CompanyRequestDto를 Entity로 변환 -> hubId 포함되있음
         Company company = Company.toEntity(requestDto);
+
         // 업체 저장
         log.info("Saving company: {}", company);
         company = companyRepository.save(company);
-        // 저장된 업체를 DTO로 변환하여 반환 (필요한 경우 추가적인 변환 메소드 작성)
+
+        // 저장된 업체를 DTO로 변환하여 반환
         return new CompanyResponseDto(company);
     }
 
@@ -69,17 +70,16 @@ public class CompanyServiceImpl implements CompanyService {
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(() -> new ResourceNotFoundException("업체를 찾을 수 없습니다."));
 
-        // DTO의 값을 이용하여 업체 정보를 업데이트
-        company.updateFromDto(requestDto); // 엔티티 내에서 DTO 값을 반영하도록 메소드 구현
+        // 엔티티의 메소드 활용
+        company.updateCompany(
+                requestDto.getName(),
+                requestDto.getAddress(),
+                requestDto.getType(),
+                requestDto.getHubId()
+        );
 
-        try {
-            // 업체 저장
-            company = companyRepository.save(company);
-        } catch (OptimisticLockException e) {
-            throw new ConcurrentModificationException("동시에 수정된 업체입니다. 다시 시도해주세요.");
-        }
-        // 수정된 업체를 DTO로 변환하여 반환
         return new CompanyResponseDto(company);
+
     }
 
     @Transactional
