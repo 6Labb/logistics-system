@@ -21,8 +21,6 @@ public interface DeliveryJpaRepository extends JpaRepository<Delivery, UUID> {
     // 배송담당자id로 조회
     //Page<Delivery> findByCompanyDeliveryAgentId(UUID companyDeliveryAgentId, Pageable pageable);
 
-    // 배송리스트 조회
-    Page<Delivery> findAll(Pageable pageable);
 
     // id로 조회
     Optional<Delivery> findById(UUID id);
@@ -32,5 +30,8 @@ public interface DeliveryJpaRepository extends JpaRepository<Delivery, UUID> {
 
     // 배송 생성
     Delivery save(Delivery delivery);
+
+    // 마지막으로 할당된 배송순번 조회
+    Optional<Delivery> findTopByToHubIdOrderByCreatedAtDesc(UUID toHubId);
 
 }

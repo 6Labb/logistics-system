@@ -12,8 +12,6 @@ import java.util.UUID;
 @Repository
 public interface DeliveryRouteJpaRepository extends JpaRepository<DeliveryRoute, UUID> {
 
-    Page<DeliveryRoute> findAll(Pageable pageable);
-
     Page<DeliveryRoute> findAllByDeliveryId(Pageable pageable, UUID deliveryId);
 
     Optional<DeliveryRoute> findById(UUID id);

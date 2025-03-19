@@ -12,12 +12,17 @@ import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.Comp
 import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.HubClient;
 import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.dto.CompanyResponseDto;
 import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.dto.HubTotalRouteResponseDto;
+import com.sixlab.logistics.delivery_service.deliveryAgent.domain.entity.DeliveryAgent;
+import com.sixlab.logistics.delivery_service.deliveryAgent.domain.entity.DeliveryAgentType;
+import com.sixlab.logistics.delivery_service.deliveryAgent.domain.repository.DeliveryAgentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -27,6 +32,7 @@ public class DeliveryService {
     private final HubClient hubClient;
     private final CompanyClient companyClient;
     private final DeliveryRepository deliveryRepository;
+    private final DeliveryAgentRepository deliveryAgentRepository;
 
     // 배송 리스트 조회
     public Page<DeliveryResponseDto> getAllDeliveries(DeliverySearchDto searchDto, Pageable pageable) {
@@ -35,8 +41,7 @@ public class DeliveryService {
             // 허브담당자는 본인의 허브 배송리스트만 가능
             // 배송담당자는 본인의 배송리스트만 가능
 
-        Page<Delivery> deliveries = deliveryRepository.findAll(pageable);
-        return deliveries.map(DeliveryResponseDto::new);
+        return deliveryRepository.searchDeliveryList(searchDto, pageable);
     }
 
     // 배송 개별 조회
@@ -136,11 +141,62 @@ public class DeliveryService {
         UUID hubTotalRouteId = hubTotalRoute.getHubTotalRouteId();
 
         // 배송담당자 조회
+        // 도착 허브(toHubId)에 속한 배송담당자 중 COMPANY 타입 조회
+        List<DeliveryAgent> deliveryAgents = deliveryAgentRepository.findByHubIdAndTypeOrderByDeliverySequenceAsc(
+                toHubId, DeliveryAgentType.COMPANY);
 
-        // 배송순번이 가장 낮은 담당자를 선택
+        if (deliveryAgents.isEmpty()) {
+            throw new ResourceNotFoundException("해당 허브에 배송담당자가 없습니다.");
+        }
 
-        // 배송담당자 순환으로 선택
-        // 알고리즘으로 처리
+        // 배송 테이블에서 해당 도착허브에 배정된 가장 최근 배송 조회
+        Optional<Delivery> lastDelivery = deliveryRepository.findTopByToHubIdOrderByCreatedAtDesc(toHubId);
+
+        Long deliveryAgentId;
+
+        if (lastDelivery.isEmpty()) {
+            // 3. 해당 허브의 첫 배송인 경우 순번 0인 담당자 배정
+            DeliveryAgent firstAgent = deliveryAgents.stream()
+                    .filter(agent -> agent.getDeliverySequence() == 0)
+                    .findFirst()
+                    .orElse(deliveryAgents.get(0)); // 순번 0이 없으면 가장 낮은 순번의 담당자
+
+            deliveryAgentId = firstAgent.getUserId();
+        } else {
+            // 마지막 배송의 담당자 정보 조회
+            Optional<DeliveryAgent> lastAgent = deliveryAgentRepository.findByUserId(
+                    lastDelivery.get().getDeliveryAgentId());
+
+            if (lastAgent.isEmpty()) {
+                // 이전 담당자 정보가 없으면 순번 0 담당자 배정
+                DeliveryAgent firstAgent = deliveryAgents.stream()
+                        .filter(agent -> agent.getDeliverySequence() == 0)
+                        .findFirst()
+                        .orElse(deliveryAgents.get(0));
+
+                deliveryAgentId = firstAgent.getUserId();
+            } else {
+                // 이전 순번 다음 순번으로 배정
+                int lastSequence = lastAgent.get().getDeliverySequence();
+
+                // 다음 순번의 담당자 찾기
+                Optional<DeliveryAgent> nextAgent = deliveryAgents.stream()
+                        .filter(agent -> agent.getDeliverySequence() > lastSequence)
+                        .findFirst();
+
+                // 다음 순번의 담당자가 없으면 다시 순번 낮은 담당자로 돌아감
+                if (nextAgent.isPresent()) {
+                    deliveryAgentId = nextAgent.get().getUserId();
+                } else {
+                    DeliveryAgent firstAgent = deliveryAgents.stream()
+                            .filter(agent -> agent.getDeliverySequence() == 0)
+                            .findFirst()
+                            .orElse(deliveryAgents.get(0));
+
+                    deliveryAgentId = firstAgent.getUserId();
+                }
+            }
+        }
 
         // 배송 생성
         Delivery delivery = Delivery.builder()
@@ -148,7 +204,7 @@ public class DeliveryService {
                 .fromHubId(fromHubId)
                 .toHubId(toHubId)
                 .hubTotalRouteId(hubTotalRouteId)
-                .deliveryAgentId(Long.valueOf("12345"))
+                .deliveryAgentId(deliveryAgentId)
                 .build();
 
         // 배송 저장

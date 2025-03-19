@@ -39,7 +39,7 @@ public class DeliveryController {
     @GetMapping("/deliveries")
     public ApiResponse<Page<DeliveryResponseDto>> getAllDeliveries(
             @ModelAttribute DeliverySearchDto searchDto,
-            @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable) {
+            @PageableDefault(page = 0, size = 10, sort = "deliveryAgentId", direction = Sort.Direction.ASC) Pageable pageable) {
 
         Page<DeliveryResponseDto> deliveries = deliveryService.getAllDeliveries(searchDto, pageable);
         return ApiResponse.success(HttpStatus.OK, deliveries, "SUCCESS");

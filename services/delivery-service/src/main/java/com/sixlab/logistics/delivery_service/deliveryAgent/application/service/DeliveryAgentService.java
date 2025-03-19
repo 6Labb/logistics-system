@@ -1,17 +1,6 @@
 package com.sixlab.logistics.delivery_service.deliveryAgent.application.service;
 
 import com.sixlab.logistics.common.shared.exception.ResourceNotFoundException;
-import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliveryRequestDto;
-import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliveryResponseDto;
-import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliverySearchDto;
-import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliveryStatusResponseDto;
-import com.sixlab.logistics.delivery_service.delivery.domain.entity.Delivery;
-import com.sixlab.logistics.delivery_service.delivery.domain.entity.DeliveryStatus;
-import com.sixlab.logistics.delivery_service.delivery.domain.repository.DeliveryRepository;
-import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.CompanyClient;
-import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.HubClient;
-import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.dto.CompanyResponseDto;
-import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.dto.HubTotalRouteResponseDto;
 import com.sixlab.logistics.delivery_service.deliveryAgent.application.dto.DeliveryAgentRequestDto;
 import com.sixlab.logistics.delivery_service.deliveryAgent.application.dto.DeliveryAgentResponseDto;
 import com.sixlab.logistics.delivery_service.deliveryAgent.application.dto.DeliveryAgentSearchDto;
@@ -22,8 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -38,8 +25,8 @@ public class DeliveryAgentService {
             // 허브담당자는 본인의 허브 배송 담당자 리스트만 가능
             // 배송담당자는 본인의 배송 담당자 리스트만 가능
 
-        Page<DeliveryAgent> deliveryAgents = deliveryAgentRepository.findAll(pageable);
-        return deliveryAgents.map(DeliveryAgentResponseDto::new);
+        return deliveryAgentRepository.searchDeliveryAgentList(searchDto, pageable);
+
     }
 
     // 배송 담당자 개별 조회
@@ -91,13 +78,9 @@ public class DeliveryAgentService {
     // 배송 담당자 생성
     @Transactional
     public DeliveryAgentResponseDto createDeliveryAgent(DeliveryAgentRequestDto requestDto) {
+        // 관리자만 가능
 
-        // 배송 담당자 생성
-        DeliveryAgent deliveryAgent = DeliveryAgent.builder()
-                .requestDto(requestDto)
-                .build();
-
-        // 배송 저장
+        DeliveryAgent deliveryAgent = new DeliveryAgent(requestDto);
         DeliveryAgent savedDeliveryAgent = deliveryAgentRepository.save(deliveryAgent);
 
         return new DeliveryAgentResponseDto(savedDeliveryAgent);
