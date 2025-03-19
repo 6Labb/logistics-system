@@ -1,5 +1,8 @@
 package com.sixlab.logistics.delivery_service.application.dto;
 
+import com.sixlab.logistics.delivery_service.domain.entity.Delivery;
+import com.sixlab.logistics.delivery_service.domain.entity.DeliveryRoute;
+import com.sixlab.logistics.delivery_service.domain.entity.DeliveryRouteStatus;
 import com.sixlab.logistics.delivery_service.domain.entity.DeliveryStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,10 +21,23 @@ public class DeliveryRouteResponseDto {
     private Integer esimateTime;
     private Double actualDistance;
     private Integer actualTime;
-    private DeliveryStatus status;
+    private DeliveryRouteStatus status;
     private UUID deliveryId;
-    private UUID depatureId;
-    private UUID arrivalHubId;
-    private UUID hubDeliveryAgentId;
+    private UUID fromHubId;
+    private UUID toHubId;
+    private UUID deliveryAgentId;
 
+    public DeliveryRouteResponseDto(DeliveryRoute deliveryRoute) {
+        this.id = deliveryRoute.getId();
+        this.sequence = deliveryRoute.getSequence();
+        this.esimateDistance = deliveryRoute.getEstimatedDistance();
+        this.esimateTime = deliveryRoute.getEstimatedTime();
+        this.status = deliveryRoute.getStatus();
+        this.actualDistance = deliveryRoute.getActualDistance();
+        this.actualTime = deliveryRoute.getActualTime();
+        this.deliveryId = deliveryRoute.getDeliveryId();
+        this.fromHubId = deliveryRoute.getFromHubId();
+        this.toHubId = deliveryRoute.getToHubId();
+        this.deliveryAgentId = deliveryRoute.getDeliveryAgentId();
+    }
 }

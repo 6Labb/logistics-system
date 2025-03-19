@@ -1,0 +1,41 @@
+package com.sixlab.logistics.delivery_service.infrastructure.repository;
+
+import com.sixlab.logistics.delivery_service.domain.entity.DeliveryRoute;
+import com.sixlab.logistics.delivery_service.domain.repository.DeliveryRouteRepository;
+import com.sixlab.logistics.delivery_service.infrastructure.jpa.DeliveryRouteJpaRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+import java.util.UUID;
+
+@Repository
+@RequiredArgsConstructor
+public class DeliveryRouteRepositoryImpl implements DeliveryRouteRepository {
+
+    private final DeliveryRouteJpaRepository jpaRepository;
+
+    @Override
+    public Page<DeliveryRoute> findAll(Pageable pageable) {
+        return jpaRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<DeliveryRoute> findAllByDeliveryId(Pageable pageable, UUID deliveryId) {
+        return jpaRepository.findAllByDeliveryId(pageable, deliveryId);
+    }
+
+    @Override
+    public Optional<DeliveryRoute> findById(UUID id) {
+        return jpaRepository.findById(id);
+    }
+
+    @Override
+    public void delete(DeliveryRoute deliveryRoute) {
+        jpaRepository.delete(deliveryRoute);
+    }
+
+}

@@ -29,31 +29,30 @@ public class Delivery extends BasicEntity {
     @Column(length = 50, nullable = false)
     private String receiveName;
 
-    @Column(length = 50, nullable = false)
-    private String receiveSlackId;
-
     private UUID fromHubId;
 
     private UUID toHubId;
 
-    private UUID orderId;
-
     private UUID companyDeliveryAgentId;
 
+    private UUID hubTotalRouteId;
+
     @Builder
-    public Delivery(DeliveryRequestDto requestDto, UUID orderId, UUID fromHubId, UUID toHubId) {
+    public Delivery(DeliveryRequestDto requestDto, UUID fromHubId, UUID toHubId, UUID hubTotalRouteId, UUID companyDeliveryAgentId, UUID supplierCompanyId) {
+        super();
         this.status = DeliveryStatus.WAITING;
         this.deliveryAddress = requestDto.getDeliveryAddress();
         this.receiveName = requestDto.getReceiveName();
-        this.companyDeliveryAgentId = requestDto.getCompanyDeliveryAgentId();
-        this.orderId = orderId;
+        this.companyDeliveryAgentId = companyDeliveryAgentId;
         this.fromHubId = fromHubId;
         this.toHubId = toHubId;
+        this.hubTotalRouteId = hubTotalRouteId;
     }
 
     public void updateDelivery(DeliveryRequestDto requestDto) {
         this.deliveryAddress = requestDto.getDeliveryAddress();
     }
+
     public void updateDeliveryStatus(DeliveryStatus status) {
         this.status = status;
     }
