@@ -9,11 +9,8 @@ import com.sixlab.logistics.order_service.application.client.ProductClient;
 import com.sixlab.logistics.order_service.application.dto.request.OrderCreateRequestDto;
 
 import com.sixlab.logistics.order_service.application.dto.request.RequestDeliveryRegisterDto;
-import com.sixlab.logistics.order_service.application.dto.response.GetCompanyResponseDto;
+import com.sixlab.logistics.order_service.application.dto.response.*;
 import com.sixlab.logistics.order_service.application.dto.response.GetCompanyResponseDto.Type;
-import com.sixlab.logistics.order_service.application.dto.response.GetProductResponseDto;
-import com.sixlab.logistics.order_service.application.dto.response.OrderCreateResponseDto;
-import com.sixlab.logistics.order_service.application.dto.response.ResponseDeliveryRegisterDto;
 import com.sixlab.logistics.order_service.domain.model.Order;
 import com.sixlab.logistics.order_service.infrastructure.persistence.OrderJpaRepository;
 import lombok.RequiredArgsConstructor;
@@ -105,7 +102,7 @@ public class OrderService {
             throw new ResourceNotFoundException("수령업체 정보가 존재하지 않습니다.");
         }
 
-        // 4. 배송등록 마이크로 서비스 호출에 전달한 데이터 생성
+        // 4. 배송등록 마이크로 서비스 호출에 전달할 데이터 생성
         RequestDeliveryRegisterDto requestDeliveryRegisterDto = RequestDeliveryRegisterDto.builder()
                 .supplierCompanyId(getProduct.getCompanyId()) // 공급업체 id
                 .receiverCompanyId(getCompanyInfo.getId()) // 수령업체 id
@@ -133,5 +130,16 @@ public class OrderService {
         Order order = dto.toEntity(getProduct.getCompanyId(), userId, getDelivery.getId());
         Order savedOrder = orderJpaRepository.save(order);
         return new OrderCreateResponseDto(savedOrder);
+    }
+
+    // 권한확인 x
+    // 주문 단건 조회 서비스
+    public OrderFindOneResponseDto findOneOrder(UUID orderId) {
+        Order order = orderJpaRepository.findById(orderId).orElseThrow(() -> {
+            log.info("주문정보가 없음");
+            return new ResourceNotFoundException("주문 정보를 찾을 수 없습니다.");
+        });
+
+        return new OrderFindOneResponseDto(order);
     }
 }

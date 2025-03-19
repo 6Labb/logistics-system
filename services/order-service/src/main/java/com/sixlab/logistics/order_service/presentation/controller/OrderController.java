@@ -4,13 +4,17 @@ import com.sixlab.logistics.common.shared.response.ApiResponse;
 import com.sixlab.logistics.order_service.application.dto.request.OrderCreateRequestDto;
 import com.sixlab.logistics.order_service.application.dto.response.GetProductResponseDto;
 import com.sixlab.logistics.order_service.application.dto.response.OrderCreateResponseDto;
+import com.sixlab.logistics.order_service.application.dto.response.OrderFindOneResponseDto;
 import com.sixlab.logistics.order_service.application.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RefreshScope
 @RestController
@@ -49,11 +53,15 @@ public class OrderController {
         return ApiResponse.success(order, "주문이 성공적으로 등록되었습니다.");
     }
 
-//    @GetMapping("/{orderId}")
-//    @Operation(summary = "주문 단건 조회")
-//    public ApiResponse<?> findOneOrder(){
-//
-//    }
+    @GetMapping("/{orderId}")
+    @Operation(summary = "주문 단건 조회")
+    public ApiResponse<?> findOneOrder(@PathVariable UUID orderId
+                                       /*@AuthenticationPrincipal UserPrincipal userPrincipal*/){
+        // 로그 찍히는거 확인 - /orders/24938764-7944-4f95-9774-5c8d6335b256: findOneOrder 메서드 호출
+        log.info("/orders/{}: findOneOrder 메서드 호출", orderId);
+        OrderFindOneResponseDto findOrder = orderService.findOneOrder(orderId);// (orderId, userPrincipal)
+        return ApiResponse.success(findOrder, "주문이 성공적으로 조회되었습니다.");
+    }
 
 
 
