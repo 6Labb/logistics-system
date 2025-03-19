@@ -1,0 +1,21 @@
+package com.sixlab.logistics.delivery_service.delivery.domain.repository;
+
+import com.sixlab.logistics.delivery_service.delivery.domain.entity.DeliveryRoute;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import java.util.Optional;
+import java.util.UUID;
+
+public interface DeliveryRouteRepository {
+
+    Page<DeliveryRoute> findAll(Pageable pageable);
+
+    Page<DeliveryRoute> findAllByDeliveryId(Pageable pageable, UUID deliveryId);
+
+    Optional<DeliveryRoute> findById(UUID id);
+
+    void delete(DeliveryRoute deliveryRoute);
+
+
+}
