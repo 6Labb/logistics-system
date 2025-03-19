@@ -38,7 +38,7 @@ public class DeliveryAgent extends BasicEntity {
         this.type = requestDto.getType();
         this.deliverySequence = requestDto.getDeliverySequence();
         this.hubId = UUID.randomUUID();
-        this.slackId = UUID.randomUUID().toString();
+        this.slackId = requestDto.getSlackId();
     }
 
     public void updateDeliveryAgent(DeliveryAgentRequestDto requestDto) {

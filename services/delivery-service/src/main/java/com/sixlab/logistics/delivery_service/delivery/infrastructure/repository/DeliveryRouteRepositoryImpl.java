@@ -1,5 +1,9 @@
 package com.sixlab.logistics.delivery_service.delivery.infrastructure.repository;
 
+import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliveryResponseDto;
+import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliveryRouteResponseDto;
+import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliveryRouteSearchDto;
+import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliverySearchDto;
 import com.sixlab.logistics.delivery_service.delivery.domain.entity.DeliveryRoute;
 import com.sixlab.logistics.delivery_service.delivery.domain.repository.DeliveryRouteRepository;
 import com.sixlab.logistics.delivery_service.delivery.infrastructure.jpa.DeliveryRouteJpaRepository;
@@ -16,10 +20,11 @@ import java.util.UUID;
 public class DeliveryRouteRepositoryImpl implements DeliveryRouteRepository {
 
     private final DeliveryRouteJpaRepository jpaRepository;
+    private final DeliveryRouteQueryRepository deliveryRouteQueryRepository;
 
     @Override
-    public Page<DeliveryRoute> findAll(Pageable pageable) {
-        return jpaRepository.findAll(pageable);
+    public Page<DeliveryRouteResponseDto> searchDeliveryRouteList(DeliveryRouteSearchDto searchDto, Pageable pageable) {
+        return deliveryRouteQueryRepository.searchDeliveryRouteList(searchDto, pageable);
     }
 
     @Override

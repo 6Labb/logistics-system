@@ -1,6 +1,10 @@
 package com.sixlab.logistics.delivery_service.delivery.domain.repository;
 
+import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliveryResponseDto;
+import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliverySearchDto;
 import com.sixlab.logistics.delivery_service.delivery.domain.entity.Delivery;
+import com.sixlab.logistics.delivery_service.deliveryAgent.application.dto.DeliveryAgentResponseDto;
+import com.sixlab.logistics.delivery_service.deliveryAgent.application.dto.DeliveryAgentSearchDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -16,10 +20,9 @@ public interface DeliveryRepository {
     //Page<Delivery> findByFromHubId(UUID fromHubId, Pageable pageable);
 
     // 배송담당자id로 조회
-    //Page<Delivery> findByCompanyDeliveryAgentId(UUID companyDeliveryAgentId, Pageable pageable);
+    //Page<Delivery> findByDeliveryAgentId(UUID deliveryAgentId, Pageable pageable);
 
-    // 배송리스트 조회
-    Page<Delivery> findAll(Pageable pageable);
+    Page<DeliveryResponseDto> searchDeliveryList(DeliverySearchDto searchDto, Pageable pageable);
 
     // id로 조회
     Optional<Delivery> findById(UUID id);
@@ -29,4 +32,7 @@ public interface DeliveryRepository {
 
     // 배송 생성
     Delivery save(Delivery delivery);
+
+    // 마지막으로 할당된 배송순번 조회
+    Optional<Delivery> findTopByToHubIdOrderByCreatedAtDesc(UUID toHubId);
 }

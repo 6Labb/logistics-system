@@ -9,6 +9,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DeliverySearchDto {
 
-    private UUID deliveryId;
+    private Long deliveryAgentId;
     private String receiveName;
 }

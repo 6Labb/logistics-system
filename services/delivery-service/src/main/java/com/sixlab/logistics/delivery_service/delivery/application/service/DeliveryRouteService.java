@@ -22,15 +22,15 @@ public class DeliveryRouteService {
     // 배송 경로 목록 조회
     public Page<DeliveryRouteResponseDto> getAllDeliveryRoute(DeliveryRouteSearchDto searchDto, Pageable pageable) {
 
-        Page<DeliveryRoute> deliveryRoute = deliveryRouteRepository.findAll(pageable);
-        return deliveryRoute.map(DeliveryRouteResponseDto::new);
+        return deliveryRouteRepository.searchDeliveryRouteList(searchDto, pageable);
     }
 
     // 특정 배송 모든 경로 조회
     public Page<DeliveryRouteResponseDto> getAllDeliveryRouteByDeliveryId(DeliveryRouteSearchDto searchDto, Pageable pageable, UUID deliveryId) {
 
-        Page<DeliveryRoute> deliveryRoutes = deliveryRouteRepository.findAllByDeliveryId(pageable, deliveryId);
-        return deliveryRoutes.map(DeliveryRouteResponseDto::new);
+        //Page<DeliveryRoute> deliveryRoutes = deliveryRouteRepository.findAllByDeliveryId(pageable, deliveryId);
+        //return deliveryRoutes.map(DeliveryRouteResponseDto::new);
+        return deliveryRouteRepository.searchDeliveryRouteList(searchDto, pageable);
     }
 
     // 특정 배송 모든 경로 개별 조회

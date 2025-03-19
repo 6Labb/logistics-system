@@ -1,17 +1,11 @@
 package com.sixlab.logistics.delivery_service.deliveryAgent.presentation.controller;
 
 import com.sixlab.logistics.common.shared.response.ApiResponse;
-import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliveryRequestDto;
-import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliveryResponseDto;
-import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliverySearchDto;
-import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliveryStatusResponseDto;
-import com.sixlab.logistics.delivery_service.delivery.application.service.DeliveryService;
 import com.sixlab.logistics.delivery_service.deliveryAgent.application.dto.DeliveryAgentRequestDto;
 import com.sixlab.logistics.delivery_service.deliveryAgent.application.dto.DeliveryAgentResponseDto;
 import com.sixlab.logistics.delivery_service.deliveryAgent.application.dto.DeliveryAgentSearchDto;
 import com.sixlab.logistics.delivery_service.deliveryAgent.application.service.DeliveryAgentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,8 +13,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 @RefreshScope
 @RestController
