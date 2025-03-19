@@ -1,10 +1,10 @@
 package com.sixlab.logistics.slack_ai_service.Messenger.application.service;
 
 import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.SlackMessageInfoDto;
-import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.SlackSendRequestDto;
-import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.SlackSendResponseDto;
-import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.SlackUserResponseDto;
-import com.sixlab.logistics.slack_ai_service.Messenger.infrastructure.feign.SlackApiClient;
+import com.sixlab.logistics.common.shared.dto.SlackSendRequestDto;
+import com.sixlab.logistics.common.shared.dto.SlackSendResponseDto;
+import com.sixlab.logistics.common.shared.dto.SlackUserResponseDto;
+import com.sixlab.logistics.common.shared.feign.SlackApiClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,7 +22,7 @@ public class SlackService {
     //@Retry(name = "findEmailRetry", fallbackMethod = "fallbackGetSlackIdByEmail")
     //@CircuitBreaker(name = "findEmailFailed" ,fallbackMethod = "fallbackGetSlackIdByEmail")
     public String getSlackIdByEmail(String email) {
-        SlackUserResponseDto response = SlackClient.getUserByEmail(email,"Bearer "+ token);
+        SlackUserResponseDto response = SlackClient.getUserByEmail(email);
         if(response.ok() && response.user() != null){
             return response.user().id();
         }
@@ -57,7 +57,7 @@ public class SlackService {
         log.info("slackEmail : " + email);
         SlackSendRequestDto requestDto = new SlackSendRequestDto(slackId,text);
         log.info("requestDto : " + requestDto);
-        SlackSendResponseDto response = SlackClient.sendMessage(requestDto,"Bearer "+token);
+        SlackSendResponseDto response = SlackClient.sendMessage(requestDto);
         log.info("response: " + response);
         if(!response.ok()){
             log.error("실패 메세지 " + response.error());

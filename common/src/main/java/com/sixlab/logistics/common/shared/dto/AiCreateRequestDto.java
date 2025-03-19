@@ -1,8 +1,8 @@
-package com.sixlab.logistics.slack_ai_service.Messenger.application.dto;
+package com.sixlab.logistics.common.shared.dto;
 
 import java.util.List;
 
-public record AiCallRequestDto(
+public record AiCreateRequestDto(
         List<Content> contents
 ) {
     public record Content(List<Part> parts) {}

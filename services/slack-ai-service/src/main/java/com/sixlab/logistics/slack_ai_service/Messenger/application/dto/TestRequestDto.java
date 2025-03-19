@@ -7,6 +7,4 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TestRequestDto {
     String message;
-
-
 }

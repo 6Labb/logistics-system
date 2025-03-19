@@ -26,3 +26,8 @@ slack:
 gemini:
   key: ${gemini.key}
   uri: ${gemini.uri}
+naver:
+  key:
+    id: ${NAVER_KEY_ID}
+  api:
+   key: ${NAVER_API_KEY}

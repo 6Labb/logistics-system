@@ -1,7 +1,9 @@
 package com.sixlab.logistics.slack_ai_service.Messenger.application.service;
 
+import com.sixlab.logistics.common.shared.dto.AiCreateRequestDto;
+import com.sixlab.logistics.common.shared.dto.AiCreateResponseDto;
 import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.*;
-import com.sixlab.logistics.slack_ai_service.Messenger.infrastructure.feign.AiApiClient;
+import com.sixlab.logistics.common.shared.feign.AiApiClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +14,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AiService {
+public class AiService{
     @Value("${gemini.key}")
     private String key;
     private static final String workingHour="09:00~18:00";
@@ -30,6 +32,7 @@ public class AiService {
         // 이벤트트리거 컨슈머처리 프로듀서 설정(받아올 데이터 주문? 배송?)
         // feignClient 받아서 싹다 조회후 넘겨줌 (캐싱이나 세션으로 받아올 곳 찾아보기)
         // 예외처리랑 재시도 로직 하고 나중에 리팩토링 ㄱㄱ
+        log.info(key);
         OrderInfoDto infoDto=new OrderInfoDto("마른오징어",50,"서울역",
                 List.of("대전역","부산역"),"부산시 사하구 낙동대로 1번길 1 해산물월드","12월 12일 3시까지 도착해야 함",workingHour);
 
@@ -46,13 +49,13 @@ public class AiService {
         log.info("요청데이터 확인 "+text);
 
         //요청 변환
-        AiCallRequestDto aiCallRequestDto = new AiCallRequestDto(List.of(
-                new AiCallRequestDto.Content(List.of(
-                        new AiCallRequestDto.Part(text)
+        AiCreateRequestDto aiCreateRequestDto = new AiCreateRequestDto(List.of(
+                new AiCreateRequestDto.Content(List.of(
+                        new AiCreateRequestDto.Part(text)
                 ))
         ));
         //응답 파싱
-        String response =extractResultFromResponse(aiClient.callAi(key, aiCallRequestDto));
+        String response =extractResultFromResponse(aiClient.callAi(aiCreateRequestDto));
         log.info("응답값 확인"+response);
 
         //Slack 보내줄 값
@@ -75,16 +78,16 @@ public class AiService {
     }
 
     //요청 변환(나중에 다른쪽에서 ai 필요하면 쓰면댐)
-    private AiCallRequestDto buildCallAiRequest(TestRequestDto testRequest) {
-        AiCallRequestDto.Part part = new AiCallRequestDto.Part(testRequest.getMessage());
-        AiCallRequestDto.Content content = new AiCallRequestDto.Content(List.of(part));
-        return new AiCallRequestDto(List.of(content));
+    private AiCreateRequestDto buildCallAiRequest(TestRequestDto testRequest) {
+        AiCreateRequestDto.Part part = new AiCreateRequestDto.Part(testRequest.getMessage());
+        AiCreateRequestDto.Content content = new AiCreateRequestDto.Content(List.of(part));
+        return new AiCreateRequestDto(List.of(content));
     }
     
     //응답 파싱
-    private String extractResultFromResponse(AiCallResponseDto response) {
+    private String extractResultFromResponse(AiCreateResponseDto response) {
         if (response.candidates() != null && !response.candidates().isEmpty()) {
-            AiCallResponseDto.Candidate candidate = response.candidates().get(0);
+            AiCreateResponseDto.Candidate candidate = response.candidates().get(0);
             if (candidate.content() != null && candidate.content().parts() != null && !candidate.content().parts().isEmpty()) {
                 return candidate.content().parts().get(0).text();
             }

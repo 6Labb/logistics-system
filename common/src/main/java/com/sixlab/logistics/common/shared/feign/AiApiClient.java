@@ -1,7 +1,7 @@
-package com.sixlab.logistics.slack_ai_service.Messenger.infrastructure.feign;
+package com.sixlab.logistics.common.shared.feign;
 
-import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.AiCallRequestDto;
-import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.AiCallResponseDto;
+import com.sixlab.logistics.common.shared.dto.AiCreateRequestDto;
+import com.sixlab.logistics.common.shared.dto.AiCreateResponseDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,5 +12,5 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface AiApiClient {
 
     @PostMapping
-    AiCallResponseDto callAi(@RequestParam String key, @RequestBody AiCallRequestDto request);
+    AiCreateResponseDto callAi(@RequestBody AiCreateRequestDto request);
 }
