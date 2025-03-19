@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -224,5 +226,32 @@ public class OrderService {
         // deleteBy 타입에 대입돨 값을 논의(정의)하는 중
         order.delete(userId);
         return new OrderDeleteResponseDto(order);
+    }
+
+    // --------------------------------------------------------------
+    // 모든 주문내역 조회: MASTER
+    public List<OrderFindOneResponseDto> findAllOrders() {
+        List<Order> findOrderList = orderJpaRepository.findAll();
+        List<OrderFindOneResponseDto> orderList = new ArrayList<>();
+
+        if(!findOrderList.isEmpty()) {
+            for(Order order : findOrderList) {
+                orderList.add(new OrderFindOneResponseDto(order));
+            }
+        }
+        return orderList;
+    }
+
+    // 모든 주문내역 조회: DELIVERY_AGENT, TRADE_PARTNER
+    public List<OrderFindOneResponseDto> findAllOrders(Long userId) {
+        List<Order> findOrderList = orderJpaRepository.findAllByUserId(userId);
+        List<OrderFindOneResponseDto> orderList = new ArrayList<>();
+
+        if(!findOrderList.isEmpty()) {
+            for(Order order : findOrderList) {
+                orderList.add(new OrderFindOneResponseDto(order));
+            }
+        }
+        return orderList;
     }
 }

@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 
+import java.util.List;
 import java.util.UUID;
 
 @SpringBootTest(classes = OrderServiceApplication.class)
@@ -37,8 +38,8 @@ class OrderServiceTest {
         OrderCreateRequestDto data = new OrderCreateRequestDto();
         data.setReceiverName("홍길동");
         data.setMessage("2025년 6월 1일까지 보내주세요.");
-        data.setAddress("서울특별시 감자구 감자동 111번지");
-        data.setQuantity(10);
+        data.setAddress("서울특별시 고구마구 고구마동 111번지");
+        data.setQuantity(5);
         data.setProductId(productId);
         data.setReceiverId(receiverCompanyId);
 
@@ -104,5 +105,21 @@ class OrderServiceTest {
         // then
 
     }
+
+    @Test
+    @DisplayName("2행이 조회되어야 한다.")
+    @Rollback(value = false)
+    void test5() {
+        // given
+        Long userId = 1L;
+        // when
+        List<OrderFindOneResponseDto> orderList = orderService.findAllOrders(userId);
+
+        // then
+        Assertions.assertThat(orderList.size()).isEqualTo(2);
+
+    }
+
+
 
 }
