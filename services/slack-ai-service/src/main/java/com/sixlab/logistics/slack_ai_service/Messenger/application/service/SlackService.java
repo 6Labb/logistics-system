@@ -7,15 +7,12 @@ import com.sixlab.logistics.common.shared.dto.SlackUserResponseDto;
 import com.sixlab.logistics.common.shared.feign.SlackApiClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class SlackService {
-    @Value("${slack.token}")
-    private String token;
     private final SlackApiClient SlackClient;
 
     //Retry 테스트중 yml 설정 해야함

@@ -3,7 +3,6 @@ package com.sixlab.logistics.slack_ai_service.Messenger.application.service;
 import com.sixlab.logistics.common.shared.dto.AiCreateRequestDto;
 import com.sixlab.logistics.common.shared.dto.AiCreateResponseDto;
 import com.sixlab.logistics.common.shared.feign.AiApiClient;
-import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.TestRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
