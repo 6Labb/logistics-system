@@ -2,8 +2,10 @@ package com.sixlab.logistics.order_service.application.service;
 
 import com.sixlab.logistics.order_service.OrderServiceApplication;
 import com.sixlab.logistics.order_service.application.dto.request.OrderCreateRequestDto;
+import com.sixlab.logistics.order_service.application.dto.request.OrderInfoUpdateRequestDto;
 import com.sixlab.logistics.order_service.application.dto.response.OrderCreateResponseDto;
 import com.sixlab.logistics.order_service.application.dto.response.OrderFindOneResponseDto;
+import com.sixlab.logistics.order_service.application.dto.response.OrderInfoUpdateResponseDto;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -59,8 +61,27 @@ class OrderServiceTest {
         log.info(oneOrder.toString());
 
         /* 로그 찍히는 것 확인
-        * OrderFindOneResponseDto(orderId=24938764-7944-4f95-9774-5c8d6335b256, supplierId=edb45825-cafb-457f-9179-7d544b1ec78a, receiverId=c0502b76-1beb-4d6d-a2d3-3f61ca1b7574, productId=50c3068a-6b09-4f45-a3af-c119168a7676, quantity=10, message=2025년 6월 1일까지 보내주세요., deliveryId=50c6789a-6b09-4f45-a3af-c119168a7676, status=SUCCESS, userId=da66e6a7-a123-4b34-8724-7dd9080fa928, receiverName=홍길동)
+            * OrderFindOneResponseDto(orderId=24938764-7944-4f95-9774-5c8d6335b256, supplierId=edb45825-cafb-457f-9179-7d544b1ec78a, receiverId=c0502b76-1beb-4d6d-a2d3-3f61ca1b7574, productId=50c3068a-6b09-4f45-a3af-c119168a7676, quantity=10, message=2025년 6월 1일까지 보내주세요., deliveryId=50c6789a-6b09-4f45-a3af-c119168a7676, status=SUCCESS, userId=da66e6a7-a123-4b34-8724-7dd9080fa928, receiverName=홍길동)
         * */
+        // then
+
+    }
+
+    @Test
+    @DisplayName("주문정보가 수정되어야 한다.")
+    void test3() {
+        // given
+        UUID orderId = UUID.fromString("24938764-7944-4f95-9774-5c8d6335b256");
+        OrderInfoUpdateRequestDto data = new OrderInfoUpdateRequestDto();
+        data.setMessage("수정되는지 볼까?");
+        data.setQuantity(5);
+
+        // when
+        OrderInfoUpdateResponseDto orderInfoUpdateResponseDto = orderService.orderInfoUpdate(orderId, data);
+        log.info(orderInfoUpdateResponseDto.toString());
+
+        /* 로그 찍히는 것 확인
+         * */
         // then
 
     }

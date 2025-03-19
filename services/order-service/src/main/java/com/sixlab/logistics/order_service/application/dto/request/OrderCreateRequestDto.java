@@ -33,7 +33,7 @@ public class OrderCreateRequestDto {
     private String address; // 배송지: 물건을 수령할 주소
 
     @NotNull
-    @Min(value = 1, message = "수량은 1개 이상이어야 합니다.")
+    @Min(value = 1, message = "물품 요청 수량은 1개 이상이어야 합니다.")
     private Integer quantity; // 상품 수량
 
     @NotBlank

@@ -12,7 +12,6 @@ import java.util.UUID;
 @FeignClient(name="product-service")
 public interface ProductClient {
     // product 조회 (param 은 productId)
-    // 1. RequestMapping("/products") 있는지 확인할 것
     @GetMapping("/products/{productId}")
     ApiResponse<GetProductResponseDto> getProductById(@PathVariable UUID productId);
 }

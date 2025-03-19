@@ -12,7 +12,6 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Setter
 public class Order extends BasicEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -41,9 +40,11 @@ public class Order extends BasicEntity {
     private UUID productId; // (주문) 물품 UUID
 
     @Column(nullable = false)
+    @Setter
     private Integer quantity; // (주문) 물품 수량
 
     @Column(nullable = false)
+    @Setter
     private String message; // 요청사항
 
     @Column(nullable = false)

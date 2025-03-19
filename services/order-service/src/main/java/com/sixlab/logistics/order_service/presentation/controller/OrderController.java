@@ -2,9 +2,11 @@ package com.sixlab.logistics.order_service.presentation.controller;
 
 import com.sixlab.logistics.common.shared.response.ApiResponse;
 import com.sixlab.logistics.order_service.application.dto.request.OrderCreateRequestDto;
+import com.sixlab.logistics.order_service.application.dto.request.OrderInfoUpdateRequestDto;
 import com.sixlab.logistics.order_service.application.dto.response.GetProductResponseDto;
 import com.sixlab.logistics.order_service.application.dto.response.OrderCreateResponseDto;
 import com.sixlab.logistics.order_service.application.dto.response.OrderFindOneResponseDto;
+import com.sixlab.logistics.order_service.application.dto.response.OrderInfoUpdateResponseDto;
 import com.sixlab.logistics.order_service.application.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -62,6 +64,17 @@ public class OrderController {
         OrderFindOneResponseDto findOrder = orderService.findOneOrder(orderId);// (orderId, userPrincipal)
         return ApiResponse.success(findOrder, "주문이 성공적으로 조회되었습니다.");
     }
+
+    // 마스터와 허브매니저만 호출할 수 있는 수정 메서드
+    // *** 수정할 수 있는 사항은 상품수량과 요청사항으로 한정한다.
+    @PatchMapping("/{orderId}")
+    public ApiResponse<?> orderInfoUpdate(@PathVariable UUID orderId,
+                                          @RequestBody OrderInfoUpdateRequestDto dto) {
+
+        OrderInfoUpdateResponseDto updateOrderInfo = orderService.orderInfoUpdate(orderId, dto);
+        return ApiResponse.success(updateOrderInfo, "주문정보가 성공적으로 수정되었습니다.");
+    }
+
 
 
 

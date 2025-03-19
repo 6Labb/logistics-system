@@ -8,6 +8,7 @@ import com.sixlab.logistics.order_service.application.client.DeliveryClient;
 import com.sixlab.logistics.order_service.application.client.ProductClient;
 import com.sixlab.logistics.order_service.application.dto.request.OrderCreateRequestDto;
 
+import com.sixlab.logistics.order_service.application.dto.request.OrderInfoUpdateRequestDto;
 import com.sixlab.logistics.order_service.application.dto.request.RequestDeliveryRegisterDto;
 import com.sixlab.logistics.order_service.application.dto.response.*;
 import com.sixlab.logistics.order_service.application.dto.response.GetCompanyResponseDto.Type;
@@ -19,12 +20,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@Transactional
 public class OrderService {
 
     private final UUID productId = UUID.fromString("50c3068a-6b09-4f45-a3af-c119168a7676");
@@ -135,11 +136,65 @@ public class OrderService {
     // 권한확인 x
     // 주문 단건 조회 서비스
     public OrderFindOneResponseDto findOneOrder(UUID orderId) {
-        Order order = orderJpaRepository.findById(orderId).orElseThrow(() -> {
+        return new OrderFindOneResponseDto(findByIdOneOrderInfo(orderId));
+    }
+
+    @Transactional
+    // 마스터와 허브 매니저만 호출 가능한 수정 메서드
+    public OrderInfoUpdateResponseDto orderInfoUpdate(UUID orderId, OrderInfoUpdateRequestDto dto) {
+        // 1. 주문정보가 존재하는지 먼저 확인
+        Order order = findByIdOneOrderInfo(orderId);
+
+        // 2.
+        // 기존 주문했던 물품 요청 수량과 수정 요청 수량이 다르다면
+
+        log.info("기존 물품 요청 수량: {}, 수정 요청 수량: {}", order.getQuantity(), dto.getQuantity());
+        if(!order.getQuantity().equals(dto.getQuantity()))
+        {
+            // 3. productId 를 기반으로 상품 서비스 조회 호출
+            // *** 추후 하기 메서드 추출(refactoring) 고려
+            // ApiResponse<GetProductResponseDto> getProduct = productClient.getProductById(order.getProductId());
+
+            // 상기 상품 서비스 호출시 전달받을 물품 객체
+            GetProductResponseDto getProduct = GetProductResponseDto.builder()
+                    .id(productId) // 50c3068a-6b09-4f45-a3af-c119168a7676
+                    .companyId(companyId)
+                    .hubId(hubId)
+                    .productName("지우개")
+                    .quantity(40)
+                    .createdBy(40) // 이 상품을 생성한 사용자
+                    .createdAt(LocalDateTime.now().minusWeeks(1))
+                    .build();
+
+            if(getProduct == null) {
+                log.info("상품이 존재하지 않을 경우 이 로그가 찍힌다.");
+                throw new ResourceNotFoundException("존재하지 않는 상품입니다.");
+            }
+
+            if(dto.getQuantity() > getProduct.getQuantity()) {
+                log.info("요청 수량이 재고 수량보다 많음");
+                log.info("요청 수량: {}, 재고 수량: {}", dto.getQuantity(), getProduct.getQuantity());
+                String data = "요청 수량이 재고 수량을 초과했습니다. 최대 주문 가능 수량을 확인해 주세요.\n 최대 주문 가능 수량: "+getProduct.getQuantity();
+                throw new OutOfStockException(data);
+            }
+
+            order.setQuantity(dto.getQuantity());
+        }
+
+        log.info("기존 요청 메시지: {}, 수정 요청 메시지: {}", order.getMessage(), dto.getMessage());
+        if(!order.getMessage().trim().equals(dto.getMessage().trim())) order.setMessage(dto.getMessage());
+        Order updatedOneOrder = orderJpaRepository.save(order);
+        return new OrderInfoUpdateResponseDto(updatedOneOrder);
+
+
+
+    }
+
+    // orderId 에 기반하여 주문정보 확인하는 메서드 -> 주문정보 존재한다면 Order 객체를 반환
+    private Order findByIdOneOrderInfo(UUID orderId) {
+        return orderJpaRepository.findById(orderId).orElseThrow(() -> {
             log.info("주문정보가 없음");
             return new ResourceNotFoundException("주문 정보를 찾을 수 없습니다.");
         });
-
-        return new OrderFindOneResponseDto(order);
     }
 }
