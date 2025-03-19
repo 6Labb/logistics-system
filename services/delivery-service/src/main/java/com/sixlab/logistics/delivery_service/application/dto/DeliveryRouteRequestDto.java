@@ -14,15 +14,10 @@ import java.util.UUID;
 @NoArgsConstructor
 public class DeliveryRouteRequestDto {
 
-    private UUID id;
     private Integer sequence;
     private Double esimateDistance;
     private Integer esimateTime;
-    private Double actualDistance;
-    private Integer actualTime;
     private DeliveryRouteStatus status;
-    private UUID deliveryId;
     private UUID fromHubId;
     private UUID toHubId;
-    private Long deliveryAgentId; // 마지막 배송경로에는 업체배송담당자가 들어감
 }
