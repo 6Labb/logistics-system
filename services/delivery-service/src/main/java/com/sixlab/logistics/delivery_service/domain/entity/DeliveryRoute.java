@@ -45,7 +45,7 @@ public class DeliveryRoute extends BasicEntity {
 
     private UUID toHubId;
 
-    private UUID deliveryAgentId;
+    private Long deliveryAgentId;
 
     @Builder
     public DeliveryRoute(Integer sequence,
@@ -57,7 +57,7 @@ public class DeliveryRoute extends BasicEntity {
                          UUID deliveryId,
                          UUID fromHubId,
                          UUID toHubId,
-                         UUID deliveryAgentId
+                         Long deliveryAgentId
                          ) {
         this.sequence = sequence;
         this.estimatedDistance = estimatedDistance;
@@ -65,10 +65,10 @@ public class DeliveryRoute extends BasicEntity {
         this.actualDistance = actualDistance;
         this.actualTime = actualTime;
         this.status = status;
-        this.deliveryId = UUID.randomUUID();;
-        this.fromHubId = UUID.randomUUID();;
-        this.toHubId = UUID.randomUUID();;
-        this.deliveryAgentId = UUID.randomUUID();;
+        this.deliveryId = UUID.randomUUID();
+        this.fromHubId = UUID.randomUUID();
+        this.toHubId = UUID.randomUUID();
+        this.deliveryAgentId = deliveryAgentId;
     }
 
     public void updateDeliveryRoute(DeliveryRouteRequestDto requestDto) {

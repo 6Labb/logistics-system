@@ -24,5 +24,5 @@ public class DeliveryRouteRequestDto {
     private UUID deliveryId;
     private UUID fromHubId;
     private UUID toHubId;
-    private UUID deliveryAgentId; // 마지막 배송경로에는 업체배송담당자가 들어감
+    private Long deliveryAgentId; // 마지막 배송경로에는 업체배송담당자가 들어감
 }
