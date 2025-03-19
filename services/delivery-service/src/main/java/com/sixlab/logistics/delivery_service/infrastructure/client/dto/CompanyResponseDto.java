@@ -1,0 +1,16 @@
+package com.sixlab.logistics.delivery_service.infrastructure.client.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.UUID;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class CompanyResponseDto {
+
+    private UUID companyId;
+    private UUID hubId;
+}

@@ -1,6 +1,8 @@
 package com.sixlab.logistics.delivery_service.domain.entity;
 
 import com.sixlab.logistics.common.shared.domain.BasicEntity;
+import com.sixlab.logistics.delivery_service.application.dto.DeliveryRequestDto;
+import com.sixlab.logistics.delivery_service.application.dto.DeliveryRouteRequestDto;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -39,9 +41,9 @@ public class DeliveryRoute extends BasicEntity {
 
     private UUID deliveryId;
 
-    private UUID departureHubId;
+    private UUID fromHubId;
 
-    private UUID arrivalHubId;
+    private UUID toHubId;
 
     private UUID deliveryAgentId;
 
@@ -53,8 +55,8 @@ public class DeliveryRoute extends BasicEntity {
                          Integer actualTime,
                          DeliveryRouteStatus status,
                          UUID deliveryId,
-                         UUID departureHubId,
-                         UUID arrivalHubId,
+                         UUID fromHubId,
+                         UUID toHubId,
                          UUID deliveryAgentId
                          ) {
         this.sequence = sequence;
@@ -64,9 +66,21 @@ public class DeliveryRoute extends BasicEntity {
         this.actualTime = actualTime;
         this.status = status;
         this.deliveryId = UUID.randomUUID();;
-        this.departureHubId = UUID.randomUUID();;
-        this.arrivalHubId = UUID.randomUUID();;
+        this.fromHubId = UUID.randomUUID();;
+        this.toHubId = UUID.randomUUID();;
         this.deliveryAgentId = UUID.randomUUID();;
+    }
+
+    public void updateDeliveryRoute(DeliveryRouteRequestDto requestDto) {
+        this.actualDistance = requestDto.getActualDistance();
+        this.actualTime = requestDto.getActualTime();
+        this.estimatedDistance = requestDto.getEsimateDistance();
+        this.estimatedTime = requestDto.getEsimateTime();
+        this.deliveryAgentId = requestDto.getDeliveryAgentId();
+    }
+
+    public void updateDeliveryRouteStatus(DeliveryRouteStatus status) {
+        this.status = status;
     }
 
 }

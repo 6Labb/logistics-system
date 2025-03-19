@@ -15,15 +15,23 @@ public class DeliveryResponseDto {
     private DeliveryStatus status;
     private String deliveryAddress;
     private String receiveName;
-    private String receiveSlackId;
     private UUID companyDeliveryAgentId;
+    private UUID hubTotalRouteId;
+    private UUID fromHubId;
+    private UUID toHubId;
 
     public DeliveryResponseDto(Delivery delivery) {
         this.id = delivery.getId();
         this.status = delivery.getStatus();
         this.deliveryAddress = delivery.getDeliveryAddress();
         this.receiveName = delivery.getReceiveName();
-        this.receiveSlackId = delivery.getReceiveSlackId();
         this.companyDeliveryAgentId = delivery.getCompanyDeliveryAgentId();
+        this.hubTotalRouteId = delivery.getHubTotalRouteId();
+        this.fromHubId = delivery.getFromHubId();
+        this.toHubId = delivery.getToHubId();
+    }
+
+    public DeliveryResponseDto(DeliveryStatus status) {
+        this.status = status;
     }
 }
