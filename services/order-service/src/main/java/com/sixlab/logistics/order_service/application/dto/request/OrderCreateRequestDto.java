@@ -39,7 +39,7 @@ public class OrderCreateRequestDto {
     @NotBlank
     private String message; // 요청사항
 
-    public Order toEntity(UUID supplierId, UUID userId, UUID deliveryId) {
+    public Order toEntity(UUID supplierId, Long userId, UUID deliveryId) {
         return Order.builder()
                 .receiverId(receiverId)
                 .productId(productId)

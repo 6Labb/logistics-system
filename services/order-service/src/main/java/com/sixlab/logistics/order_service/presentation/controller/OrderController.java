@@ -3,10 +3,7 @@ package com.sixlab.logistics.order_service.presentation.controller;
 import com.sixlab.logistics.common.shared.response.ApiResponse;
 import com.sixlab.logistics.order_service.application.dto.request.OrderCreateRequestDto;
 import com.sixlab.logistics.order_service.application.dto.request.OrderInfoUpdateRequestDto;
-import com.sixlab.logistics.order_service.application.dto.response.GetProductResponseDto;
-import com.sixlab.logistics.order_service.application.dto.response.OrderCreateResponseDto;
-import com.sixlab.logistics.order_service.application.dto.response.OrderFindOneResponseDto;
-import com.sixlab.logistics.order_service.application.dto.response.OrderInfoUpdateResponseDto;
+import com.sixlab.logistics.order_service.application.dto.response.*;
 import com.sixlab.logistics.order_service.application.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -57,7 +54,7 @@ public class OrderController {
 
     @GetMapping("/{orderId}")
     @Operation(summary = "주문 단건 조회")
-    public ApiResponse<?> findOneOrder(@PathVariable UUID orderId
+    public ApiResponse<OrderFindOneResponseDto> findOneOrder(@PathVariable UUID orderId
                                        /*@AuthenticationPrincipal UserPrincipal userPrincipal*/){
         // 로그 찍히는거 확인 - /orders/24938764-7944-4f95-9774-5c8d6335b256: findOneOrder 메서드 호출
         log.info("/orders/{}: findOneOrder 메서드 호출", orderId);
@@ -68,11 +65,17 @@ public class OrderController {
     // 마스터와 허브매니저만 호출할 수 있는 수정 메서드
     // *** 수정할 수 있는 사항은 상품수량과 요청사항으로 한정한다.
     @PatchMapping("/{orderId}")
-    public ApiResponse<?> orderInfoUpdate(@PathVariable UUID orderId,
+    public ApiResponse<OrderInfoUpdateResponseDto> orderInfoUpdate(@PathVariable UUID orderId,
                                           @RequestBody OrderInfoUpdateRequestDto dto) {
 
         OrderInfoUpdateResponseDto updateOrderInfo = orderService.orderInfoUpdate(orderId, dto);
         return ApiResponse.success(updateOrderInfo, "주문정보가 성공적으로 수정되었습니다.");
+    }
+
+    @DeleteMapping("/{orderId}")
+    public ApiResponse<OrderDeleteResponseDto> deleteOrder(@PathVariable UUID orderId) {
+        OrderDeleteResponseDto dto = orderService.deleteOrder(orderId);
+        return ApiResponse.success(dto, "주문이 성공적으로 삭제되었습니다.(소프트 삭제)");
     }
 
 

@@ -5,6 +5,7 @@ import com.sixlab.logistics.common.shared.exception.ResourceNotFoundException;
 import com.sixlab.logistics.common.shared.response.ApiResponse;
 import com.sixlab.logistics.order_service.application.client.CompanyClient;
 import com.sixlab.logistics.order_service.application.client.DeliveryClient;
+import com.sixlab.logistics.order_service.application.client.HubClient;
 import com.sixlab.logistics.order_service.application.client.ProductClient;
 import com.sixlab.logistics.order_service.application.dto.request.OrderCreateRequestDto;
 
@@ -34,13 +35,14 @@ public class OrderService {
     // 허브 id: GetProductResponseDto 에 상품 id, 공급업체 id, 수량 등의 필드 정보가 존재하고,
     // 해당 허브 id 는 상품 id 를 관리하고 있으며 해당 상품의 수량은 quantity 필드를 참고하면 된다.
     private final UUID hubId = UUID.fromString("69199641-5072-4036-a899-af524390fb93");
-    private final UUID userId = UUID.fromString("da66e6a7-a123-4b34-8724-7dd9080fa928");
+    private final Long userId = 1L;
     private final UUID deliveryId = UUID.fromString("50c6789a-6b09-4f45-a3af-c119168a7676");
     private final UUID deliveryAgentId = UUID.fromString("50c7777a-6b09-4f45-a3af-c119168a7676");
 
     private final DeliveryClient deliveryClient;
     private final ProductClient productClient;
     private final CompanyClient companyClient;
+    private final HubClient hubClient;
 
     private final OrderJpaRepository orderJpaRepository;
 
@@ -196,5 +198,31 @@ public class OrderService {
             log.info("주문정보가 없음");
             return new ResourceNotFoundException("주문 정보를 찾을 수 없습니다.");
         });
+    }
+
+    // 주문 삭제 메서드, 마스터와 담당! 허브 관리자만이 삭제를 할 수 있다.
+    @Transactional
+    public OrderDeleteResponseDto deleteOrder(UUID orderId) {
+        // 1. 주문정보 확인(주문 id)
+        Order order = findByIdOneOrderInfo(orderId);
+
+        // 2. 권한 확인
+        // 허브관리자라면 담당 허브 관리자인지 확인
+        // order 객체에서 productId 를 얻고,
+        // 1) product 서비스 호출: productId 를 기반으로 product 객체를 얻고,
+        // 2) hub 서비스 호출: product 객체에서 얻은 hubId 를 기반으로 hub 객체를 얻고,
+        // 3) hub 관리자 서비스 호출: hub 매니저 객체에서 userId 를 얻어야 한다.
+        // --> 그리고 비교해서 맞지 않다면 접근 권한이 없다고 리턴한다.
+
+        // 3. 상품 서비스에게 수량 만큼의 복원을 요청한다.
+
+
+        // 4. 배송 서비스에게 배송 id 삭제를 요청한다.
+
+        // 5. 주문을 삭제한다.
+        // 소프트 삭제 로직 설계중 deleteBy 타입에 필요한 userId 타입 논의?
+        // deleteBy 타입에 대입돨 값을 논의(정의)하는 중
+        order.delete(userId);
+        return new OrderDeleteResponseDto(order);
     }
 }

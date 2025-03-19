@@ -4,6 +4,7 @@ import com.sixlab.logistics.common.shared.domain.BasicEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -52,5 +53,5 @@ public class Order extends BasicEntity {
     private Status status; // 주문 상태
 
     @Column(name = "user_id")
-    private UUID userId; // 주문자 고유 id
+    private Long userId; // 주문자 고유 id
 }

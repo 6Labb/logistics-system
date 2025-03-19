@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Getter
 public class OrderCreateResponseDto {
-    private UUID orderId;
+    private final UUID orderId;
     private final UUID supplierId; // 공급업체 UUID
     private final UUID receiverId; // 수령업체 UUID
     private final UUID deliveryId; // 배달 UUID
@@ -17,7 +17,7 @@ public class OrderCreateResponseDto {
     private final Integer quantity; // (주문) 물품 수량
     private final String message; // 요청사항
     private final Status status; // 주문 상태
-    private final UUID userId; // 주문자 고유 id
+    private final Long userId; // 주문자 고유 id
     private final String receiverName; // 수령인
 
     public OrderCreateResponseDto(Order order) {

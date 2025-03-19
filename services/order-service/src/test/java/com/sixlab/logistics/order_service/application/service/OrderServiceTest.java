@@ -4,6 +4,7 @@ import com.sixlab.logistics.order_service.OrderServiceApplication;
 import com.sixlab.logistics.order_service.application.dto.request.OrderCreateRequestDto;
 import com.sixlab.logistics.order_service.application.dto.request.OrderInfoUpdateRequestDto;
 import com.sixlab.logistics.order_service.application.dto.response.OrderCreateResponseDto;
+import com.sixlab.logistics.order_service.application.dto.response.OrderDeleteResponseDto;
 import com.sixlab.logistics.order_service.application.dto.response.OrderFindOneResponseDto;
 import com.sixlab.logistics.order_service.application.dto.response.OrderInfoUpdateResponseDto;
 import org.assertj.core.api.Assertions;
@@ -13,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 
 import java.util.UUID;
 
@@ -54,7 +56,7 @@ class OrderServiceTest {
     @DisplayName("단건 주문조회가 되어야 한다.")
     void test2() {
         // given
-        UUID orderId = UUID.fromString("24938764-7944-4f95-9774-5c8d6335b256");
+        UUID orderId = UUID.fromString("20f0290b-9143-40cf-9093-169f7d9f7f90");
 
         // when
         OrderFindOneResponseDto oneOrder = orderService.findOneOrder(orderId);
@@ -68,10 +70,11 @@ class OrderServiceTest {
     }
 
     @Test
+    @Rollback(value = false)
     @DisplayName("주문정보가 수정되어야 한다.")
     void test3() {
         // given
-        UUID orderId = UUID.fromString("24938764-7944-4f95-9774-5c8d6335b256");
+        UUID orderId = UUID.fromString("20f0290b-9143-40cf-9093-169f7d9f7f90");
         OrderInfoUpdateRequestDto data = new OrderInfoUpdateRequestDto();
         data.setMessage("수정되는지 볼까?");
         data.setQuantity(5);
@@ -79,6 +82,22 @@ class OrderServiceTest {
         // when
         OrderInfoUpdateResponseDto orderInfoUpdateResponseDto = orderService.orderInfoUpdate(orderId, data);
         log.info(orderInfoUpdateResponseDto.toString());
+
+        /* 로그 찍히는 것 확인
+         * */
+        // then
+
+    }
+
+    @Test
+    @DisplayName("주문정보가 삭제되어야 한다.")
+    @Rollback(value = false)
+    void test4() {
+        // given
+        UUID orderId = UUID.fromString("20f0290b-9143-40cf-9093-169f7d9f7f90");
+        // when
+        OrderDeleteResponseDto dto = orderService.deleteOrder(orderId);
+        log.info(dto.toString());
 
         /* 로그 찍히는 것 확인
          * */

@@ -22,7 +22,7 @@ public class OrderInfoUpdateResponseDto {
     private String message; // 요청사항
     private UUID deliveryId; // 배송 id
     private Status status; // 주문 상태
-    private UUID userId;
+    private Long userId;
     private String receiverName; // 수령인
 
     public OrderInfoUpdateResponseDto(Order order) {
