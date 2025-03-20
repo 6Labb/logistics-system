@@ -31,3 +31,9 @@ naver:
     id: ${NAVER_KEY_ID}
   api:
    key: ${NAVER_API_KEY}
+
+logging:
+  level:
+    root: INFO
+    feign: DEBUG
+    feign.client: DEBUG

@@ -3,7 +3,9 @@ server:
 
 message:
   queue:
-    ai: ai.queue
+    ai:
+  err:
+    exchange:
 
 spring:
   jpa:
@@ -15,7 +17,7 @@ spring:
         show_sql: true
         format_sql: true
         use_sql_comments: true
-        default_schema: messages
+        default_schema: ai_core
   datasource:
     url: jdbc:postgresql://localhost:5432/logistics
     username: postgres
@@ -53,4 +55,10 @@ slack:
 gemini:
   key: ${gemini.key}
   uri: ${gemini.uri}
+
+logging:
+  level:
+    root: INFO
+    feign: DEBUG
+    feign.client: DEBUG
 

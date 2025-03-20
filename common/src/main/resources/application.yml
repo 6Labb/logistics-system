@@ -1,6 +1,0 @@
-slack:
-
-  uri: ${slack.uri}
-gemini:
-  key: ${gemini.key}
-  uri: ${gemini.uri}

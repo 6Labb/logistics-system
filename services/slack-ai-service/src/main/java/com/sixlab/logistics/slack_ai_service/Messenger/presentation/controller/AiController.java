@@ -3,6 +3,7 @@ import com.sixlab.logistics.slack_ai_service.Messenger.application.service.AiSer
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RefreshScope
@@ -26,10 +27,13 @@ public class AiController {
     //ai 응답호출
     @PostMapping("/callAi")
     public void getSlack_AiResponse() {
-        aiService.callAiResponseDto();
-
+        aiService.processOrderAndNotifySlack();
     }
 
-
+    @PostMapping("/question")
+    public ResponseEntity<String> geminiGetAnswer(@RequestParam String question) {
+        String answer = aiService.generateContent(question);
+        return ResponseEntity.ok(answer);
+    }
 
 }
