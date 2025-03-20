@@ -4,6 +4,8 @@ server:
 message: "company-service dev message updated 12:59"
 
 spring:
+  application:
+    name: company-service
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
