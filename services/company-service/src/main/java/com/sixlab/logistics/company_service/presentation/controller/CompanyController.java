@@ -66,14 +66,26 @@ public class CompanyController {
     }
 
     @GetMapping("/search")
-    public ApiResponse<Page<CompanyResponseDto>> searchCompanies(
+    public ApiResponse<PaginationResponseDto<CompanyResponseDto>> searchCompanies(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String type,
             @RequestParam(required = false) UUID hubId,
             @PageableDefault Pageable pageable) {
 
+        // 서비스에서 페이지네이션된 결과 가져오기
         Page<CompanyResponseDto> companies = companyService.searchCompanies(name, type, hubId, pageable);
-        return ApiResponse.success(companies, "업체 검색 성공");
+
+        // 페이지네이션된 데이터를 PaginationResponseDto로 변환
+        PaginationResponseDto<CompanyResponseDto> result = new PaginationResponseDto<>(
+                companies.getContent(),
+                companies.getPageable().getPageNumber(),
+                companies.getPageable().getPageSize(),
+                companies.getTotalElements(),
+                companies.getTotalPages()
+        );
+
+        // ApiResponse로 감싸서 반환
+        return ApiResponse.success(result, "업체 검색 성공");
     }
 
 }
