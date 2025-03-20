@@ -18,7 +18,6 @@ import java.util.UUID;
 @Table(name = "p_product", schema = "products")
 public class Product extends BasicEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private String name;
     private Integer quantity;
@@ -28,7 +27,7 @@ public class Product extends BasicEntity {
     // DTO에서 Entity로 변환하는 메서드
     public static Product toEntity(ProductRequestDto requestDto) {
         return Product.builder()
-                .id(requestDto.getId() != null ? requestDto.getId() : UUID.randomUUID()) // 기존 ID 유지
+                .id(UUID.randomUUID())
                 .name(requestDto.getName())
                 .quantity(requestDto.getQuantity())
                 .hubId(requestDto.getHubId())
