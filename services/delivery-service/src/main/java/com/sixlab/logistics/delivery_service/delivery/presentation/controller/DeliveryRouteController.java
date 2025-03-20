@@ -97,6 +97,12 @@ public class DeliveryRouteController {
         return ApiResponse.success(HttpStatus.OK, null, "SUCCESS");
     }
 
-    // 배송 경로 생성(알고리즘으로)
+    // 배송 경로 생성
+    @PostMapping("/delivery_routes")
+    public ApiResponse<DeliveryRouteResponseDto> createDeliveryRoute(
+            @PathVariable UUID deliveryId) {
+        DeliveryRouteResponseDto createDeliveryRoute = deliveryRouteService.createDeliveryRoute(deliveryId);
+        return ApiResponse.success(HttpStatus.CREATED, createDeliveryRoute, "SUCCESS");
+    }
 
 }

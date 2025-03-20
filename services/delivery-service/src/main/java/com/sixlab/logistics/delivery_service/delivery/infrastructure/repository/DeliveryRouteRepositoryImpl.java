@@ -28,11 +28,6 @@ public class DeliveryRouteRepositoryImpl implements DeliveryRouteRepository {
     }
 
     @Override
-    public Page<DeliveryRoute> findAllByDeliveryId(Pageable pageable, UUID deliveryId) {
-        return jpaRepository.findAllByDeliveryId(pageable, deliveryId);
-    }
-
-    @Override
     public Optional<DeliveryRoute> findById(UUID id) {
         return jpaRepository.findById(id);
     }
@@ -40,6 +35,11 @@ public class DeliveryRouteRepositoryImpl implements DeliveryRouteRepository {
     @Override
     public void delete(DeliveryRoute deliveryRoute) {
         jpaRepository.delete(deliveryRoute);
+    }
+
+    @Override
+    public DeliveryRoute save(DeliveryRoute deliveryRoute) {
+        return jpaRepository.save(deliveryRoute);
     }
 
 }

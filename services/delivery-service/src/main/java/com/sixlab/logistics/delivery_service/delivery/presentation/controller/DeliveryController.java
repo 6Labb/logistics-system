@@ -86,6 +86,4 @@ public class DeliveryController {
         return ApiResponse.success(HttpStatus.CREATED, createDelivery, "SUCCESS");
     }
 
-    // 업체 배송 담당자 배정
-
 }
