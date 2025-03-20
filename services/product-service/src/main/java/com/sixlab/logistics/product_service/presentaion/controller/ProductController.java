@@ -57,4 +57,22 @@ public class ProductController {
         productService.deleteProduct(productId);
         return ApiResponse.success(HttpStatus.OK, null, "상품이 정상적으로 삭제되었습니다.");
     }
+
+    // 상품 재고 감소
+    @PutMapping("/{productId}/decrease-stock")
+    public ApiResponse<Void> decreaseStock(
+            @PathVariable UUID productId,
+            @RequestParam int quantity) {
+        productService.decreaseStock(productId, quantity);
+        return ApiResponse.success(HttpStatus.OK, null, "상품 재고 감소 성공");
+    }
+
+    // 상품 재고 복원 (주문 취소시)
+    @PutMapping("/{productId}/restore-stock")
+    public ApiResponse<Void> restoreStock(
+            @PathVariable UUID productId,
+            @RequestParam int quantity) {
+        productService.restoreStock(productId, quantity);
+        return ApiResponse.success(HttpStatus.OK, null, "상품 재고 복원 성공");
+    }
 }

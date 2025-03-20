@@ -2,9 +2,7 @@ package com.sixlab.logistics.product_service.domain.model;
 
 import com.sixlab.logistics.common.shared.domain.BasicEntity;
 import com.sixlab.logistics.product_service.presentaion.dto.ProductRequestDto;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,17 +18,17 @@ import java.util.UUID;
 @Table(name = "p_product", schema = "products")
 public class Product extends BasicEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private String name;
     private Integer quantity;
-
     private UUID hubId;
     private UUID companyId;
 
     // DTO에서 Entity로 변환하는 메서드
     public static Product toEntity(ProductRequestDto requestDto) {
         return Product.builder()
-                .id(UUID.randomUUID()) // DTO의 ID를 엔티티에 셋팅
+                .id(requestDto.getId() != null ? requestDto.getId() : UUID.randomUUID()) // 기존 ID 유지
                 .name(requestDto.getName())
                 .quantity(requestDto.getQuantity())
                 .hubId(requestDto.getHubId())
@@ -39,9 +37,20 @@ public class Product extends BasicEntity {
     }
 
     public void updateProduct(ProductRequestDto requestDto) {
-        this.name = requestDto.getName();
-        this.quantity = requestDto.getQuantity();
-        this.hubId = requestDto.getHubId();
-        this.companyId = requestDto.getCompanyId();
+        if (requestDto.getName() != null) this.name = requestDto.getName();
+        if (requestDto.getQuantity() != null) this.quantity = requestDto.getQuantity();
+        if (requestDto.getHubId() != null) this.hubId = requestDto.getHubId();
+        if (requestDto.getCompanyId() != null) this.companyId = requestDto.getCompanyId();
+    }
+
+    public void decreaseStock(int quantity) {
+        if (this.quantity < quantity) {
+            throw new IllegalStateException("재고가 부족합니다.");
+        }
+        this.quantity -= quantity;
+    }
+
+    public void increaseStock(int quantity) {
+        this.quantity += quantity;
     }
 }

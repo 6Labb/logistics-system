@@ -59,4 +59,22 @@ public class ProductServiceImpl implements ProductService {
         }
         productRepository.deleteById(productId);
     }
+
+    @Transactional
+    @Override
+    public void decreaseStock(UUID productId, int quantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
+
+        product.decreaseStock(quantity);
+    }
+
+    @Transactional
+    @Override
+    public void restoreStock(UUID productId, int quantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
+
+        product.increaseStock(quantity);
+    }
 }
