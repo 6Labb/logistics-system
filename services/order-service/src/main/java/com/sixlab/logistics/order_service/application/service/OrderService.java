@@ -220,11 +220,12 @@ public class OrderService {
         // 3. 상품 서비스에게 수량 만큼의 복원을 요청한다.
 
 
-        // 4. 배송 서비스에게 배송 id 삭제를 요청한다.
 
-        // 5. 주문을 삭제한다.
-        // 소프트 삭제 로직 설계중 deleteBy 타입에 필요한 userId 타입 논의?
-        // deleteBy 타입에 대입돨 값을 논의(정의)하는 중
+        // 4. 배송 서비스에게 배송 id 삭제를 요청한다.
+        // {"message": "SUCCESS", "data":null}
+        // deliveryClient.requestDeliveryDelete(order.getDeliveryId());
+
+        // 5. 주문을 삭제한다(소프트 삭제)
         order.delete(userId);
         return new OrderDeleteResponseDto(order);
     }

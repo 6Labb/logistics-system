@@ -54,6 +54,5 @@ public class OrderCreateRequestDto {
                 .userId(userId)
                 .deliveryId(deliveryId)
                 .build();
-        // 배달 id 필드의 값은 null
     }
 }
