@@ -1,7 +1,7 @@
 package com.sixlab.logistics.company_service.domain.model;
 
 public enum CompanyType {
-    RECEIVER("생산업체"),
+    RECEIVER("수령업체"),
     SUPPLIER("공급업체");
 
     private final String description;
