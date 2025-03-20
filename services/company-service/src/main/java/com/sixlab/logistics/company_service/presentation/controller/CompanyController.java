@@ -4,7 +4,11 @@ import com.sixlab.logistics.common.shared.response.ApiResponse;
 import com.sixlab.logistics.company_service.application.service.CompanyService;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyRequestDto;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyResponseDto;
+import com.sixlab.logistics.company_service.presentation.dto.PaginationResponseDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,8 +32,11 @@ public class CompanyController {
 
     // 업체 목록 조회
     @GetMapping
-    public ApiResponse<List<CompanyResponseDto>> getAllCompanies() {
-        List<CompanyResponseDto> companies = companyService.getAllCompanies();
+    public ApiResponse<PaginationResponseDto<CompanyResponseDto>> getAllCompanies(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size
+    ) {
+        PaginationResponseDto<CompanyResponseDto> companies = companyService.getAllCompanies(page, size);
         return ApiResponse.success(companies, "업체 목록 조회 성공");
     }
 
@@ -59,12 +66,13 @@ public class CompanyController {
     }
 
     @GetMapping("/search")
-    public ApiResponse<List<CompanyResponseDto>> searchCompanies(
+    public ApiResponse<Page<CompanyResponseDto>> searchCompanies(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String type,
-            @RequestParam(required = false) UUID hubId) {
+            @RequestParam(required = false) UUID hubId,
+            @PageableDefault Pageable pageable) {
 
-        List<CompanyResponseDto> companies = companyService.searchCompanies(name, type, hubId);
+        Page<CompanyResponseDto> companies = companyService.searchCompanies(name, type, hubId, pageable);
         return ApiResponse.success(companies, "업체 검색 성공");
     }
 
