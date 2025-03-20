@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @EnableFeignClients(basePackages = "com.sixlab.logistics")
 @SpringBootApplication
-// @ComponentScan(basePackages = {"com.sixlab.logistics.company_service","com.sixlab.logistics.common"})
+@ComponentScan(basePackages = {"com.sixlab.logistics.common", "com.sixlab.logistics.company_service"})
 public class CompanyServiceApplication {
 
 	public static void main(String[] args) {

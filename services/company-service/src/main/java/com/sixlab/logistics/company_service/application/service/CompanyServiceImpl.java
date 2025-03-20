@@ -61,6 +61,15 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Transactional(readOnly = true)
     @Override
+    public List<CompanyResponseDto> searchCompanies(String name, String type, UUID hubId) {
+        List<Company> companies = companyRepository.searchCompanies(name, type, hubId);
+        return companies.stream()
+                .map(CompanyResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    @Override
     public CompanyResponseDto getCompanyById(UUID companyId) {
         // 업체 조회 (없는 경우 예외 처리)
         Company company = companyRepository.findById(companyId)
@@ -98,4 +107,6 @@ public class CompanyServiceImpl implements CompanyService {
         // 업체 삭제
         companyRepository.delete(company);
     }
+
+
 }

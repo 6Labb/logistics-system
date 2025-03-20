@@ -13,4 +13,5 @@ public interface CompanyService {
     CompanyResponseDto getCompanyById(UUID companyId);
     CompanyResponseDto updateCompany(UUID companyId, CompanyRequestDto requestDto);
     void deleteCompany(UUID companyId);
+    List<CompanyResponseDto> searchCompanies(String name, String type, UUID hubId);
 }

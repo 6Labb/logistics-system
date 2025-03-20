@@ -6,6 +6,7 @@ import com.sixlab.logistics.company_service.presentation.dto.CompanyRequestDto;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -55,6 +56,16 @@ public class CompanyController {
             @PathVariable UUID companyId){
         companyService.deleteCompany(companyId);
         return ApiResponse.success(HttpStatus.OK, null, "업체가 정상적으로 삭제되었습니다.");
+    }
+
+    @GetMapping("/search")
+    public ApiResponse<List<CompanyResponseDto>> searchCompanies(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) UUID hubId) {
+
+        List<CompanyResponseDto> companies = companyService.searchCompanies(name, type, hubId);
+        return ApiResponse.success(companies, "업체 검색 성공");
     }
 
 }
