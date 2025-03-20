@@ -4,6 +4,7 @@ import com.sixlab.logistics.common.shared.domain.BasicEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -12,7 +13,6 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Setter
 public class Order extends BasicEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -41,9 +41,11 @@ public class Order extends BasicEntity {
     private UUID productId; // (주문) 물품 UUID
 
     @Column(nullable = false)
+    @Setter
     private Integer quantity; // (주문) 물품 수량
 
     @Column(nullable = false)
+    @Setter
     private String message; // 요청사항
 
     @Column(nullable = false)
@@ -51,5 +53,5 @@ public class Order extends BasicEntity {
     private Status status; // 주문 상태
 
     @Column(name = "user_id")
-    private UUID userId; // 주문자 고유 id
+    private Long userId; // 주문자 고유 id
 }

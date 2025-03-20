@@ -1,10 +1,10 @@
-package com.sixlab.logistics.order_service;
+package com.sixlab.logistics.slack_ai_service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class OrderServiceApplicationTests {
+class SlackMessengerServiceApplicationTests {
 
 	@Test
 	void contextLoads() {

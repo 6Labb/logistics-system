@@ -20,19 +20,19 @@ public abstract class BasicEntity {
     protected LocalDateTime createdAt;
 
     @CreatedBy
-    protected Integer createdBy;
+    protected Long createdBy;
 
     @LastModifiedDate
     protected LocalDateTime updatedAt;
 
     @LastModifiedBy
-    protected Integer updatedBy;
+    protected Long updatedBy;
 
     protected LocalDateTime deletedAt;
 
-    protected Integer deletedBy;
+    protected Long deletedBy;
 
-    public void delete(Integer deletedBy) {
+    public void delete(Long deletedBy) {
         this.deletedAt = LocalDateTime.now();
         this.deletedBy = deletedBy;
     }

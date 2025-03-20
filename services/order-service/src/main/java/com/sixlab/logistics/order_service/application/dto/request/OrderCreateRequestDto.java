@@ -3,6 +3,7 @@ package com.sixlab.logistics.order_service.application.dto.request;
 import com.sixlab.logistics.order_service.domain.model.Order;
 import com.sixlab.logistics.order_service.domain.model.Status;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -30,12 +31,15 @@ public class OrderCreateRequestDto {
 
     @NotBlank
     private String address; // 배송지: 물건을 수령할 주소
+
     @NotNull
+    @Min(value = 1, message = "물품 요청 수량은 1개 이상이어야 합니다.")
     private Integer quantity; // 상품 수량
+
     @NotBlank
     private String message; // 요청사항
 
-    public Order toEntity(UUID supplierId, UUID userId, UUID deliveryId) {
+    public Order toEntity(UUID supplierId, Long userId, UUID deliveryId) {
         return Order.builder()
                 .receiverId(receiverId)
                 .productId(productId)
@@ -50,6 +54,5 @@ public class OrderCreateRequestDto {
                 .userId(userId)
                 .deliveryId(deliveryId)
                 .build();
-        // 배달 id 필드의 값은 null
     }
 }
