@@ -42,4 +42,9 @@ public class DeliveryRouteRepositoryImpl implements DeliveryRouteRepository {
         jpaRepository.delete(deliveryRoute);
     }
 
+    @Override
+    public DeliveryRoute save(DeliveryRoute deliveryRoute) {
+        return jpaRepository.save(deliveryRoute);
+    }
+
 }
