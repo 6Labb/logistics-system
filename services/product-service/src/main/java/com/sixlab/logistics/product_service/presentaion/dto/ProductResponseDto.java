@@ -16,27 +16,28 @@ import java.util.UUID;
 public class ProductResponseDto {
     private UUID id;
     private String name;
-    private String quantity;
+    private Integer quantity;
     private UUID hubId;
     private UUID companyId;
     private LocalDateTime createdAt;
-    private String createdBy;
 
-    public ProductResponseDto(UUID id, UUID companyId, UUID hubId, String quantity, String name) {
+    public ProductResponseDto(UUID id, UUID companyId, UUID hubId, Integer quantity, String name, LocalDateTime createdAt) {
         this.id = id;
         this.companyId = companyId;
         this.hubId = hubId;
         this.quantity = quantity;
         this.name = name;
+        this.createdAt = createdAt;
     }
 
-    public ProductResponseDto(Product product){
-        this.id = product.getId();
-        this.companyId = product.getCompanyId();
-        this.hubId = product.getHubId();
-        this.quantity = product.getQuantity().toString();
-        this.name = product.getName();
-        this.createdAt = product.getCreatedAt();
-        this.createdBy = product.getCreatedBy().toString();
+    public static ProductResponseDto fromEntity(Product product) {
+        return new ProductResponseDto(
+                product.getId(),
+                product.getCompanyId(),
+                product.getHubId(),
+                product.getQuantity(),
+                product.getName(),
+                product.getCreatedAt()
+        );
     }
 }

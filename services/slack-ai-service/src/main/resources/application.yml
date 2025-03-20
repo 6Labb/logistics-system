@@ -20,3 +20,20 @@ management:
     web:
       exposure:
         include: refresh
+slack:
+  token: ${slack.token}
+  uri: ${slack.uri}
+gemini:
+  key: ${gemini.key}
+  uri: ${gemini.uri}
+naver:
+  key:
+    id: ${NAVER_KEY_ID}
+  api:
+   key: ${NAVER_API_KEY}
+
+logging:
+  level:
+    root: INFO
+    feign: DEBUG
+    feign.client: DEBUG

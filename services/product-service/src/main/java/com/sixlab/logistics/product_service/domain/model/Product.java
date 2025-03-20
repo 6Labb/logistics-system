@@ -38,4 +38,10 @@ public class Product extends BasicEntity {
                 .build();
     }
 
+    public void updateProduct(ProductRequestDto requestDto) {
+        this.name = requestDto.getName();
+        this.quantity = requestDto.getQuantity();
+        this.hubId = requestDto.getHubId();
+        this.companyId = requestDto.getCompanyId();
+    }
 }
