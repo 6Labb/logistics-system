@@ -3,12 +3,16 @@ package com.sixlab.logistics.company_service.application.service;
 import com.sixlab.logistics.common.shared.exception.DuplicateResourceException;
 import com.sixlab.logistics.common.shared.exception.ResourceNotFoundException;
 import com.sixlab.logistics.company_service.domain.model.Company;
+import com.sixlab.logistics.company_service.domain.model.CompanyType;
 import com.sixlab.logistics.company_service.domain.repository.CompanyRepository;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyRequestDto;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyResponseDto;
-import com.sixlab.logistics.company_service.presentation.dto.ExternalCompanyResponse;
+import com.sixlab.logistics.company_service.presentation.dto.PaginationResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,13 +54,29 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<CompanyResponseDto> getAllCompanies() {
-        // 모든 업체 조회
-        List<Company> companies = companyRepository.findAll();
-        // 업체 리스트를 DTO로 변환하여 반환
-        return companies.stream()
+    public PaginationResponseDto<CompanyResponseDto> getAllCompanies(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Company> companyPage = companyRepository.findAll(pageable);
+
+        // 모든 업체 조회 -> 업체 리스트를 DTO로 변환하여 반환
+        List<CompanyResponseDto> companyDtos = companyPage.getContent().stream()
                 .map(CompanyResponseDto::new)
                 .collect(Collectors.toList());
+        //
+        return PaginationResponseDto.<CompanyResponseDto>builder()
+                .content(companyDtos)
+                .page(companyPage.getNumber())
+                .size(companyPage.getSize())
+                .totalItems(companyPage.getTotalElements())
+                .totalPages(companyPage.getTotalPages())
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<CompanyResponseDto> searchCompanies(String name, String type, UUID hubId, Pageable pageable) {
+        Page<Company> companies = companyRepository.searchCompanies(name, type, hubId, pageable);
+        return companies.map(CompanyResponseDto::new);
     }
 
     @Transactional(readOnly = true)
@@ -98,4 +118,5 @@ public class CompanyServiceImpl implements CompanyService {
         // 업체 삭제
         companyRepository.delete(company);
     }
+
 }
