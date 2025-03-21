@@ -58,12 +58,12 @@ public class DeliveryRoute extends BasicEntity {
                          UUID toHubId,
                          Long deliveryAgentId
                          ) {
-        this.sequence = sequence;
+        this.sequence = 0;
         this.estimatedDistance = estimatedDistance;
         this.estimatedTime = estimatedTime;
         this.actualDistance = actualDistance;
         this.actualTime = actualTime;
-        this.status = status;
+        this.status = DeliveryRouteStatus.WAITING;
         this.deliveryId = UUID.randomUUID();
         this.fromHubId = UUID.randomUUID();
         this.toHubId = UUID.randomUUID();
