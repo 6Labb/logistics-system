@@ -2,8 +2,8 @@ package com.sixlab.logistics.company_service.application.service;
 
 import com.sixlab.logistics.common.shared.exception.DuplicateResourceException;
 import com.sixlab.logistics.common.shared.exception.ResourceNotFoundException;
+import com.sixlab.logistics.company_service.application.client.HubClient;
 import com.sixlab.logistics.company_service.domain.model.Company;
-import com.sixlab.logistics.company_service.domain.model.CompanyType;
 import com.sixlab.logistics.company_service.domain.repository.CompanyRepository;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyRequestDto;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyResponseDto;
