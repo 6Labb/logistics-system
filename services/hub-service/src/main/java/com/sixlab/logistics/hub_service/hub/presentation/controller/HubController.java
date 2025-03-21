@@ -1,13 +1,16 @@
-package com.sixlab.logistics.hub_service.hub;
+package com.sixlab.logistics.hub_service.hub.presentation.controller;
 
 
 import com.sixlab.logistics.common.shared.response.ApiResponse;
-import com.sixlab.logistics.common.shared.response.ApiResponseDto;
+import com.sixlab.logistics.hub_service.hub.application.dto.HubCreateRequestDto;
+import com.sixlab.logistics.hub_service.hub.application.dto.HubCreateResponseDto;
+import com.sixlab.logistics.hub_service.hub.application.dto.HubResponseDto;
+import com.sixlab.logistics.hub_service.hub.application.dto.HubUpdateRequestDto;
+import com.sixlab.logistics.hub_service.hub.application.service.HubService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,7 +35,7 @@ public class HubController {
 
     private final HubService hubService;
 
-    //@PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER')")
+    @PreAuthorize("hasRole('MASTER')")
     @PostMapping
     public ApiResponse<HubCreateResponseDto> createHub(@Valid @RequestBody HubCreateRequestDto requestDto) {
         HubCreateResponseDto response = hubService.createHub(requestDto);
@@ -44,5 +47,24 @@ public class HubController {
         HubResponseDto response = hubService.getHubById(id);
         return ApiResponse.success(response, "Hub found");
     }
+
+    @PutMapping("/{id}")
+    public ApiResponse<HubResponseDto> updateHub(
+            @PathVariable UUID id,
+            @Valid @RequestBody HubUpdateRequestDto requestDto) {
+
+        HubResponseDto response = hubService.updateHub(id, requestDto);
+        return ApiResponse.success(response, "Hub updated");
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> softDeleteHub(@PathVariable UUID id) {
+        hubService.deleteHub(id);
+        return ApiResponse.success(null, "Hub soft deleted");
+    }
+
+
+
+
 
 }

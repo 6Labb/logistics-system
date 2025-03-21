@@ -1,10 +1,9 @@
-package com.sixlab.logistics.hub_service.hub;
+package com.sixlab.logistics.hub_service.hub.application.dto;
 
+import com.sixlab.logistics.hub_service.hub.domain.model.Hub;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
 
 /**
  * 허브 정보 조회 응답 Dto

@@ -1,8 +1,7 @@
-package com.sixlab.logistics.hub_service.hub;
+package com.sixlab.logistics.hub_service.hub.domain.model;
 
 
 import com.sixlab.logistics.common.shared.domain.BasicEntity;
-import com.sixlab.logistics.hub_service.hubmanager.HubManager;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -49,5 +48,14 @@ public class Hub extends BasicEntity {
                 .longitude(longitude)
                 .build();
     }
+
+    public void update(String hubName, String hubAddress, double latitude, double longitude) {
+        this.hubName = hubName;
+        this.hubAddress = hubAddress;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
+
 
 }

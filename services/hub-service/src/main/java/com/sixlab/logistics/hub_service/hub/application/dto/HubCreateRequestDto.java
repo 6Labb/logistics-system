@@ -1,4 +1,4 @@
-package com.sixlab.logistics.hub_service.hub;
+package com.sixlab.logistics.hub_service.hub.application.dto;
 
 import lombok.Builder;
 import lombok.Getter;
