@@ -13,8 +13,10 @@ public class ResponseDeliveryRegisterDto {
     private DeliveryStatus status;
     private String deliveryAddress; // 배송지
     private String receiveName; // 수령인
-    // private String receiveSlackId;
-    private UUID companyDeliveryAgentId;
+    private Long deliveryAgentId;
+    private UUID hubRouteId;
+    private UUID fromHubId;
+    private UUID toHubId;
 
     public enum DeliveryStatus {
         WAITING, // 배송대기

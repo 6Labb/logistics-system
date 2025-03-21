@@ -2,6 +2,7 @@ package com.sixlab.logistics.order_service.application.service;
 
 import com.sixlab.logistics.common.shared.exception.OutOfStockException;
 import com.sixlab.logistics.common.shared.exception.ResourceNotFoundException;
+import com.sixlab.logistics.common.shared.response.ApiResponseDto;
 import com.sixlab.logistics.order_service.application.client.CompanyClient;
 import com.sixlab.logistics.order_service.application.client.DeliveryClient;
 import com.sixlab.logistics.order_service.application.client.HubClient;
@@ -13,17 +14,20 @@ import com.sixlab.logistics.order_service.application.dto.request.OrderInfoMessa
 import com.sixlab.logistics.order_service.application.dto.request.OrderInfoUpdateRequestDto;
 import com.sixlab.logistics.order_service.application.dto.request.RequestDeliveryRegisterDto;
 import com.sixlab.logistics.order_service.application.dto.response.*;
-import com.sixlab.logistics.order_service.application.dto.response.GetCompanyResponseDto.Type;
 import com.sixlab.logistics.order_service.domain.model.Order;
 import com.sixlab.logistics.order_service.infrastructure.persistence.OrderJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import java.util.*;
 
 @Service
@@ -61,79 +65,91 @@ public class OrderService {
         // 1. 모든 로그인 사용자 (주문자) 가능
         // jwt 를 통해 user 의 id 를 얻어낸다.
 
-        // 2. 상품 테이블에서 상품이 존재하는지
-        // 상품 id 를 전달하면서 상품조회 서비스 호출
-        // --> 상품 조회 서비스의 권한은 MASTER, HUB_MANAGER, TRADE_PARTNER
+        // 2. 상품서비스의 상품 조회기능 호출
+        ResponseEntity<ApiResponseDto<GetProductResponseDto>> requestProduct = productClient.getProductById(dto.getProductId());
 
-        // ApiResponse<GetProductResponseDto> productById = productClient.getProductById(dto.getProductId());
-
-        // 상기코드 실행시 전달받을 객체, 지금은 Product 객체 직접 생성
+        /* 상기코드 실행시 전달받을 객체, 지금은 Product 객체 직접 생성
         GetProductResponseDto getProduct = GetProductResponseDto.builder()
                 .id(productId) // 50c3068a-6b09-4f45-a3af-c119168a7676
                 .companyId(companyId)
                 .hubId(hubId)
-                .productName("지우개")
+                .name("지우개")
                 .quantity(40)
-                .createdBy(40) // 이 상품을 생성한 사용자
+                // .createdBy(40) // 이 상품을 생성한 사용자
                 .createdAt(LocalDateTime.now().minusWeeks(1))
-                .build();
+                .build(); */
 
 
-        if(getProduct == null) {
-            log.info("상품이 존재하지 않을 경우 이 로그가 찍힌다.");
-            throw new ResourceNotFoundException("존재하지 않는 상품입니다.");
-        }
+        GetProductResponseDto getProduct = requestProduct.getBody().getData();
+
+        ifExist(getProduct);
 
         // (상품 id 기반으로 객체를 전달받은상태) & 요청 상품 수량이 재고 수량보다 적거나 같은지 확인
         // 상품 객체에 허브 id, 공급업체 id, (재고) 수량 필드 등이 존재하고,
         // 여기서 (재고) 수량은 허브 id 가 관리하는 수량으로 정의함 (팀원들끼리 합의봄)
         // *** 클라이언트로부터 요청수량 0 미만으로는 받지 못하도록 설정 @Min(value=1)
+        /*
         if(dto.getQuantity() > getProduct.getQuantity()) {
             log.info("요청 수량이 재고 수량보다 많음");
             log.info("요청 수량: {}, 재고 수량: {}", dto.getQuantity(), getProduct.getQuantity());
             String data = "요청 수량이 재고 수량을 초과했습니다. 최대 주문 가능 수량을 확인해 주세요.\n 최대 주문 가능 수량: "+getProduct.getQuantity();
             throw new OutOfStockException(data);
+        }*/
+        checkProductStock(dto.getQuantity(), getProduct.getQuantity());
+
+        // 3. 재고 감소 요청하기
+        ResponseEntity<ApiResponseDto<ProductStockResponseDto>> stockDecreaseResponse = productClient.requestProductStockDecrease(dto.getProductId(), dto.getQuantity());
+
+        // stockDecreaseResponse.getStatusCode() --> HttpStatus 객체
+        // 상태코드가 2 로 시작하지 않을 경우 서비스 호출에 실패
+        if(!stockDecreaseResponse.getStatusCode().is2xxSuccessful()) {
+            log.error("재고 감소 요청 실패 - 상태코드: {}, 데이터: {}", stockDecreaseResponse.getStatusCode(), stockDecreaseResponse.getBody());
+            // stockDecreaseResponse.getBody() --> ApiResponseDto<ProductStockResponseDto>
+            throw new Exception("재고 감소 요청이 실패했습니다. 상태 코드: " + stockDecreaseResponse.getStatusCode());
         }
 
-        // 3. company-service 의 조회 메서드 호출하기
-        // ApiResponse<GetCompanyResponseDto> companyById = companyClient.getCompanyById(dto.getReceiverId());
+        // 4. company-service 의 조회 메서드 호출하기
+        // 클라이언트로부터 전달받은 수령업체가 존재하는지 확인
+        ResponseEntity<ApiResponseDto<GetCompanyResponseDto>> company = companyClient.getCompanyById(dto.getReceiverId());
+        GetCompanyResponseDto getReceiverCompanyInfo = company.getBody().getData();
 
-        // 상기 코드 호출시 하기의 객체를 전달받음
+        /* 상기 코드 호출시 하기의 객체를 전달받음
         GetCompanyResponseDto getCompanyInfo = GetCompanyResponseDto.builder()
-                .type(Type.RECEIVER)
+                .type(GetCompanyResponseDto.CompanyType.RECEIVER)
                 .name("스파르타")
                 // 업체 정보 생성한 일자 정보
                 .createdAt(LocalDateTime.now().minusWeeks(1))
                 .hubId(hubId) // 업체 테이블에 왜 hub id 가??
                 .id(receiverCompanyId) // 수령업체 id 여야함. 지금 이 객체에서는
-                .build();
-
-        if(getCompanyInfo == null || getCompanyInfo.getType() != Type.RECEIVER) {
-            // company-service 의 조회 메서드 호출 후 전달받은 company 객체가 null 또는
-            // null 이 아니라면 --> 객체에서 업체 타입의 정보가 RECEIVER 가 아니라면
+                .build();*/
+        if(getReceiverCompanyInfo == null || getReceiverCompanyInfo.getType() != GetCompanyResponseDto.CompanyType.RECEIVER) {
+            // company-service 의 조회 메서드 호출 후 전달받은 company 객체가 null 이라면 또는
+            // null 이 아닌데 객체에서 업체 타입의 정보가 RECEIVER 가 아니라면
             throw new ResourceNotFoundException("수령업체 정보가 존재하지 않습니다.");
         }
 
         // 4. 배송등록 마이크로 서비스 호출에 전달할 데이터 생성
         RequestDeliveryRegisterDto requestDeliveryRegisterDto = RequestDeliveryRegisterDto.builder()
                 .supplierCompanyId(getProduct.getCompanyId()) // 공급업체 id
-                .receiverCompanyId(getCompanyInfo.getId()) // 수령업체 id
+                .receiverCompanyId(getReceiverCompanyInfo.getId()) // 수령업체 id
                 .deliveryAddress(dto.getAddress()) // 배송지
                 .receiveName(dto.getReceiverName()) // 수령인
                 .build();
 
         // 하기와 같은 코드로 배송 서비스 호출 --> 배송 서비스의 배송등록 메서드 호출됨
-        // ApiResponse<GetProductResponseDto> getDelivery = deliveryClient.requestDeliveryRegister(requestDeliveryRegisterDto);
+        ResponseEntity<ApiResponseDto<ResponseDeliveryRegisterDto>> delieveryResponse = deliveryClient.requestDeliveryRegister(requestDeliveryRegisterDto);
 
-        ResponseDeliveryRegisterDto getDelivery = ResponseDeliveryRegisterDto.builder()
-                .companyDeliveryAgentId(deliveryAgentId)
-                .deliveryAddress(dto.getAddress())
-                .status(ResponseDeliveryRegisterDto.DeliveryStatus.WAITING)
-                .receiveName(dto.getReceiverName())
-                .id(deliveryId)
-                .build();
+        if(!delieveryResponse.getStatusCode().is2xxSuccessful()) {
+            log.info("배송 등록 요청했고, ResponseEntity 의 상태코드 문제");
+            log.error("배송 서비스 요청 실패 - 상태코드: {}, 데이터: {}", delieveryResponse.getStatusCode(), delieveryResponse.getBody());
+            throw new Exception("배송 서비스 요청이 실패했습니다. 상태 코드: " + delieveryResponse.getStatusCode());
+        }
 
-       if(getDelivery == null) {
+        ResponseDeliveryRegisterDto getDelivery = delieveryResponse.getBody().getData();
+
+        // 하기는 배송 서비스로부터 ResponseEntity 가
+        // 반환됐지만 data 가 없을 때 예외 처리
+        if(getDelivery == null) {
             log.info("배송 서비스 호출 --> 배송등록 메서드 호출 --> 실패");
             throw new ResourceNotFoundException("배송등록 서비스 호출에 실패하였습니다.");
         }
@@ -150,6 +166,17 @@ public class OrderService {
         return new OrderCreateResponseDto(savedOrder);
     }
 
+    // 객체를 전달했을 때 비어있는지의 여부를 확인하는 메서드
+    // - 어떤 객체와 예외를 매개변수로 받고
+    // - 객체가 null 인지 비교,
+    // - null 이라면 함께 전달받은 예외를 발생시키는 로직으로 develop 하기
+    private void ifExist(GetProductResponseDto data) {
+        if(data == null) {
+            log.info("상품이 존재하지 않을 경우 이 로그가 찍힌다.");
+            throw new ResourceNotFoundException("존재하지 않는 상품입니다.");
+        }
+    }
+
     // 권한확인 x
     // 주문 단건 조회 서비스
     public OrderFindOneResponseDto findOneOrder(UUID orderId) {
@@ -162,38 +189,33 @@ public class OrderService {
         // 1. 주문정보가 존재하는지 먼저 확인
         Order order = findByIdOneOrderInfo(orderId);
 
-        // 2.
-        // 기존 주문했던 물품 요청 수량과 수정 요청 수량이 다르다면
-
+        // 2. 기존 주문했던 물품 요청 수량과 수정 요청 수량이 다르다면
         log.info("기존 물품 요청 수량: {}, 수정 요청 수량: {}", order.getQuantity(), dto.getQuantity());
         if(!order.getQuantity().equals(dto.getQuantity()))
         {
             // 3. productId 를 기반으로 상품 서비스 조회 호출
-            // *** 추후 하기 메서드 추출(refactoring) 고려
-            // ApiResponse<GetProductResponseDto> getProduct = productClient.getProductById(order.getProductId());
-
-            // 상기 상품 서비스 호출시 전달받을 물품 객체
+            ResponseEntity<ApiResponseDto<GetProductResponseDto>> response = productClient.getProductById(order.getProductId());
+            GetProductResponseDto getProduct = response.getBody().getData();
+            /* 상기 상품 서비스 호출시 전달받을 물품 객체
             GetProductResponseDto getProduct = GetProductResponseDto.builder()
-                    .id(productId) // 50c3068a-6b09-4f45-a3af-c119168a7676
+                    .id(order.getProductId())// .id(productId) // 50c3068a-6b09-4f45-a3af-c119168a7676
                     .companyId(companyId)
                     .hubId(hubId)
-                    .productName("지우개")
+                    .name("지우개")
                     .quantity(40)
-                    .createdBy(40) // 이 상품을 생성한 사용자
+                    // .createdBy(40) // 이 상품을 생성한 사용자
                     .createdAt(LocalDateTime.now().minusWeeks(1))
-                    .build();
-
+                    .build();*/
+            /* ------------------------------------------------------------
             if(getProduct == null) {
                 log.info("상품이 존재하지 않을 경우 이 로그가 찍힌다.");
                 throw new ResourceNotFoundException("존재하지 않는 상품입니다.");
-            }
+            }*/
+            // getProduct 가 null 이라면 예외 발생
+            ifExist(getProduct);
 
-            if(dto.getQuantity() > getProduct.getQuantity()) {
-                log.info("요청 수량이 재고 수량보다 많음");
-                log.info("요청 수량: {}, 재고 수량: {}", dto.getQuantity(), getProduct.getQuantity());
-                String data = "요청 수량이 재고 수량을 초과했습니다. 최대 주문 가능 수량을 확인해 주세요.\n 최대 주문 가능 수량: "+getProduct.getQuantity();
-                throw new OutOfStockException(data);
-            }
+            // 요청수량이 상품 재고 수량보다 많으면 예외 발생
+            checkProductStock(dto.getQuantity(), getProduct.getQuantity());
 
             order.setQuantity(dto.getQuantity());
         }
@@ -202,9 +224,15 @@ public class OrderService {
         if(!order.getMessage().trim().equals(dto.getMessage().trim())) order.setMessage(dto.getMessage());
         Order updatedOneOrder = orderJpaRepository.save(order);
         return new OrderInfoUpdateResponseDto(updatedOneOrder);
+    }
 
-
-
+    private void checkProductStock(Integer requestQuantity, Integer existQuantity) {
+        if(requestQuantity > existQuantity) {
+            log.info("요청 수량이 재고 수량보다 많음");
+            log.info("요청 수량: {}, 재고 수량: {}", requestQuantity, existQuantity);
+            String data = "요청 수량이 재고 수량을 초과했습니다. 최대 주문 가능 수량을 확인해 주세요.\n 최대 주문 가능 수량: "+ existQuantity;
+            throw new OutOfStockException(data);
+        }
     }
 
     // orderId 에 기반하여 주문정보 확인하는 메서드 -> 주문정보 존재한다면 Order 객체를 반환
@@ -230,6 +258,7 @@ public class OrderService {
         // --> 그리고 비교해서 맞지 않다면 접근 권한이 없다고 리턴한다.
 
         // 3. 상품 서비스에게 수량 만큼의 복원을 요청한다.
+
 
 
 
@@ -270,7 +299,8 @@ public class OrderService {
     private OrderInfoMessageRequestDto createOrderMessage(UUID getOrderId,GetProductResponseDto getProduct, OrderCreateRequestDto dto, ResponseDeliveryRegisterDto getDelivery) {
         return OrderInfoMessageRequestDto.builder()
                 .orderId(getOrderId)
-                .productName(getProduct.getProductName())
+                // dto 필드에 productName 없어요 getName 으로 변경했습니다.
+                .productName(getProduct.getName())
                 .quantity(dto.getQuantity())
                 .receiverName(dto.getReceiverName())
                 .destination(dto.getAddress())
