@@ -16,7 +16,6 @@ public class DeliveryResponseDto {
     private String deliveryAddress;
     private String receiveName;
     private Long deliveryAgentId;
-    private UUID hubRouteId;
     private UUID fromHubId;
     private UUID toHubId;
 
@@ -26,7 +25,6 @@ public class DeliveryResponseDto {
         this.deliveryAddress = delivery.getDeliveryAddress();
         this.receiveName = delivery.getReceiveName();
         this.deliveryAgentId = delivery.getDeliveryAgentId();
-        this.hubRouteId = delivery.getHubRouteId();
         this.fromHubId = delivery.getFromHubId();
         this.toHubId = delivery.getToHubId();
     }

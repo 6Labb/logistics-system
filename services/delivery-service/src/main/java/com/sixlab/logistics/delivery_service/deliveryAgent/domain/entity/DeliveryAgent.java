@@ -4,6 +4,7 @@ import com.sixlab.logistics.common.shared.domain.BasicEntity;
 import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliveryRequestDto;
 import com.sixlab.logistics.delivery_service.delivery.domain.entity.DeliveryStatus;
 import com.sixlab.logistics.delivery_service.deliveryAgent.application.dto.DeliveryAgentRequestDto;
+import com.sixlab.logistics.delivery_service.deliveryAgent.application.dto.DeliveryAgentResponseDto;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -41,9 +42,23 @@ public class DeliveryAgent extends BasicEntity {
         this.slackId = requestDto.getSlackId();
     }
 
+    @Builder
+    public DeliveryAgent(DeliveryAgentResponseDto responseDto) {
+        super();
+        this.userId = responseDto.getUserId();
+        this.type = responseDto.getType();
+        this.deliverySequence = responseDto.getDeliverySequence();
+        this.hubId = responseDto.getHubId();
+        this.slackId = responseDto.getSlackId();
+    }
+
     public void updateDeliveryAgent(DeliveryAgentRequestDto requestDto) {
         this.hubId = requestDto.getHubId();
         this.slackId = requestDto.getSlackId();
+    }
+
+    public void updateSequence(Integer sequence) {
+        this.deliverySequence = sequence;
     }
 
 }

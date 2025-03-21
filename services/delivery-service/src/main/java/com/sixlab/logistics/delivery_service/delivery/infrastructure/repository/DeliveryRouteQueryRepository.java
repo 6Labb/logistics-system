@@ -37,7 +37,7 @@ public class DeliveryRouteQueryRepository {
 
         // receiveName으로 검색
         if (searchDto.getDeliveryAgentId() != null) {
-            builder.and(deliveryRoute.deliveryAgentId.eq(searchDto.getDeliveryAgentId()));
+            builder.and(deliveryRoute.companyDeliveryAgentId.eq(searchDto.getDeliveryAgentId()));
         }
 
         // 페이징된 결과 조회
@@ -54,7 +54,8 @@ public class DeliveryRouteQueryRepository {
                         deliveryRoute.deliveryId,
                         deliveryRoute.fromHubId,
                         deliveryRoute.toHubId,
-                        deliveryRoute.deliveryAgentId
+                        deliveryRoute.companyDeliveryAgentId,
+                        deliveryRoute.hubDeliveryAgentId
                 ))
                 .from(deliveryRoute)
                 .where(builder)

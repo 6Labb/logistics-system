@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,5 +18,7 @@ public class DeliveryRouteRequestDto {
     private Double actualDistance;
     private Integer actualTime;
     private DeliveryRouteStatus status;
-    private Long deliveryAgentId; // 마지막 배송경로에는 업체배송담당자가 들어감
+    private Long companyDeliveryAgentId;
+    private Long hubDeliveryAgentId;
+    private UUID hubRouteId;
 }
