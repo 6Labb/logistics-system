@@ -2,7 +2,6 @@ package com.sixlab.logistics.order_service.application.service;
 
 import com.sixlab.logistics.common.shared.exception.OutOfStockException;
 import com.sixlab.logistics.common.shared.exception.ResourceNotFoundException;
-import com.sixlab.logistics.common.shared.response.ApiResponse;
 import com.sixlab.logistics.order_service.application.client.CompanyClient;
 import com.sixlab.logistics.order_service.application.client.DeliveryClient;
 import com.sixlab.logistics.order_service.application.client.HubClient;
@@ -10,6 +9,7 @@ import com.sixlab.logistics.order_service.application.client.ProductClient;
 import com.sixlab.logistics.order_service.application.dto.UserInfo;
 import com.sixlab.logistics.order_service.application.dto.request.OrderCreateRequestDto;
 
+import com.sixlab.logistics.order_service.application.dto.request.OrderInfoMessageRequestDto;
 import com.sixlab.logistics.order_service.application.dto.request.OrderInfoUpdateRequestDto;
 import com.sixlab.logistics.order_service.application.dto.request.RequestDeliveryRegisterDto;
 import com.sixlab.logistics.order_service.application.dto.response.*;
@@ -18,14 +18,13 @@ import com.sixlab.logistics.order_service.domain.model.Order;
 import com.sixlab.logistics.order_service.infrastructure.persistence.OrderJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -49,6 +48,13 @@ public class OrderService {
 
     private final OrderJpaRepository orderJpaRepository;
 
+    private final RabbitTemplate rabbitTemplate;
+
+    @Value("${message.exchange}")
+    private String exchange;
+
+    @Value("${message.queue.order}")
+    private String queueOrder;
 
     public OrderCreateResponseDto createOrder(OrderCreateRequestDto dto) throws Exception{
         log.info("service 계층: createOrder() 호출됨");
@@ -135,6 +141,12 @@ public class OrderService {
         // 5. Order 엔터티 객체 만들어서 저장하기
         Order order = dto.toEntity(getProduct.getCompanyId(), userId, getDelivery.getId());
         Order savedOrder = orderJpaRepository.save(order);
+
+        //AI 호출용 RabbitMQ
+        OrderInfoMessageRequestDto message = createOrderMessage(savedOrder.getOrderId(),getProduct, dto, getDelivery);
+        rabbitTemplate.convertAndSend(exchange, "order.created", message);
+        System.out.println("📤 주문 메시지 전송됨: " +exchange+" : "+ queueOrder+" : "+message); //테스트후  삭제
+
         return new OrderCreateResponseDto(savedOrder);
     }
 
@@ -253,6 +265,18 @@ public class OrderService {
         }
         // 데이터베이스로부터 반환된 행이 0 이라면 비어있는 리스트가 반환됨.
         return dtoList;
+    }
+
+    private OrderInfoMessageRequestDto createOrderMessage(UUID getOrderId,GetProductResponseDto getProduct, OrderCreateRequestDto dto, ResponseDeliveryRegisterDto getDelivery) {
+        return OrderInfoMessageRequestDto.builder()
+                .orderId(getOrderId)
+                .productName(getProduct.getProductName())
+                .quantity(dto.getQuantity())
+                .receiverName(dto.getReceiverName())
+                .destination(dto.getAddress())
+                .requestMessage(dto.getMessage())
+                .deliveryId(getDelivery.getId())
+                .build();
     }
 }
 

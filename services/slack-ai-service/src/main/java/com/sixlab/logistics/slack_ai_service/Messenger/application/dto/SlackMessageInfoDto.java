@@ -4,11 +4,12 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Builder
 public class SlackMessageInfoDto {
-    private String orderId;
+    private UUID orderId;
     private String customerName;
     private String productName;
     private int quantity;

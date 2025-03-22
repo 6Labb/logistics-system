@@ -1,7 +1,10 @@
 server:
   port: 19096
 
-message: "order-service dev message updated 10:29"
+message:
+  exchange: order-exchange
+  queue:
+    order: orderInfo-queue
 
 spring:
   jpa:
@@ -14,6 +17,10 @@ spring:
         format_sql: true
         use_sql_comments: true
         default_schema: orders
+    rabbitmq.host: localhost
+    rabbitmq.port: 5672
+    rabbitmq.username: guest
+    rabbitmq.password: guest
   datasource:
     url: jdbc:postgresql://localhost:5432/logistics
     username: postgres

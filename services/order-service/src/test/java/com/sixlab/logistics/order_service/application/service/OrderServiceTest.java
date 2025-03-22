@@ -8,6 +8,7 @@ import com.sixlab.logistics.order_service.application.dto.response.OrderCreateRe
 import com.sixlab.logistics.order_service.application.dto.response.OrderDeleteResponseDto;
 import com.sixlab.logistics.order_service.application.dto.response.OrderFindOneResponseDto;
 import com.sixlab.logistics.order_service.application.dto.response.OrderInfoUpdateResponseDto;
+import com.sixlab.logistics.order_service.config.OrderApplicationQueueConfig;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,12 +16,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.Rollback;
 
 import java.util.List;
 import java.util.UUID;
 
 @SpringBootTest(classes = OrderServiceApplication.class)
+@Import(OrderApplicationQueueConfig.class)
 class OrderServiceTest {
     private final UUID productId = UUID.fromString("50c3068a-6b09-4f45-a3af-c119168a7676");
     private final UUID receiverCompanyId = UUID.fromString("c0502b76-1beb-4d6d-a2d3-3f61ca1b7574"); // 수령업체 id

@@ -52,13 +52,13 @@ public class SlackService {
             log.error("실패 메세지 " + response.error());
         }
 
-        Slack slack = new Slack(
-                response.channel(),
-                prompt,
-                response.ok() ? MessageType.SENT : MessageType.FAILED
-        );
-
-        slackRepository.save(slack);
+//        Slack slack = new Slack(
+//                response.channel(),
+//                prompt,
+//                response.ok() ? MessageType.SENT : MessageType.FAILED
+//        );
+//
+//        slackRepository.save(slack);
 
 
     }

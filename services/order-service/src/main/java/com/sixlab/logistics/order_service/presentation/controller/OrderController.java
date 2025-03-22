@@ -46,7 +46,7 @@ public class OrderController {
 
 
     @Operation(summary = "주문 등록")
-    @PostMapping
+    @PostMapping("/create")
     public ApiResponse<OrderCreateResponseDto> createOrder(
             @RequestBody @Valid OrderCreateRequestDto requestDto) throws Exception {
         log.info("createOrder: {}", requestDto);

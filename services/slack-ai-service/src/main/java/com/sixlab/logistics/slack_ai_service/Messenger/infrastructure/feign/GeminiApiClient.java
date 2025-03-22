@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 //uri?key=GEMINI_API_KEY
 @FeignClient(name = "geminiApiClient", url = "${gemini.uri}" ,configuration = GeminiApiClientConfig.class)
-public interface AiApiClient {
+public interface GeminiApiClient {
 
     @PostMapping
     AiCreateResponseDto callAi(@RequestBody AiCreateRequestDto request);

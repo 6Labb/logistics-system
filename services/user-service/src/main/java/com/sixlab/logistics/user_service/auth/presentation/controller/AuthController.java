@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +21,8 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @Value("${admin.token}")
+    private String token;
     /**
      * 사용자 ID를 받아 JWT 액세스 토큰을 생성하여 응답합니다.
      *
@@ -28,7 +31,7 @@ public class AuthController {
      */
 //    @GetMapping("/auth/signIn")
 //    public ResponseEntity<?> createAuthenticationToken(@RequestParam String username, Role role){
-//        //String token = authService.createAccessToken(username, role);
+//        String token = authService.createAccessToken(username, role);
 //
 //        return ResponseEntity.ok()
 //                .header("Authorization", "Bearer " + token)

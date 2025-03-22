@@ -3,11 +3,11 @@ server:
 
 message:
   queue:
-    ai:
-  err:
-    exchange:
+    order: orderInfo-queue
 
 spring:
+  config:
+    import: optional:file:.env[.properties]
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -29,26 +29,41 @@ spring:
   rabbitmq.port: 5672
   rabbitmq.username: guest
   rabbitmq.password: guest
+  rabbitmq:
+    listener:
+      simple:
+        acknowledge-mode : manual
   resilience4j:
+    retry:
+      instances:
+        externalApi: # 외부 API 호출용 Retry 인스턴스
+          maxRetryAttempts: 3
+          waitDuration: 500ms
+          enableExponentialBackoff: true
+          exponentialBackoffMultiplier: 2
+          retryExceptions: #재시도 예외처리
+            - java.net.ConnectException
+            - java.io.IOException
+          ignoreExceptions:
+            - java.lang.NullPointerException
+        databaseCall: # DB 호출용 Retry 인스턴스
+          maxRetryAttempts: 2
+          waitDuration: 200ms
+          retryExceptions:
+            - org.springframework.dao.DataAccessException
     circuitbreaker:
       configs:
         default: # 기본 구성 이름
-          registerHealthIndicator: true  # 애플리케이션의 헬스 체크에 서킷 브레이커 상태를 추가하여 모니터링 가능
-          # 서킷 브레이커가 동작할 때 사용할 슬라이딩 윈도우의 타입을 설정
-          # COUNT_BASED: 마지막 N번의 호출 결과를 기반으로 상태를 결정
-          # TIME_BASED: 마지막 N초 동안의 호출 결과를 기반으로 상태를 결정
-          slidingWindowType: COUNT_BASED  # 슬라이딩 윈도우의 타입을 호출 수 기반(COUNT_BASED)으로 설정
-          # 슬라이딩 윈도우의 크기를 설정
-          # COUNT_BASED일 경우: 최근 N번의 호출을 저장
-          # TIME_BASED일 경우: 최근 N초 동안의 호출을 저장
-          slidingWindowSize: 5  # 슬라이딩 윈도우의 크기를 5번의 호출로 설정
-          minimumNumberOfCalls: 5  # 서킷 브레이커가 동작하기 위해 필요한 최소한의 호출 수를 5로 설정
-          slowCallRateThreshold: 100  # 느린 호출의 비율이 이 임계값(100%)을 초과하면 서킷 브레이커가 동작
-          slowCallDurationThreshold: 60000  # 느린 호출의 기준 시간(밀리초)으로, 60초 이상 걸리면 느린 호출로 간주
-          failureRateThreshold: 50  # 실패율이 이 임계값(50%)을 초과하면 서킷 브레이커가 동작
-          permittedNumberOfCallsInHalfOpenState: 3  # 서킷 브레이커가 Half-open 상태에서 허용하는 최대 호출 수를 3으로 설정
-          # 서킷 브레이커가 Open 상태에서 Half-open 상태로 전환되기 전에 기다리는 시간
-          waitDurationInOpenState: 20s  # Open 상태에서 Half-open 상태로 전환되기 전에 대기하는 시간을 20초로 설정
+          slidingWindowType: COUNT_BASED  # 호출 수 기반(COUNT_BASED) / 시간 순 기반(TIME_BASED)
+          slidingWindowSize: 5  # 슬라이딩 윈도우의 크기
+          failureRateThreshold: 25  # 실패율 임계값 (%)
+          minimumNumberOfCalls: 5  # 실패율 계산을 시작하기 위한 최소 호출 수
+          slowCallRateThreshold: 100  # 느린 호출 비율 임계값 (%)
+          slowCallDurationThreshold: 60000  # 느린 호출로 간주되는 시간
+          permittedNumberOfCallsInHalfOpenState: 5  # Half-Open 상태에서 허용되는 호출 수
+          waitDurationInOpenState: 20s  # Open 상태에서 대기하는 시간
+          automaticTransitionFromOpenToHalfOpenEnabled: true # Open에서 Half-Open으로 자동 전환 여부
+          registerHealthIndicator: true  #서킷 브레이커 상태 모니터링
 slack:
   token: ${slack.token}
   uri: ${slack.uri}
@@ -61,4 +76,18 @@ logging:
     root: INFO
     feign: DEBUG
     feign.client: DEBUG
+
+management:
+  zipkin:
+    tracking:
+    endpoint: "http://localhost:9411/api/v2/spans"
+  tracing:
+    sampling:
+      probability: 1.0
+
+service:
+  jwt:
+    access-expiration: 3600000
+    # secret-key: ${SECRET_KEY}
+    secret-key: "401b09eab3c013d4ca54922bb802bec8fd5318192b0a75f201d8b3727429080fb337591abd3e44453b954555b7a0812e1081c39b740293f765eae731f5a65ed1"
 

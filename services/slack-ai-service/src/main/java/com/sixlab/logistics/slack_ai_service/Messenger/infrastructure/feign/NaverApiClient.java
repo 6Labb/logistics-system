@@ -1,4 +1,4 @@
-package com.sixlab.logistics.common.shared.feign;
+package com.sixlab.logistics.slack_ai_service.Messenger.infrastructure.feign;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;

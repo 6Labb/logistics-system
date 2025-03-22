@@ -25,10 +25,10 @@ public class AiController {
     }
 
     //ai 응답호출
-    @PostMapping("/callAi")
-    public void getSlack_AiResponse() {
-        aiService.processOrderAndNotifySlack();
-    }
+//    @PostMapping("/callAi")
+//    public void getSlack_AiResponse() {
+//        aiService.processOrderAndNotifySlack();
+//    }
 
     @PostMapping("/question")
     public ResponseEntity<String> geminiGetAnswer(@RequestParam String question) {
