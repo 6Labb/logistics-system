@@ -26,8 +26,7 @@ public class DeliveryAgentService {
     public Page<DeliveryAgentResponseDto> getAllDeliveryAgent(DeliveryAgentSearchDto searchDto, Pageable pageable) {
         // 권한 받아오기
             // 관리자는 전부 가능
-            // 허브담당자는 본인의 허브 배송 담당자 리스트만 가능
-            // 배송담당자는 본인의 배송 담당자 리스트만 가능
+            // 허브담당자는 본인의 허브 소속 배송 담당자 리스트만 가능
 
         return deliveryAgentRepository.searchDeliveryAgentList(searchDto, pageable);
 

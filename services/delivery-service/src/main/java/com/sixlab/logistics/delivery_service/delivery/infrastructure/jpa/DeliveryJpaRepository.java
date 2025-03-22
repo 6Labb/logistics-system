@@ -1,5 +1,7 @@
 package com.sixlab.logistics.delivery_service.delivery.infrastructure.jpa;
 
+import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliveryResponseDto;
+import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliverySearchDto;
 import com.sixlab.logistics.delivery_service.delivery.domain.entity.Delivery;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,26 +14,20 @@ import java.util.UUID;
 @Repository
 public interface DeliveryJpaRepository extends JpaRepository<Delivery, UUID> {
 
-    // 배송상태 조회
-    //Optional<Delivery> findByStatus(DeliveryStatus status);
-
-    // 소속 허브id로 조회
-    //Page<Delivery> findByHubId(UUID hubId, Pageable pageable);
-
-    // 배송담당자id로 조회
-    //Page<Delivery> findByCompanyDeliveryAgentId(UUID companyDeliveryAgentId, Pageable pageable);
-
-
-    // id로 조회
+    // 배송 개별 조회
+    // id로 조회(관리자)
     Optional<Delivery> findById(UUID id);
 
-    // 배송 삭제
-    void delete(Delivery delivery);
+    // 허브 담당자
+    Optional<Delivery> findByIdAndToHubId(UUID id, UUID hubId);
+
+    // 배송 담당자 - 허브
+    Optional<Delivery> findByIdAndHubDeliveryAgentId(UUID id, Long hubDeliveryAgentId);
+
+    // 배송 담당자 - 업체
+    Optional<Delivery> findByIdAndCompanyDeliveryAgentId(UUID id, Long companyDeliveryAgentId);
 
     // 배송 생성
     Delivery save(Delivery delivery);
-
-    // 마지막으로 할당된 배송순번 조회
-    Optional<Delivery> findTopByToHubIdOrderByCreatedAtDesc(UUID toHubId);
 
 }

@@ -1,5 +1,6 @@
 package com.sixlab.logistics.delivery_service.delivery.infrastructure.jpa;
 
+import com.sixlab.logistics.delivery_service.delivery.domain.entity.Delivery;
 import com.sixlab.logistics.delivery_service.delivery.domain.entity.DeliveryRoute;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,8 +15,16 @@ public interface DeliveryRouteJpaRepository extends JpaRepository<DeliveryRoute,
 
     Page<DeliveryRoute> findAllByDeliveryId(Pageable pageable, UUID deliveryId);
 
-    Optional<DeliveryRoute> findById(UUID id);
+    // 허브 담당자
+    Optional<DeliveryRoute> findByIdAndToHubId(UUID id, UUID hubId);
 
-    void delete(DeliveryRoute deliveryRoute);
+    // 배송 담당자 - 허브
+    Optional<DeliveryRoute> findByIdAndHubDeliveryAgentId(UUID id, Long hubDeliveryAgentId);
+
+    // 배송 담당자 - 업체
+    Optional<DeliveryRoute> findByIdAndCompanyDeliveryAgentId(UUID id, Long companyDeliveryAgentId);
+
+    // 배송 생성
+    DeliveryRoute save(DeliveryRoute deliveryRoute);
 
 }

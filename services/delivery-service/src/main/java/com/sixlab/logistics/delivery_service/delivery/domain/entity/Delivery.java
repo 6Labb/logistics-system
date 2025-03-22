@@ -33,16 +33,19 @@ public class Delivery extends BasicEntity {
 
     private UUID toHubId;
 
-    private Long deliveryAgentId;
+    private Long companyDeliveryAgentId;
+
+    private Long hubDeliveryAgentId;
 
     @Builder
-    public Delivery(DeliveryRequestDto requestDto, UUID fromHubId, UUID toHubId, Long deliveryAgentId, UUID id) {
+    public Delivery(DeliveryRequestDto requestDto, UUID fromHubId, UUID toHubId, Long companyDeliveryAgentId, Long hubDeliveryAgentId, UUID id) {
         super();
         this.id = id;
         this.status = DeliveryStatus.WAITING;
         this.deliveryAddress = requestDto.getDeliveryAddress();
         this.receiveName = requestDto.getReceiveName();
-        this.deliveryAgentId = deliveryAgentId;
+        this.companyDeliveryAgentId = companyDeliveryAgentId;
+        this.hubDeliveryAgentId = hubDeliveryAgentId;
         this.fromHubId = fromHubId;
         this.toHubId = toHubId;
     }
@@ -58,8 +61,9 @@ public class Delivery extends BasicEntity {
         this.toHubId = toHubId;
     }
 
-    public void updateDeliveryAgent(Long deliveryAgentId) {
-        this.deliveryAgentId = deliveryAgentId;
+    public void updateDeliveryAgent(Long companyDeliveryAgentId, Long hubDeliveryAgentId) {
+        this.companyDeliveryAgentId = companyDeliveryAgentId;
+        this.hubDeliveryAgentId = hubDeliveryAgentId;
     }
 
     public void updateDelivery(DeliveryRequestDto requestDto) {

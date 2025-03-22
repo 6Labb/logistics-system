@@ -4,6 +4,7 @@ import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliveryRe
 import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliveryRouteResponseDto;
 import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliveryRouteSearchDto;
 import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliverySearchDto;
+import com.sixlab.logistics.delivery_service.delivery.domain.entity.Delivery;
 import com.sixlab.logistics.delivery_service.delivery.domain.entity.DeliveryRoute;
 import com.sixlab.logistics.delivery_service.delivery.domain.repository.DeliveryRouteRepository;
 import com.sixlab.logistics.delivery_service.delivery.infrastructure.jpa.DeliveryRouteJpaRepository;
@@ -24,12 +25,7 @@ public class DeliveryRouteRepositoryImpl implements DeliveryRouteRepository {
 
     @Override
     public Page<DeliveryRouteResponseDto> searchDeliveryRouteList(DeliveryRouteSearchDto searchDto, Pageable pageable) {
-        return deliveryRouteQueryRepository.searchDeliveryRouteList(searchDto, pageable);
-    }
-
-    @Override
-    public Page<DeliveryRoute> findAllByDeliveryId(Pageable pageable, UUID deliveryId) {
-        return jpaRepository.findAllByDeliveryId(pageable, deliveryId);
+        return deliveryRouteQueryRepository.searchDeliveryRouteList(searchDto, pageable, null, null);
     }
 
     @Override
@@ -38,8 +34,17 @@ public class DeliveryRouteRepositoryImpl implements DeliveryRouteRepository {
     }
 
     @Override
-    public void delete(DeliveryRoute deliveryRoute) {
-        jpaRepository.delete(deliveryRoute);
+    public Optional<DeliveryRoute> findByIdAndToHubId(UUID id, UUID hubId) {
+        return jpaRepository.findByIdAndToHubId(id, hubId);
+    }
+
+    @Override
+    public Optional<DeliveryRoute> findByIdAndDeliveryAgentId(UUID id, Long currentUserId) {
+        Optional<DeliveryRoute> deliveryRoute = jpaRepository.findByIdAndHubDeliveryAgentId(id, currentUserId);
+        if (deliveryRoute.isPresent()) {
+            return deliveryRoute;
+        }
+        return jpaRepository.findByIdAndCompanyDeliveryAgentId(id, currentUserId);
     }
 
     @Override
