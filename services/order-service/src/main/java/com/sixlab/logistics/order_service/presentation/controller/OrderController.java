@@ -1,6 +1,7 @@
 package com.sixlab.logistics.order_service.presentation.controller;
 
 import com.sixlab.logistics.common.shared.response.ApiResponse;
+import com.sixlab.logistics.common.shared.security.UserDetailsImpl;
 import com.sixlab.logistics.order_service.application.dto.UserInfo;
 import com.sixlab.logistics.order_service.application.dto.request.OrderCreateRequestDto;
 import com.sixlab.logistics.order_service.application.dto.request.OrderInfoUpdateRequestDto;
@@ -8,10 +9,12 @@ import com.sixlab.logistics.order_service.application.dto.response.*;
 import com.sixlab.logistics.order_service.application.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,35 +23,18 @@ import java.util.UUID;
 @RefreshScope
 @RestController
 @RequestMapping("/orders")
-@Slf4j
+@Slf4j(topic = "order-service controller")
 @ControllerAdvice
+@RequiredArgsConstructor
 public class OrderController {
-
-    @Value("${server.port}")
-    private String serverPort;
-
-    @Value("${message}")
-    private String message;
-
     private final OrderService orderService;
-
-    public OrderController(OrderService orderService) {
-        this.orderService = orderService;
-    }
-
-
-//    @GetMapping
-//    public String getOrder() {
-//        log.info("http://localhost:19096/orders: GET");
-//        return "info!!! From port : " + serverPort + "and message : " + message;
-//    }
-
-
-
     @Operation(summary = "주문 등록")
     @PostMapping
+    @PreAuthorize("hasRole('MASTER')")
     public ApiResponse<OrderCreateResponseDto> createOrder(
-            @RequestBody @Valid OrderCreateRequestDto requestDto) throws Exception {
+            @RequestBody @Valid OrderCreateRequestDto requestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
+        log.info("userDetails.getUserId() - {}, userDetails.getUserInfo() - {}", userDetails.getUserId(), userDetails.getUserInfo().toString());
         log.info("createOrder: {}", requestDto);
         OrderCreateResponseDto order = orderService.createOrder(requestDto);
         return ApiResponse.success(order, "주문이 성공적으로 등록되었습니다.");
