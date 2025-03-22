@@ -1,20 +1,17 @@
 package com.sixlab.logistics.user_service.auth.infrastructure.config;
 
-import com.sixlab.logistics.user_service.user.application.service.UserDetailsServiceImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -27,17 +24,10 @@ import java.util.List;
 @Component
 public class JwtTokenProvider {
 
-    private final UserDetailsServiceImpl userDetailsService;
-
     //@Value("${service.jwt.secret-key}") // 🔥 Auth 서비스와 동일한 환경변수 사용
     private String SECRET_KEY = "401b09eab3c013d4ca54922bb802bec8fd5318192b0a75f201d8b3727429080fb337591abd3e44453b954555b7a0812e1081c39b740293f765eae731f5a65ed1";
 
     private SecretKey key;
-
-
-    public JwtTokenProvider(UserDetailsServiceImpl userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
 
     @PostConstruct
     public void init() {
@@ -66,7 +56,6 @@ public class JwtTokenProvider {
                 .parseSignedClaims(token)
                 .getPayload();
 
-        //String userId = claims.get("userId", String.class);
         Long userId = Long.parseLong(claims.get("userId", String.class));
         String role = claims.get("role", String.class);
 
@@ -75,16 +64,14 @@ public class JwtTokenProvider {
             throw new RuntimeException("Invalid JWT: userId 또는 role이 없음");
         }
 
-        UserDetails userDetails = userDetailsService.loadUserById(userId);
+        UserInfo userInfo = new UserInfo("UNUSED", "UNUSED", userId ,role);
+        UserDetails userDetails = new UserDetailsImpl(userInfo);
 
-        if (!role.startsWith("ROLE_")) {
-            role = "ROLE_" + role; //
-        }
+        if (!role.startsWith("ROLE_")) { role = "ROLE_" + role; }
         System.out.println("✅ getAuthentication - userId: " + userId + ", role: " + role);
 
         List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(role);
 
-        //return new UsernamePasswordAuthenticationToken(userId, token, authorities);
         return new UsernamePasswordAuthenticationToken(userDetails, token, authorities);
     }
 

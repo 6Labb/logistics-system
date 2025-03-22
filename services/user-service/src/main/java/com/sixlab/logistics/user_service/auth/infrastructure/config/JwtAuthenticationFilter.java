@@ -36,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String requestURI = request.getRequestURI();
 
-        // 🔥 로그인 & 회원가입 요청은 JWT 필터 적용 제외!
+        // 로그인 & 회원가입 요청은 JWT 필터 적용 제외!
         if (requestURI.equals("/auth/signIn") || requestURI.equals("/users/signUp")) {
             filterChain.doFilter(request, response);
             return;
