@@ -49,7 +49,6 @@ public class DeliveryQueryRepository {
                         delivery.deliveryAddress,
                         delivery.receiveName,
                         delivery.deliveryAgentId,
-                        delivery.hubRouteId,
                         delivery.fromHubId,
                         delivery.toHubId
                 ))

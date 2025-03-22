@@ -1,12 +1,12 @@
-package com.sixlab.logistics.user_service.user.domain.model;
+package com.sixlab.logistics.common.shared.security;
 
-import com.sixlab.logistics.user_service.user.application.dto.Role;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  *  security 에서 사용할 유저 객체 생성
@@ -14,34 +14,36 @@ import java.util.Collection;
  */
 public class UserDetailsImpl implements UserDetails {
 
-    private final User user;
+    private final UserInfo userInfo;
 
-    public UserDetailsImpl(User user) { this.user = user; }
+    public UserDetailsImpl(UserInfo userInfo) {
+        this.userInfo = userInfo;
+    }
 
     // accessing user information from a controller or service
-    public User getUser() { return this.user;}
+    public UserInfo getUserInfo() { return this.userInfo; }
 
     // return authority information
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Role role = user.getRole();
-        String authority = role.getAuthority();
 
-        SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(authority);
-        Collection<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(simpleGrantedAuthority);
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + userInfo.getRole());
 
-        return authorities;
+        return Collections.singletonList(authority);
     }
 
     @Override
     public String getUsername() {
-        return "UNUSED";
+        return userInfo.getUsername();
     }
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return userInfo.getPassword();
+    }
+
+    public Long getUserId() {
+        return userInfo.getUserId();
     }
 
     @Override public boolean isAccountNonExpired() { return true; }

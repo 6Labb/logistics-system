@@ -4,9 +4,9 @@ services:
     container_name: logistics-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB} #logistics
-      POSTGRES_USER: ${POSTGRES_USER} #postgres
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} #lab6
+      POSTGRES_DB: logistics #logistics
+      POSTGRES_USER: postgres #postgres
+      POSTGRES_PASSWORD: lab6 #lab6
     ports:
       - "5432:5432"
     volumes:
@@ -35,10 +35,11 @@ services:
       - "9411:9411"
     networks:
       - logistics-network
+    environment:
+      - JAVA_OPTS=-XX:UseSVE=0
 
 networks:
   logistics-network:
-
 
 volumes:
   postgres-data:

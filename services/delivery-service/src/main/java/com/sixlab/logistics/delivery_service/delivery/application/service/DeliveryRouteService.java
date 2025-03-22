@@ -9,12 +9,19 @@ import com.sixlab.logistics.delivery_service.delivery.domain.repository.Delivery
 import com.sixlab.logistics.delivery_service.delivery.domain.repository.DeliveryRouteRepository;
 import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.HubClient;
 import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.dto.HubRouteResponseDto;
+import com.sixlab.logistics.delivery_service.deliveryAgent.application.service.DeliveryAgentService;
+import com.sixlab.logistics.delivery_service.deliveryAgent.domain.entity.DeliveryAgent;
+import com.sixlab.logistics.delivery_service.deliveryAgent.domain.entity.DeliveryAgentType;
+import com.sixlab.logistics.delivery_service.deliveryAgent.domain.repository.DeliveryAgentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -24,6 +31,8 @@ public class DeliveryRouteService {
     private final HubClient hubClient;
     private final DeliveryRouteRepository deliveryRouteRepository;
     private final DeliveryRepository deliveryRepository;
+    private final DeliveryAgentRepository deliveryAgentRepository;
+    private final DeliveryAgentService deliveryAgentService;
 
     // 배송 경로 목록 조회
     public Page<DeliveryRouteResponseDto> getAllDeliveryRoute(DeliveryRouteSearchDto searchDto, Pageable pageable) {
@@ -107,18 +116,31 @@ public class DeliveryRouteService {
     }
 
     // 배송경로 생성
-    /*
     @Transactional
     public DeliveryRouteResponseDto createDeliveryRoute(UUID deliveryId) {
         // 배송 존재 여부 확인
         Delivery delivery = deliveryRepository.findById(deliveryId)
                 .orElseThrow(() -> new ResourceNotFoundException("해당 배송을 찾을 수 없습니다."));
 
-        // 허브 경로 정보 조회 (FeignClient 호출)
-        HubRouteResponseDto hubRoute = hubClient.getHubRouteId(
-                delivery.getFromHubId(),
-                delivery.getToHubId()
+        UUID fromHubId = delivery.getFromHubId();
+        UUID toHubId = delivery.getToHubId();
+        DeliveryAgentType fromType = DeliveryAgentType.HUB;
+        DeliveryAgentType toType = DeliveryAgentType.COMPANY;
+
+        // 허브이동관리 id 조회
+        //HubRouteResponseDto hubRoute = hubClient.getHubRouteId(fromHubId, toHubId);
+        // TODO: 테스트용 허브 경로
+        HubRouteResponseDto hubRoute = new HubRouteResponseDto(
+                UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac130002"),//UUID id
+                UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120001"),//fromHubId;
+                UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120003"),//toHubId;
+                80,// totalDuration; // 소요시간
+                110.3// routeDistance; // 이동거리
         );
+
+        // 순번이 허브 첫 배송인 경우 해당 허브 소속의 배송담당자 순번 0인 사람 배정
+        DeliveryAgent fromDeliveryAgent = new DeliveryAgent(deliveryAgentService.getDeliveryAgentByHubIdAndType(fromHubId, fromType)); // 공급업체 소속 허브 ID, 허브 타입
+        DeliveryAgent toDeliveryAgent = new DeliveryAgent(deliveryAgentService.getDeliveryAgentByHubIdAndType(toHubId,toType)); // 수령업체 소속 허브 ID, 업체 타입
 
         // 배송 기록 생성
         DeliveryRoute deliveryRoute = DeliveryRoute.builder()
@@ -129,43 +151,13 @@ public class DeliveryRouteService {
                 .actualTime(hubRoute.getTotalDuration())
                 .fromHubId(delivery.getFromHubId())
                 .toHubId(delivery.getToHubId())
-                .deliveryAgentId(delivery.getDeliveryAgentId())
+                .companyDeliveryAgentId(toDeliveryAgent.getUserId())
+                .hubDeliveryAgentId(fromDeliveryAgent.getUserId())
                 .build();
 
         DeliveryRoute savedDeliveryRoute = deliveryRouteRepository.save(deliveryRoute);
 
         return new DeliveryRouteResponseDto(savedDeliveryRoute);
     }
-    */
-
-    // 배송경로 생성
-    @Transactional
-    public DeliveryRouteResponseDto createDeliveryRoute(UUID deliveryId) {
-        // 배송 존재 여부 확인
-        Delivery delivery = deliveryRepository.findById(deliveryId)
-                .orElseThrow(() -> new ResourceNotFoundException("해당 배송을 찾을 수 없습니다."));
-
-        Double estimatedDistance = Double.valueOf("30");
-        Integer estimatedTime = Integer.valueOf("15");
-
-        // 배송 기록 생성
-        DeliveryRoute deliveryRoute = DeliveryRoute.builder()
-                .deliveryId(deliveryId)
-                .estimatedDistance(estimatedDistance)
-                .estimatedTime(estimatedTime)
-                .actualDistance(estimatedDistance)
-                .actualTime(estimatedTime)
-                .fromHubId(delivery.getFromHubId())
-                .toHubId(delivery.getToHubId())
-                .deliveryAgentId(delivery.getDeliveryAgentId())
-                .build();
-
-        DeliveryRoute savedDeliveryRoute = deliveryRouteRepository.save(deliveryRoute);
-
-        return new DeliveryRouteResponseDto(savedDeliveryRoute);
-    }
-
-
-
 
 }

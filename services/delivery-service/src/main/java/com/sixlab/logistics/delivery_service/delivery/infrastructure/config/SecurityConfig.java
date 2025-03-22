@@ -1,7 +1,5 @@
-package com.sixlab.logistics.hub_service.hub.infrastructure.config;
+package com.sixlab.logistics.delivery_service.delivery.infrastructure.config;
 
-import com.sixlab.logistics.common.shared.security.JwtAuthenticationFilter;
-import com.sixlab.logistics.common.shared.security.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -23,14 +21,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    @Bean(name = "jwtTokenProvider")
-    public JwtTokenProvider jwtTokenProvider() {
-        return new JwtTokenProvider();
-    }
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(jwtTokenProvider());
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
     @Bean
@@ -46,7 +40,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 // JWT 필터 추가
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         // 설정된 보안 필터 체인을 반환합니다.
         return http.build();
