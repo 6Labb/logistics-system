@@ -1,6 +1,6 @@
-package com.sixlab.logistics.hub_service.hubmanager.application.dto;
+package com.sixlab.logistics.hub_service.hub.application.dto.hubmanager;
 
-import com.sixlab.logistics.hub_service.hubmanager.domain.model.HubManager;
+import com.sixlab.logistics.hub_service.hub.domain.model.HubManager;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,10 +1,10 @@
 package com.sixlab.logistics.hub_service.hub.application.service;
 
 
-import com.sixlab.logistics.hub_service.hub.application.dto.HubCreateRequestDto;
-import com.sixlab.logistics.hub_service.hub.application.dto.HubCreateResponseDto;
-import com.sixlab.logistics.hub_service.hub.application.dto.HubResponseDto;
-import com.sixlab.logistics.hub_service.hub.application.dto.HubUpdateRequestDto;
+import com.sixlab.logistics.hub_service.hub.application.dto.hub.HubCreateRequestDto;
+import com.sixlab.logistics.hub_service.hub.application.dto.hub.HubCreateResponseDto;
+import com.sixlab.logistics.hub_service.hub.application.dto.hub.HubResponseDto;
+import com.sixlab.logistics.hub_service.hub.application.dto.hub.HubUpdateRequestDto;
 import com.sixlab.logistics.hub_service.hub.domain.model.Hub;
 import com.sixlab.logistics.hub_service.hub.domain.repository.HubRepository;
 import jakarta.persistence.EntityNotFoundException;

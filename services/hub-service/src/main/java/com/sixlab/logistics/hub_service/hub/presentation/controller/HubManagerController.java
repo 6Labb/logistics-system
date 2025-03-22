@@ -1,12 +1,12 @@
-package com.sixlab.logistics.hub_service.hubmanager.presentation.controller;
+package com.sixlab.logistics.hub_service.hub.presentation.controller;
 
 
 import com.sixlab.logistics.common.shared.response.ApiResponse;
-import com.sixlab.logistics.hub_service.hubmanager.application.dto.HubManagerCreateRequestDto;
-import com.sixlab.logistics.hub_service.hubmanager.application.dto.HubManagerCreateResponseDto;
-import com.sixlab.logistics.hub_service.hubmanager.application.dto.HubManagerResponseDto;
-import com.sixlab.logistics.hub_service.hubmanager.application.dto.HubManagerUpdateRequestDto;
-import com.sixlab.logistics.hub_service.hubmanager.application.service.HubManagerService;
+import com.sixlab.logistics.hub_service.hub.application.dto.hubmanager.HubManagerCreateRequestDto;
+import com.sixlab.logistics.hub_service.hub.application.dto.hubmanager.HubManagerCreateResponseDto;
+import com.sixlab.logistics.hub_service.hub.application.dto.hubmanager.HubManagerResponseDto;
+import com.sixlab.logistics.hub_service.hub.application.dto.hubmanager.HubManagerUpdateRequestDto;
+import com.sixlab.logistics.hub_service.hub.application.service.HubManagerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -17,7 +17,7 @@ import java.util.UUID;
 @RefreshScope
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/hub-managers")
+@RequestMapping("/hubs/{id}/manager")
 public class HubManagerController {
 
     private final HubManagerService hubManagerService;

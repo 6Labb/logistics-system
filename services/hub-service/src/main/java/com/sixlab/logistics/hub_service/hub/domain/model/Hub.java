@@ -29,7 +29,7 @@ public class Hub extends BasicEntity {
 
     private double longitude;
 
-    //private Long hubManagerId;
+    private Long hubManagerId;
 
 
     @Builder
