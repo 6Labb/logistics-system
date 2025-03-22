@@ -37,8 +37,8 @@ public class HubController {
 
     @PreAuthorize("hasRole('MASTER')")
     @PostMapping
-    public ApiResponse<HubCreateResponseDto> createHub(@Valid @RequestBody HubCreateRequestDto requestDto) {
-        HubCreateResponseDto response = hubService.createHub(requestDto);
+    public ApiResponse<HubResponseDto> createHub(@Valid @RequestBody HubCreateRequestDto requestDto) {
+        HubResponseDto response = hubService.createHub(requestDto);
         return ApiResponse.success(response, "Hub created");
     }
 
