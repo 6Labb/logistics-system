@@ -22,7 +22,7 @@ public class HubService {
 
     public HubCreateResponseDto createHub(HubCreateRequestDto requestDto) {
 
-        Hub hub = Hub.create(requestDto.getHubName(), requestDto.getHubAddress(), requestDto.getLatitude(), requestDto.getLongitude());
+        Hub hub = Hub.create(requestDto.getHubName(), requestDto.getHubAddress(), requestDto.getLatitude(), requestDto.getLongitude(), requestDto.getHubManagerId());
 
         hubRepository.save(hub);
 
@@ -50,7 +50,8 @@ public class HubService {
                 requestDto.getHubName() != null ? requestDto.getHubName() : hub.getHubName(),
                 requestDto.getHubAddress() != null ? requestDto.getHubAddress() : hub.getHubAddress(),
                 requestDto.getLatitude() != null ? requestDto.getLatitude() : hub.getLatitude(),
-                requestDto.getLongitude() != null ? requestDto.getLongitude() : hub.getLongitude()
+                requestDto.getLongitude() != null ? requestDto.getLongitude() : hub.getLongitude(),
+                requestDto.getHubManagerId() != null ? requestDto.getHubManagerId() : hub.getHubManagerId()
         );
 
         return HubResponseDto.of(hub);

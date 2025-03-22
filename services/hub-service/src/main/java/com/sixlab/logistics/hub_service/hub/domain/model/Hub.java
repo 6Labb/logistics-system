@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -31,29 +33,38 @@ public class Hub extends BasicEntity {
 
     private Long hubManagerId;
 
+    @OneToMany(mappedBy = "departureHub")
+    private List<HubRoute> departureRoutes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "arrivalHub")
+    private List<HubRoute> arrivalRoutes = new ArrayList<>();
+
 
     @Builder
-    private Hub(String hubName, String hubAddress, double latitude, double longitude) {
+    private Hub(String hubName, String hubAddress, double latitude, double longitude, Long hubManagerId) {
         this.hubName = hubName;
         this.hubAddress = hubAddress;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.hubManagerId = hubManagerId;
     }
 
-    public static Hub create(String hubName, String hubAddress, double latitude, double longitude) {
+    public static Hub create(String hubName, String hubAddress, double latitude, double longitude, Long hubManagerId) {
         return Hub.builder()
                 .hubName(hubName)
                 .hubAddress(hubAddress)
                 .latitude(latitude)
                 .longitude(longitude)
+                .hubManagerId(hubManagerId)
                 .build();
     }
 
-    public void update(String hubName, String hubAddress, double latitude, double longitude) {
+    public void update(String hubName, String hubAddress, double latitude, double longitude, Long hubManagerId) {
         this.hubName = hubName;
         this.hubAddress = hubAddress;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.hubManagerId = hubManagerId;
     }
 
 

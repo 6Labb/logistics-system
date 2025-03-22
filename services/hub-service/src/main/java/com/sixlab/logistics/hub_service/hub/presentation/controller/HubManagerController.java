@@ -17,7 +17,7 @@ import java.util.UUID;
 @RefreshScope
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/hubs/{id}/manager")
+@RequestMapping("/hubs/{hubId}/manager")
 public class HubManagerController {
 
     private final HubManagerService hubManagerService;
@@ -30,25 +30,25 @@ public class HubManagerController {
         return ApiResponse.success(response, "HubManager created");
     }
 
-    @GetMapping("/{id}")
-    public ApiResponse<HubManagerResponseDto> getHubManager(@PathVariable UUID id) {
-        HubManagerResponseDto response = hubManagerService.getManagerById(id);
+    @GetMapping("/{managerId}")
+    public ApiResponse<HubManagerResponseDto> getHubManager(@PathVariable UUID managerId) {
+        HubManagerResponseDto response = hubManagerService.getManagerById(managerId);
         return ApiResponse.success(response, "HubManager retrieved");
     }
 
 
-    @PutMapping("/{id}")
+    @PutMapping("/{managerId}")
     public ApiResponse<HubManagerResponseDto> updateHubManager(
-            @PathVariable UUID id,
+            @PathVariable UUID managerId,
             @Valid @RequestBody HubManagerUpdateRequestDto request) {
 
-        HubManagerResponseDto response = hubManagerService.updateManager(id, request);
+        HubManagerResponseDto response = hubManagerService.updateManager(managerId, request);
         return ApiResponse.success(response, "HubManager updated");
     }
 
-    @DeleteMapping("/{id}")
-    public ApiResponse<Void> softDeleteHubManager(@PathVariable UUID id) {
-        hubManagerService.deleteManager(id);
+    @DeleteMapping("/{managerId}")
+    public ApiResponse<Void> softDeleteHubManager(@PathVariable UUID managerId) {
+        hubManagerService.deleteManager(managerId);
         return ApiResponse.success(null, "HubManager soft deleted");
     }
 

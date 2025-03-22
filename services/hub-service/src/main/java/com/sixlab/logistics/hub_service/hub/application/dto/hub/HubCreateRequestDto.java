@@ -11,4 +11,5 @@ public class HubCreateRequestDto {
     private String hubAddress;
     private double latitude;
     private double longitude;
+    private Long hubManagerId;
 }
