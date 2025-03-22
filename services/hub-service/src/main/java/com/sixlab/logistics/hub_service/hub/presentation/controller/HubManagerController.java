@@ -2,14 +2,16 @@ package com.sixlab.logistics.hub_service.hub.presentation.controller;
 
 
 import com.sixlab.logistics.common.shared.response.ApiResponse;
-import com.sixlab.logistics.hub_service.hub.application.dto.hubmanager.HubManagerCreateRequestDto;
-import com.sixlab.logistics.hub_service.hub.application.dto.hubmanager.HubManagerCreateResponseDto;
-import com.sixlab.logistics.hub_service.hub.application.dto.hubmanager.HubManagerResponseDto;
-import com.sixlab.logistics.hub_service.hub.application.dto.hubmanager.HubManagerUpdateRequestDto;
+import com.sixlab.logistics.hub_service.hub.application.dto.hubmanager.*;
 import com.sixlab.logistics.hub_service.hub.application.service.HubManagerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -30,12 +32,17 @@ public class HubManagerController {
         return ApiResponse.success(response, "HubManager created");
     }
 
-    @GetMapping("/{managerId}")
+    @GetMapping("/by-id/{managerId}")
     public ApiResponse<HubManagerResponseDto> getHubManager(@PathVariable UUID managerId) {
         HubManagerResponseDto response = hubManagerService.getManagerById(managerId);
         return ApiResponse.success(response, "HubManager retrieved");
     }
 
+    @GetMapping("/by-userid/{userId}")
+    public ApiResponse<HubManagerResponseDto> getHubManagerByUserId(@PathVariable Long userId) {
+        HubManagerResponseDto response = hubManagerService.getManagerByUserId(userId);
+        return ApiResponse.success(response, "HubManager retrieved");
+    }
 
     @PutMapping("/{managerId}")
     public ApiResponse<HubManagerResponseDto> updateHubManager(
@@ -51,6 +58,24 @@ public class HubManagerController {
         hubManagerService.deleteManager(managerId);
         return ApiResponse.success(null, "HubManager soft deleted");
     }
+
+    @GetMapping("/search")
+    public ApiResponse<Page<HubManagerResponseDto>> searchHubManagers(
+            @ModelAttribute HubManagerSearchCondition condition,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        // 사이즈 제한 필터링
+        int size = pageable.getPageSize();
+        if (size != 10 && size != 30 && size != 50) {
+            pageable = PageRequest.of(pageable.getPageNumber(), 10, pageable.getSort());
+        }
+
+        Page<HubManagerResponseDto> result = hubManagerService.search(condition, pageable);
+        return ApiResponse.success(result, "HubManager searched");
+    }
+
+
+
 
 
 

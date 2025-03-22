@@ -1,5 +1,6 @@
 package com.sixlab.logistics.hub_service.hub.domain.model;
 
+import com.sixlab.logistics.common.shared.domain.BasicEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,7 +13,7 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "p_hub_route")
-public class HubRoute {
+public class HubRoute extends BasicEntity {
 
     @Id
     @GeneratedValue

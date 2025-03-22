@@ -19,6 +19,7 @@ public class OrderInfoDto {
     public OrderInfoDto(String productName, int quantity, String sender,
                         List<String> waypoints, String destination,
                         String additionalInfo,String workHours) {
+
         this.productName = productName;
         this.quantity = quantity;
         this.sender = sender;
@@ -26,6 +27,7 @@ public class OrderInfoDto {
         this.destination = destination;
         this.additionalInfo = additionalInfo;
         this.workHours = workHours;
+
     }
 
 
