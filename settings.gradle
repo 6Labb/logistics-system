@@ -4,9 +4,7 @@ rootProject.name = 'logistics-system'
 // 공통 모듈 추가
 include 'common'
 project(':common').projectDir = file('common')
-//infra 서비스 포함
-include 'infra:gateway-server'
-project(':infra:gateway-server').projectDir = file('infra/gateway-server')
+
 
 // 비즈니스 서비스 포함
 include 'services:company-service'
