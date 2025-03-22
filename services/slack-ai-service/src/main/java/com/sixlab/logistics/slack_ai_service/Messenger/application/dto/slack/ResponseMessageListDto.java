@@ -1,4 +1,4 @@
-package com.sixlab.logistics.slack_ai_service.Messenger.application.dto;
+package com.sixlab.logistics.slack_ai_service.Messenger.application.dto.slack;
 
 import lombok.Getter;
 

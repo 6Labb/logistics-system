@@ -1,8 +1,8 @@
 package com.sixlab.logistics.slack_ai_service.Messenger.infrastructure.feign;
 
-import com.sixlab.logistics.common.shared.dto.SlackSendRequestDto;
-import com.sixlab.logistics.common.shared.dto.SlackSendResponseDto;
-import com.sixlab.logistics.common.shared.dto.SlackUserResponseDto;
+import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.slack.SlackSendRequestDto;
+import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.slack.SlackSendResponseDto;
+import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.slack.SlackUserResponseDto;
 import com.sixlab.logistics.slack_ai_service.Messenger.config.SlackApiConfig;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;

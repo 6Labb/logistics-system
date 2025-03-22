@@ -1,4 +1,4 @@
-package com.sixlab.logistics.slack_ai_service.Messenger.application.dto;
+package com.sixlab.logistics.slack_ai_service.Messenger.application.dto.slack;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +15,7 @@ public class SlackMessageInfoDto {
     private int quantity;
     private String request;
     private String sender;
-    private List<String> transitCenters;
+    private String transitCenters;
     private String destination;
     private String deliveryManagerName;
     private String deadline;

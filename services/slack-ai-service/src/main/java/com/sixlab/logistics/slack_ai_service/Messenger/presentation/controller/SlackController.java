@@ -1,5 +1,5 @@
 package com.sixlab.logistics.slack_ai_service.Messenger.presentation.controller;
-import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.ResponseMessageListDto;
+import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.slack.ResponseMessageListDto;
 import com.sixlab.logistics.slack_ai_service.Messenger.application.service.SlackService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

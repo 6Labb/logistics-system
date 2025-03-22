@@ -1,7 +1,7 @@
 package com.sixlab.logistics.slack_ai_service.Messenger.infrastructure.feign;
 
-import com.sixlab.logistics.common.shared.dto.AiCreateRequestDto;
-import com.sixlab.logistics.common.shared.dto.AiCreateResponseDto;
+import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.ai.AiCreateRequestDto;
+import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.ai.AiCreateResponseDto;
 import com.sixlab.logistics.slack_ai_service.Messenger.config.GeminiApiClientConfig;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;

@@ -1,10 +1,18 @@
 package com.sixlab.logistics.slack_ai_service.Messenger.application.service;
 
 import com.rabbitmq.client.Channel;
-import com.sixlab.logistics.common.shared.dto.AiCreateRequestDto;
-import com.sixlab.logistics.common.shared.dto.AiCreateResponseDto;
-import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.*;
+import com.sixlab.logistics.common.shared.response.ApiResponseHelper;
+import com.sixlab.logistics.slack_ai_service.Messenger.Exception.GeminiRetryException;
+import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.ai.*;
+import com.sixlab.logistics.common.shared.response.ApiResponse;
+import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.slack.SlackMessageInfoDto;
+import com.sixlab.logistics.slack_ai_service.Messenger.infrastructure.feign.DeliveryClient;
 import com.sixlab.logistics.slack_ai_service.Messenger.infrastructure.feign.GeminiApiClient;
+import com.sixlab.logistics.slack_ai_service.Messenger.infrastructure.feign.HubClient;
+import com.sixlab.logistics.slack_ai_service.Messenger.infrastructure.feign.UserClient;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.messaging.handler.annotation.Header;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +22,12 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+
+import static com.sixlab.logistics.common.shared.response.ApiResponseHelper.extractData;
 
 @Service
 @RequiredArgsConstructor
@@ -27,59 +41,73 @@ public class AiService{
                     "답변 형식: 위 내용을 기반으로 도출된 최종 발송 시한은 XX월 XX일 오전/오후 X시 입니다. 추가적인 설명 없이 이 형식으로만 답변해줘.";
 
     private final SlackService slackService;
-
+    private final CacheService cacheService;
     private final GeminiApiClient aiClient;
+    private final DeliveryClient deliveryClient;
+    private final UserClient userClient;
+    private final HubClient hubClient;
 
     @RabbitListener(queues = "orderInfo-queue")
-    public void processOrderAndNotifySlack(OrderInfoMessageResponseDto message,
+    public void processOrderAndNotifySlack(OrderInfoMessageResponseDto queue,
                                            Channel channel,
                                            @Header(AmqpHeaders.DELIVERY_TAG) long tag) {
 
-        /*
-            rabbitMQ message 값
-            private UUID orderId;
-            private String productName;
-            private Integer quantity;
-            private String receiverName;
-            private String destination;
-            private String requestMessage;
-            private UUID deliveryId;
-        */
+        //발송허브담당자 - 출발허브-목적허브 배송 담당자?? 허브관리자면 현재 누가 해당 주문의 배송담당자인지 알수있는방법이 없음 허브 배송담당자로 진행
+        ApiResponse<DeliveryClientResponseDto> deliveryResponse = deliveryClient.getDelivery(queue.getDeliveryId());
+        DeliveryClientResponseDto deliveryData = extractData(deliveryResponse, Function.identity());
 
-        //deliveryClient.getDeliveryInfo(); //담당자이름 출발지 경유지 조회후 slack service 전달
-        //userClient.getUserInfo(); // 어차피 메시지를 보내는사람은 로그인한 주문자 본인 (권한또한 모든 사용자가 보냄)
+        ApiResponse<UserClientResponseDto> userResponse = userClient.getUser2(deliveryData.getHudDeliveryAgentId());
+        UserClientResponseDto userData = extractData(userResponse, Function.identity());
+        String userName = userData.getUserName();
+        String slackId= userData.getSlackId();
+
+        String fromHubName = cacheService.getHubName(deliveryData.getFromHubId());
+        String toHubName = cacheService.getHubName(deliveryData.getToHubId());
 
         try {
-            log.info("메시지 수신: " + message);
+            log.info("메시지 수신: " + queue);
             OrderInfoRequestDto infoDto = OrderInfoRequestDto.builder()
-                    .productName(message.getProductName())
-                    .quantity(message.getQuantity())
-                    .startLocation("서울역")
-                    .stopLocations(List.of("대전역", "부산역"))
-                    .destination(message.getDestination())
-                    .requestMessage(message.getRequestMessage())
+                    .productName(queue.getProductName())
+                    .quantity(queue.getQuantity())
+                    .startLocation(fromHubName)
+                    .stopLocations(toHubName)
+                    .destination(queue.getDestination())
+                    .requestMessage(queue.getRequestMessage())
                     .workingHour(workingHour)
                     .build();
-            
+
             String prompt = buildPromptText(infoDto);
-            
-            AiCreateRequestDto aiCreateRequestDto = buildCallAiRequest(prompt);
-            
-            String aiDeadline =extractResultFromResponse(aiClient.callAi(aiCreateRequestDto));
+
+            String aiDeadline = getAiResponse(prompt);
             log.info("AI 호출 확인"+aiDeadline);
 
-            SlackMessageInfoDto sendSlackMessage = buildSlackMessage(message,infoDto,aiDeadline);
+            SlackMessageInfoDto sendSlackMessage = buildSlackMessage(queue,infoDto,userName,aiDeadline);
 
-            slackService.sendSlackMessage("hu185@naver.com",sendSlackMessage); //이메일 없으면 오류남 ㅠㅠㅠ 그냥 일단 내꺼로 하드코딩
-            
-            channel.basicAck(tag, false); //큐 삭제 (수동)
+            slackService.sendSlackMessage(slackId,sendSlackMessage);
+
+            channel.basicAck(tag, false); //큐 삭제
         } catch (IOException e) {
-            System.out.println("처리실패");
+            log.error("메시지 처리 중 IO 오류 발생: {}", e.getMessage(), e);
             try {
-                channel.basicNack(tag, false, false);
+                channel.basicNack(tag, false, true);
+            } catch (IOException nackEx) {
+                log.error("basicNack 실패: {}", nackEx.getMessage(), nackEx);
+
             } catch (Exception ioException) {
-                ioException.printStackTrace();
+                log.error("예상치 못한 오류 발생: {}", e.getMessage(), e);
             }
+        }
+    }
+
+    @Retry(name = "geminiRetry")
+    @CircuitBreaker(name = "gemini", fallbackMethod = "fallbackAiCall")
+    public String getAiResponse(String prompt) {
+        AiCreateRequestDto request = buildCallAiRequest(prompt);
+        try {
+            AiCreateResponseDto response = aiClient.callAi(request);
+            return extractResultFromResponse(response);
+        } catch (Exception e) {
+            throw new GeminiRetryException("Gemini 호출 실패", e);
         }
     }
 
@@ -94,7 +122,7 @@ public class AiService{
         AiCreateRequestDto.Content content = new AiCreateRequestDto.Content(List.of(part));
         return new AiCreateRequestDto(List.of(content));
     }
-    
+
     //응답 파싱
     private String extractResultFromResponse(AiCreateResponseDto response) {
         if (response.candidates() != null && !response.candidates().isEmpty()) {
@@ -121,7 +149,7 @@ public class AiService{
         );
     }
 
-    private SlackMessageInfoDto buildSlackMessage(OrderInfoMessageResponseDto message, OrderInfoRequestDto infoDto, String aiDeadline) {
+    private SlackMessageInfoDto buildSlackMessage(OrderInfoMessageResponseDto message, OrderInfoRequestDto infoDto,String userName ,String aiDeadline) {
         return SlackMessageInfoDto.builder()
                 .orderId(message.getOrderId())
                 .customerName(message.getReceiverName())
@@ -131,7 +159,7 @@ public class AiService{
                 .sender(infoDto.getStartLocation())
                 .transitCenters(infoDto.getStopLocations())
                 .destination(message.getDestination())
-                .deliveryManagerName("고길동")
+                .deliveryManagerName(userName)
                 .deadline(aiDeadline)
                 .build();
     }

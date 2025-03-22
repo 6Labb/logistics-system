@@ -4,7 +4,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.ResponseMessageListDto;
+import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.slack.ResponseMessageListDto;
 import com.sixlab.logistics.slack_ai_service.Messenger.domain.entity.QSlack;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

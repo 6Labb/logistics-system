@@ -11,15 +11,15 @@ import java.util.UUID;
 public class HubRouteResponseDto {
 
     private UUID routeId;
-    private String departureHubName;
-    private String arrivalHubName;
+    private UUID departureHubId;
+    private UUID arrivalHubId;
     private int distance;
     private int duration;
 
-    private HubRouteResponseDto(UUID id, String hubName, String hubName1, int distance, int duration) {
+    private HubRouteResponseDto(UUID id, UUID departureHubId, UUID arrivalHubId, int distance, int duration) {
         this.routeId = id;
-        this.departureHubName = hubName;
-        this.arrivalHubName = hubName1;
+        this.departureHubId = departureHubId;
+        this.arrivalHubId = arrivalHubId;
         this.distance = distance;
         this.duration = duration;
     }
@@ -27,8 +27,8 @@ public class HubRouteResponseDto {
     public static HubRouteResponseDto from(HubRoute route) {
         return new HubRouteResponseDto(
                 route.getId(),
-                route.getDepartureHub().getHubName(),
-                route.getArrivalHub().getHubName(),
+                route.getDepartureHub().getId(),
+                route.getArrivalHub().getId(),
                 route.getDistance(),
                 route.getDuration()
         );
