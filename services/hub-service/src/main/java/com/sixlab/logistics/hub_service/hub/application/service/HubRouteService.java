@@ -1,7 +1,6 @@
 package com.sixlab.logistics.hub_service.hub.application.service;
 
 
-import com.sixlab.logistics.common.shared.security.UserDetailsImpl;
 import com.sixlab.logistics.hub_service.hub.application.dto.hubroute.HubRouteRequestDto;
 import com.sixlab.logistics.hub_service.hub.application.dto.hubroute.HubRouteResponseDto;
 import com.sixlab.logistics.hub_service.hub.domain.model.Hub;
@@ -9,7 +8,6 @@ import com.sixlab.logistics.hub_service.hub.domain.model.HubRoute;
 import com.sixlab.logistics.hub_service.hub.domain.repository.HubRepository;
 import com.sixlab.logistics.hub_service.hub.domain.repository.HubRouteRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

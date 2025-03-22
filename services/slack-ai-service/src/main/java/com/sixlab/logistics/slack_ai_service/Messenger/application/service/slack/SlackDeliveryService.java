@@ -1,7 +1,6 @@
-package com.sixlab.logistics.slack_ai_service.Messenger.application.service;
+package com.sixlab.logistics.slack_ai_service.Messenger.application.service.slack;
 
 import com.sixlab.logistics.slack_ai_service.Messenger.infrastructure.feign.SlackApiClient;
-import io.lettuce.core.RedisClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -10,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class SlackSchedulerService {
+public class SlackDeliveryService {
 
     private final SlackApiClient slackApiClient;
     //분산 rock 사용

@@ -3,7 +3,6 @@ package com.sixlab.logistics.slack_ai_service.Messenger.application.dto.slack;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.List;
 import java.util.UUID;
 
 @Getter

@@ -1,5 +1,5 @@
 package com.sixlab.logistics.slack_ai_service.Messenger.presentation.controller;
-import com.sixlab.logistics.slack_ai_service.Messenger.application.service.AiService;
+import com.sixlab.logistics.slack_ai_service.Messenger.application.service.ai.AiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;

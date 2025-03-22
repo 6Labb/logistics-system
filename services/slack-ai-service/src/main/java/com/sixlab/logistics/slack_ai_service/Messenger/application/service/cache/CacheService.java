@@ -1,11 +1,9 @@
-package com.sixlab.logistics.slack_ai_service.Messenger.application.service;
+package com.sixlab.logistics.slack_ai_service.Messenger.application.service.cache;
 
 import com.sixlab.logistics.common.shared.response.ApiResponse;
 import com.sixlab.logistics.common.shared.response.ApiResponseHelper;
 import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.ai.HubClientResponseDto;
 import com.sixlab.logistics.slack_ai_service.Messenger.infrastructure.feign.HubClient;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;

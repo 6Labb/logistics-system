@@ -1,10 +1,11 @@
-package com.sixlab.logistics.slack_ai_service.Messenger.application.service;
+package com.sixlab.logistics.slack_ai_service.Messenger.application.service.ai;
 
 import com.rabbitmq.client.Channel;
-import com.sixlab.logistics.common.shared.response.ApiResponseHelper;
-import com.sixlab.logistics.slack_ai_service.Messenger.Exception.GeminiRetryException;
-import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.ai.*;
 import com.sixlab.logistics.common.shared.response.ApiResponse;
+import com.sixlab.logistics.slack_ai_service.Messenger.application.service.cache.CacheService;
+import com.sixlab.logistics.slack_ai_service.Messenger.application.service.slack.SlackService;
+import com.sixlab.logistics.slack_ai_service.Messenger.exception.GeminiRetryException;
+import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.ai.*;
 import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.slack.SlackMessageInfoDto;
 import com.sixlab.logistics.slack_ai_service.Messenger.infrastructure.feign.DeliveryClient;
 import com.sixlab.logistics.slack_ai_service.Messenger.infrastructure.feign.GeminiApiClient;
@@ -12,19 +13,15 @@ import com.sixlab.logistics.slack_ai_service.Messenger.infrastructure.feign.HubC
 import com.sixlab.logistics.slack_ai_service.Messenger.infrastructure.feign.UserClient;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.messaging.handler.annotation.Header;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import static com.sixlab.logistics.common.shared.response.ApiResponseHelper.extractData;

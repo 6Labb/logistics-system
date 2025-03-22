@@ -1,6 +1,6 @@
-package com.sixlab.logistics.slack_ai_service.Messenger.application.service;
+package com.sixlab.logistics.slack_ai_service.Messenger.application.service.slack;
 
-import com.sixlab.logistics.slack_ai_service.Messenger.Exception.SlackCircuitException;
+import com.sixlab.logistics.slack_ai_service.Messenger.exception.SlackCircuitException;
 import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.slack.SlackSendRequestDto;
 import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.slack.SlackSendResponseDto;
 import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.slack.SlackUserResponseDto;
