@@ -20,5 +20,5 @@ public interface DeliveryClient {
 
     // 배송 서비스의 삭제 메서드 호출
     @DeleteMapping("/deliveries/{id}")
-    ApiResponse<GetProductResponseDto> requestDeliveryDelete(@PathVariable("id") UUID id);
+    ResponseEntity<ApiResponse<Void>> requestDeliveryDelete(@PathVariable("id") UUID id);
 }

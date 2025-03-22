@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.UUID;
 
-//@FeignClient(name="hub-service")
-//public interface HubManagerClient {
-//    // hub 조회 (param 은 hubId)
-//    @GetMapping("/hubs/{hubManagerId}")
-//    // ResponseDto 추후 추가 예정
-//    ApiResponse<?> getHubManagerById(@PathVariable UUID hubManagerId);
-//}
+@FeignClient(name="hub-service")
+public interface HubManagerClient {
+    // hub 조회 (param 은 hubId)
+    @GetMapping("/hubs/{hubManagerId}")
+    // ResponseDto 추후 추가 예정
+    ApiResponse<?> getHubManagerById(@PathVariable UUID hubManagerId);
+}
