@@ -7,7 +7,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
-@EnableJpaAuditing
 @EnableFeignClients
 @ComponentScan(basePackages = {"com.sixlab.logistics.hub_service","com.sixlab.logistics.common"})
 public class HubServiceApplication {

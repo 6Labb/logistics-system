@@ -1,10 +1,10 @@
 package com.sixlab.logistics.hub_service.hub.application.service;
 
 
-import com.sixlab.logistics.hub_service.hub.application.dto.HubCreateRequestDto;
-import com.sixlab.logistics.hub_service.hub.application.dto.HubCreateResponseDto;
-import com.sixlab.logistics.hub_service.hub.application.dto.HubResponseDto;
-import com.sixlab.logistics.hub_service.hub.application.dto.HubUpdateRequestDto;
+import com.sixlab.logistics.hub_service.hub.application.dto.hub.HubCreateRequestDto;
+import com.sixlab.logistics.hub_service.hub.application.dto.hub.HubCreateResponseDto;
+import com.sixlab.logistics.hub_service.hub.application.dto.hub.HubResponseDto;
+import com.sixlab.logistics.hub_service.hub.application.dto.hub.HubUpdateRequestDto;
 import com.sixlab.logistics.hub_service.hub.domain.model.Hub;
 import com.sixlab.logistics.hub_service.hub.domain.repository.HubRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -22,7 +22,7 @@ public class HubService {
 
     public HubCreateResponseDto createHub(HubCreateRequestDto requestDto) {
 
-        Hub hub = Hub.create(requestDto.getHubName(), requestDto.getHubAddress(), requestDto.getLatitude(), requestDto.getLongitude());
+        Hub hub = Hub.create(requestDto.getHubName(), requestDto.getHubAddress(), requestDto.getLatitude(), requestDto.getLongitude(), requestDto.getHubManagerId());
 
         hubRepository.save(hub);
 
@@ -50,7 +50,8 @@ public class HubService {
                 requestDto.getHubName() != null ? requestDto.getHubName() : hub.getHubName(),
                 requestDto.getHubAddress() != null ? requestDto.getHubAddress() : hub.getHubAddress(),
                 requestDto.getLatitude() != null ? requestDto.getLatitude() : hub.getLatitude(),
-                requestDto.getLongitude() != null ? requestDto.getLongitude() : hub.getLongitude()
+                requestDto.getLongitude() != null ? requestDto.getLongitude() : hub.getLongitude(),
+                requestDto.getHubManagerId() != null ? requestDto.getHubManagerId() : hub.getHubManagerId()
         );
 
         return HubResponseDto.of(hub);

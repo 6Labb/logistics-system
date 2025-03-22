@@ -2,10 +2,10 @@ package com.sixlab.logistics.hub_service.hub.presentation.controller;
 
 
 import com.sixlab.logistics.common.shared.response.ApiResponse;
-import com.sixlab.logistics.hub_service.hub.application.dto.HubCreateRequestDto;
-import com.sixlab.logistics.hub_service.hub.application.dto.HubCreateResponseDto;
-import com.sixlab.logistics.hub_service.hub.application.dto.HubResponseDto;
-import com.sixlab.logistics.hub_service.hub.application.dto.HubUpdateRequestDto;
+import com.sixlab.logistics.hub_service.hub.application.dto.hub.HubCreateRequestDto;
+import com.sixlab.logistics.hub_service.hub.application.dto.hub.HubCreateResponseDto;
+import com.sixlab.logistics.hub_service.hub.application.dto.hub.HubResponseDto;
+import com.sixlab.logistics.hub_service.hub.application.dto.hub.HubUpdateRequestDto;
 import com.sixlab.logistics.hub_service.hub.application.service.HubService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

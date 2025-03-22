@@ -1,6 +1,6 @@
-package com.sixlab.logistics.hub_service.hubmanager.domain.repository;
+package com.sixlab.logistics.hub_service.hub.domain.repository;
 
-import com.sixlab.logistics.hub_service.hubmanager.domain.model.HubManager;
+import com.sixlab.logistics.hub_service.hub.domain.model.HubManager;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
