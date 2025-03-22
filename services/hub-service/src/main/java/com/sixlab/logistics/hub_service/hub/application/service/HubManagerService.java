@@ -1,13 +1,13 @@
-package com.sixlab.logistics.hub_service.hubmanager.application.service;
+package com.sixlab.logistics.hub_service.hub.application.service;
 
-import com.sixlab.logistics.hub_service.hub.UserClient;
-import com.sixlab.logistics.hub_service.hub.UserResponseDto;
-import com.sixlab.logistics.hub_service.hubmanager.application.dto.HubManagerResponseDto;
-import com.sixlab.logistics.hub_service.hubmanager.application.dto.HubManagerUpdateRequestDto;
-import com.sixlab.logistics.hub_service.hubmanager.domain.model.HubManager;
-import com.sixlab.logistics.hub_service.hubmanager.domain.repository.HubManagerRepository;
-import com.sixlab.logistics.hub_service.hubmanager.application.dto.HubManagerCreateRequestDto;
-import com.sixlab.logistics.hub_service.hubmanager.application.dto.HubManagerCreateResponseDto;
+import com.sixlab.logistics.hub_service.hub.infrastructure.feign.UserClient;
+import com.sixlab.logistics.hub_service.hub.infrastructure.feign.UserResponseDto;
+import com.sixlab.logistics.hub_service.hub.application.dto.hubmanager.HubManagerResponseDto;
+import com.sixlab.logistics.hub_service.hub.application.dto.hubmanager.HubManagerUpdateRequestDto;
+import com.sixlab.logistics.hub_service.hub.domain.model.HubManager;
+import com.sixlab.logistics.hub_service.hub.domain.repository.HubManagerRepository;
+import com.sixlab.logistics.hub_service.hub.application.dto.hubmanager.HubManagerCreateRequestDto;
+import com.sixlab.logistics.hub_service.hub.application.dto.hubmanager.HubManagerCreateResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;

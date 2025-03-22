@@ -1,4 +1,4 @@
-package com.sixlab.logistics.hub_service.hub.application.dto;
+package com.sixlab.logistics.hub_service.hub.application.dto.hub;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -11,13 +11,15 @@ public class HubUpdateRequestDto {
     private String hubAddress;
     private Double latitude;
     private Double longitude;
+    private Long hubManagerId;
 
     @Builder
-    public HubUpdateRequestDto(String hubName, String hubAddress, Double latitude, Double longitude) {
+    public HubUpdateRequestDto(String hubName, String hubAddress, Double latitude, Double longitude, Long hubManagerId) {
         this.hubName = hubName;
         this.hubAddress = hubAddress;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.hubManagerId = hubManagerId;
     }
 }
 

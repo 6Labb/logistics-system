@@ -1,4 +1,4 @@
-package com.sixlab.logistics.hub_service.hubmanager.domain.model;
+package com.sixlab.logistics.hub_service.hub.domain.model;
 
 import com.sixlab.logistics.common.shared.domain.BasicEntity;
 import jakarta.persistence.*;

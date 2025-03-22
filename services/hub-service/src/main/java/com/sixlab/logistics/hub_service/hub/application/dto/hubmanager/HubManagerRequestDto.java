@@ -1,4 +1,4 @@
-package com.sixlab.logistics.hub_service.hubmanager.application.dto;
+package com.sixlab.logistics.hub_service.hub.application.dto.hubmanager;
 
 import java.util.UUID;
 
