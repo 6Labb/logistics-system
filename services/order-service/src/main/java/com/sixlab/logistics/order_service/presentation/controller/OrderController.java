@@ -11,9 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,13 +28,13 @@ public class OrderController {
     private final OrderService orderService;
     @Operation(summary = "주문 등록")
     @PostMapping
-    @PreAuthorize("hasRole('MASTER')")
+    // 모든 권한 접근 허용
     public ApiResponse<OrderCreateResponseDto> createOrder(
             @RequestBody @Valid OrderCreateRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
-        log.info("userDetails.getUserId() - {}, userDetails.getUserInfo() - {}", userDetails.getUserId(), userDetails.getUserInfo().toString());
-        log.info("createOrder: {}", requestDto);
-        OrderCreateResponseDto order = orderService.createOrder(requestDto);
+        // log.info("createOrder: {}", requestDto);
+        // userId 만 서비스에 전달, createdBy 세팅할 예정
+        OrderCreateResponseDto order = orderService.createOrder(requestDto, , userDetails.getUserId());
         return ApiResponse.success(order, "주문이 성공적으로 등록되었습니다.");
     }
 

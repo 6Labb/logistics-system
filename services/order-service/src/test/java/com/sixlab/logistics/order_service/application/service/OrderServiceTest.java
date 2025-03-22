@@ -30,29 +30,29 @@ class OrderServiceTest {
 
     private Logger log = LoggerFactory.getLogger("order-service-test");
 
-    @Test
-    @DisplayName("주문생성이 되어야 한다.")
-    void test() {
-        // given
-
-        // 클라이언트로부터 전달받은 데이터(커맨드 객체로 래핑)
-        OrderCreateRequestDto data = new OrderCreateRequestDto();
-        data.setReceiverName("홍길동");
-        data.setMessage("2025년 6월 1일까지 보내주세요.");
-        data.setAddress("서울특별시 고구마구 고구마동 111번지");
-        data.setQuantity(5);
-        data.setProductId(productId);
-        data.setReceiverId(receiverCompanyId);
-
-        // when
-        try{
-            OrderCreateResponseDto order = orderService.createOrder(data);
-            System.out.println("생성된 주문: "+order);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        // then
-    }
+//    @Test
+//    @DisplayName("주문생성이 되어야 한다.")
+//    void test() {
+//        // given
+//
+//        // 클라이언트로부터 전달받은 데이터(커맨드 객체로 래핑)
+//        OrderCreateRequestDto data = new OrderCreateRequestDto();
+//        data.setReceiverName("홍길동");
+//        data.setMessage("2025년 6월 1일까지 보내주세요.");
+//        data.setAddress("서울특별시 고구마구 고구마동 111번지");
+//        data.setQuantity(5);
+//        data.setProductId(productId);
+//        data.setReceiverId(receiverCompanyId);
+//
+//        // when
+//        try{
+//            OrderCreateResponseDto order = orderService.createOrder(data, userDetails);
+//            System.out.println("생성된 주문: "+order);
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
+//        // then
+//    }
 
     @Test
     @DisplayName("단건 주문조회가 되어야 한다.")

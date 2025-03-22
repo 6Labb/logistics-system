@@ -1,6 +1,5 @@
 package com.sixlab.logistics.order_service.application.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sixlab.logistics.common.shared.exception.OutOfStockException;
 import com.sixlab.logistics.common.shared.exception.ResourceNotFoundException;
@@ -49,13 +48,11 @@ public class OrderService {
 
     private final OrderJpaRepository orderJpaRepository;
 
+    // 모든 권한 접근 허용, 주문 생성 메서드
+    public OrderCreateResponseDto createOrder(OrderCreateRequestDto dto, Long userId) throws Exception{
+        // log.info("service 계층: createOrder() 호출됨");
 
-    public OrderCreateResponseDto createOrder(OrderCreateRequestDto dto) throws Exception{
-        log.info("service 계층: createOrder() 호출됨");
-        // 1. 모든 로그인 사용자 (주문자) 가능
-        // jwt 를 통해 user 의 id 를 얻어낸다.
-
-        // 2. 상품서비스의 상품 조회기능 호출
+        // 1. 상품서비스의 상품 조회기능 호출
         ResponseEntity<ApiResponseDto<GetProductResponseDto>> requestProduct = productClient.getProductById(dto.getProductId());
 
         /* 상기코드 실행시 전달받을 객체, 지금은 Product 객체 직접 생성

@@ -42,7 +42,7 @@ public class UserDetailsImpl implements UserDetails {
         return userInfo.getPassword();
     }
 
-    public Long getUserId() {
+    public UserDetailsImpl getUserId() {
         return userInfo.getUserId();
     }
 
