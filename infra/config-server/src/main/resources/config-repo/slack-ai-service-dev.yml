@@ -36,34 +36,34 @@ spring:
   resilience4j:
     retry:
       instances:
-        externalApi: # 외부 API 호출용 Retry 인스턴스
-          maxRetryAttempts: 3
-          waitDuration: 500ms
+        externalApi:
+          maxRetryAttempts: 2 # 빠른 응답 예상
+          waitDuration: 300ms # 짧게
+          retryExceptions:
+            - com.sixlab.logistics.slack_ai_service.Messenger.application.exception.SlackRetryException
+            - java.net.ConnectException
+        geminiRetry: # Gemini
+          maxRetryAttempts: 4 # 불안정 예상
+          waitDuration: 1000ms # 길게
           enableExponentialBackoff: true
           exponentialBackoffMultiplier: 2
-          retryExceptions: #재시도 예외처리
-            - java.net.ConnectException
-            - java.io.IOException
-          ignoreExceptions:
-            - java.lang.NullPointerException
-        databaseCall: # DB 호출용 Retry 인스턴스
-          maxRetryAttempts: 2
-          waitDuration: 200ms
           retryExceptions:
-            - org.springframework.dao.DataAccessException
+            - com.sixlab.logistics.slack_ai_service.Messenger.application.exception.GeminiRetryException
+            - java.net.ConnectException
     circuitbreaker:
-      configs:
-        default: # 기본 구성 이름
-          slidingWindowType: COUNT_BASED  # 호출 수 기반(COUNT_BASED) / 시간 순 기반(TIME_BASED)
-          slidingWindowSize: 5  # 슬라이딩 윈도우의 크기
-          failureRateThreshold: 25  # 실패율 임계값 (%)
-          minimumNumberOfCalls: 5  # 실패율 계산을 시작하기 위한 최소 호출 수
-          slowCallRateThreshold: 100  # 느린 호출 비율 임계값 (%)
-          slowCallDurationThreshold: 60000  # 느린 호출로 간주되는 시간
-          permittedNumberOfCallsInHalfOpenState: 5  # Half-Open 상태에서 허용되는 호출 수
-          waitDurationInOpenState: 20s  # Open 상태에서 대기하는 시간
-          automaticTransitionFromOpenToHalfOpenEnabled: true # Open에서 Half-Open으로 자동 전환 여부
-          registerHealthIndicator: true  #서킷 브레이커 상태 모니터링
+      instances:
+        slackCircuitBreaker:
+          slidingWindowSize: 20s # 짧게
+          failureRateThreshold: 30 # 덜 민감
+          waitDurationInOpenState: 10s
+          recordExceptions:
+            - com.sixlab.logistics.slack_ai_service.Messenger.application.exception.SlackCircuitException
+        geminiCircuitBreaker:
+          slidingWindowSize: 60s # 길게
+          failureRateThreshold: 15 # 더 민감
+          waitDurationInOpenState: 20s
+          recordExceptions:
+            - com.sixlab.logistics.slack_ai_service.Messenger.application.exception.GeminiRetryException
 slack:
   token: ${slack.token}
   uri: ${slack.uri}
