@@ -1,11 +1,12 @@
 package com.sixlab.logistics.order_service.application.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sixlab.logistics.common.shared.exception.OutOfStockException;
 import com.sixlab.logistics.common.shared.exception.ResourceNotFoundException;
 import com.sixlab.logistics.common.shared.response.ApiResponseDto;
 import com.sixlab.logistics.order_service.application.client.CompanyClient;
 import com.sixlab.logistics.order_service.application.client.DeliveryClient;
-import com.sixlab.logistics.order_service.application.client.HubClient;
 import com.sixlab.logistics.order_service.application.client.ProductClient;
 import com.sixlab.logistics.order_service.application.dto.UserInfo;
 import com.sixlab.logistics.order_service.application.dto.request.OrderCreateRequestDto;
@@ -15,21 +16,21 @@ import com.sixlab.logistics.order_service.application.dto.request.RequestDeliver
 import com.sixlab.logistics.order_service.application.dto.response.*;
 import com.sixlab.logistics.order_service.domain.model.Order;
 import com.sixlab.logistics.order_service.infrastructure.persistence.OrderJpaRepository;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class OrderService {
+    private final ObjectMapper objectMapper;
 
     private final UUID productId = UUID.fromString("50c3068a-6b09-4f45-a3af-c119168a7676");
     private final UUID companyId = UUID.fromString("edb45825-cafb-457f-9179-7d544b1ec78a"); // 공급업체 id
@@ -44,7 +45,7 @@ public class OrderService {
     private final DeliveryClient deliveryClient;
     private final ProductClient productClient;
     private final CompanyClient companyClient;
-    private final HubClient hubClient;
+    // private final HubClient hubClient;
 
     private final OrderJpaRepository orderJpaRepository;
 
@@ -68,9 +69,8 @@ public class OrderService {
                 .createdAt(LocalDateTime.now().minusWeeks(1))
                 .build(); */
 
-
-        GetProductResponseDto getProduct = requestProduct.getBody().getData();
-
+        ApiResponseDto<?> apiResponseDto = checkFeignClientResponse(requestProduct);
+        GetProductResponseDto getProduct = (GetProductResponseDto)apiResponseDto.getData();
         ifExist(getProduct);
 
         // (상품 id 기반으로 객체를 전달받은상태) & 요청 상품 수량이 재고 수량보다 적거나 같은지 확인
@@ -99,8 +99,11 @@ public class OrderService {
 
         // 4. company-service 의 조회 메서드 호출하기
         // 클라이언트로부터 전달받은 수령업체가 존재하는지 확인
-        ResponseEntity<ApiResponseDto<GetCompanyResponseDto>> company = companyClient.getCompanyById(dto.getReceiverId());
-        GetCompanyResponseDto getReceiverCompanyInfo = company.getBody().getData();
+        ResponseEntity<ApiResponseDto<GetCompanyResponseDto>> response = companyClient.getCompanyById(dto.getReceiverId());
+
+        // http 상태 코드가 2 로 시작하고, response.getBody() 가 null 이 아님을 확인
+        ApiResponseDto<GetCompanyResponseDto> getBody = checkFeignClientResponse(response);
+        GetCompanyResponseDto getReceiverCompanyInfo = getBody.getData();
         
         /* 상기 코드 호출시 하기의 객체를 전달받음
         GetCompanyResponseDto getCompanyInfo = GetCompanyResponseDto.builder()
@@ -149,11 +152,22 @@ public class OrderService {
         return new OrderCreateResponseDto(savedOrder);
     }
 
+    // FeignClient 호출시 반환 값 검증: 메서드 호출에 문제가 없었는지에 대한 확인 절차
+    private static <T> ApiResponseDto<T> checkFeignClientResponse(ResponseEntity<ApiResponseDto<T>> response) {
+        if(!response.getStatusCode().is2xxSuccessful() || response.getBody() == null || response.getBody().getStatus() != HttpStatus.OK.value()) {
+            throw new RuntimeException("FeignClient 호출 문제 발생 - http 상태 코드: "+ response.getStatusCode());
+        }
+        return response.getBody();
+    }
+
     // 객체를 전달했을 때 비어있는지의 여부를 확인하는 메서드
     // - 어떤 객체와 예외를 매개변수로 받고
     // - 객체가 null 인지 비교,
     // - null 이라면 함께 전달받은 예외를 발생시키는 로직으로 develop 하기
-    private void ifExist(GetProductResponseDto data) {
+
+    // 제네릭을 사용해서 다양한 타입의 객체를 받아 객체의 null 의 여부를 검증하는 메서드
+    // 무치형 타입: 값을 반환하지 않는
+    private <T> void ifExist(T data) {
         if(data == null) {
             log.info("상품이 존재하지 않을 경우 이 로그가 찍힌다.");
             throw new ResourceNotFoundException("존재하지 않는 상품입니다.");
@@ -237,13 +251,26 @@ public class OrderService {
         // order 객체에서 productId 를 얻고,
         // 1) product 서비스 호출: productId 를 기반으로 product 객체를 얻고,
         // 2) hub 서비스 호출: product 객체에서 얻은 hubId 를 기반으로 hub 객체를 얻고,
-        // 3) hub 관리자 서비스 호출: hub 매니저 객체에서 userId 를 얻어야 한다.
         // --> 그리고 비교해서 맞지 않다면 접근 권한이 없다고 리턴한다.
 
         // 3. 상품 서비스에게 수량 만큼의 복원을 요청한다.
+        ResponseEntity<ApiResponseDto<ProductStockResponseDto>> response =
+                productClient.requestProductStockRestore(order.getProductId(), order.getQuantity());
 
+        if(!response.getStatusCode().is2xxSuccessful() || response.getBody() == null || response.getBody().getStatus() != HttpStatus.OK.value()) {
+            // http 상태 코드와 api response 형식에 담긴 status 의 값을 확인해보자.
+            log.info("response.getStatus(): {}", response.getStatusCode());
 
+            // 에러코드가 500, 400 등이라면 응답 본문이 없을 수 있으니(response.getBody() == null)
+            // 아래 로그에서 getStatus() 가 안찍힐 가능성이 있음.
+            log.info("response.getBody() - ApiResponse<ProductStockResponseDto> 의 status: {}", response.getBody().getStatus());
+            log.info("message: {}", response.getBody().getMessage()); // 에러메시지가 반환될 것임.
 
+            String errorMessage = "Error response from ProductService. HTTP Status: " + response.getStatusCode() + ", " +"API Response Status: " + response.getBody().getStatus();
+
+            throw new FeignException.FeignClientException(response.getStatusCode().value(),
+                    errorMessage, null, null, null);
+        }
 
         // 4. 배송 서비스에게 배송 id 삭제를 요청한다.
         // {"message": "SUCCESS", "data":null}
