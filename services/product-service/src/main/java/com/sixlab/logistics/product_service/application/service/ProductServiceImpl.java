@@ -3,6 +3,8 @@ package com.sixlab.logistics.product_service.application.service;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sixlab.logistics.product_service.application.client.CompanyClient;
+import com.sixlab.logistics.product_service.application.dto.CompanyResponseDto;
 import com.sixlab.logistics.product_service.domain.model.Product;
 import com.sixlab.logistics.product_service.domain.model.QProduct;
 import com.sixlab.logistics.product_service.domain.repository.ProductRepository;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final JPAQueryFactory queryFactory;
+    private final CompanyClient companyClient;
 
     @Transactional
     @Override
@@ -49,8 +52,25 @@ public class ProductServiceImpl implements ProductService {
                 .offset(page * size)
                 .limit(size);
 
+        // 상품 리스트 가져오기
         List<ProductResponseDto> products = query.fetch().stream()
-                .map(ProductResponseDto::fromEntity)  // Product를 ProductResponseDto로 변환
+                .map(p -> {
+                    // 상품 정보 조회 후 companyId와 hubId 추가
+                    ProductResponseDto productResponseDto = ProductResponseDto.fromEntity(p);
+
+                    // CompanyClient를 통해 companyId와 hubId 조회
+                    UUID companyId = p.getCompanyId();  // companyId가 UUID 타입이라고 가정
+                    CompanyResponseDto company = companyClient.getCompanyById(companyId.toString());  // CompanyClient에서 UUID로 처리하려면 String으로 변환
+
+                    // CompanyResponseDto에서 hubId를 가져옴
+                    UUID hubId = company.getHubId();  // CompanyResponseDto에 hubId가 있다고 가정
+
+                    // ProductResponseDto에 companyId, hubId 설정
+                    productResponseDto.setCompanyId(companyId);  // companyId는 UUID로 설정
+                    productResponseDto.setHubId(hubId);
+
+                    return productResponseDto;
+                })
                 .collect(Collectors.toList());
 
         long totalItems = query.fetchCount();  // 총 아이템 수
