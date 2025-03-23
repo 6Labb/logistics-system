@@ -1,8 +1,8 @@
 package com.sixlab.logistics.company_service.presentation.controller;
 
 import com.sixlab.logistics.common.shared.response.ApiResponse;
+import com.sixlab.logistics.common.shared.security.UserDetailsImpl;
 import com.sixlab.logistics.company_service.application.service.CompanyService;
-import com.sixlab.logistics.company_service.config.UserDetailsImpl;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyRequestDto;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyResponseDto;
 import com.sixlab.logistics.company_service.presentation.dto.PaginationResponseDto;
@@ -24,7 +24,7 @@ public class CompanyController {
     private final CompanyService companyService;
 
     // 업체 등록
-    //@PreAuthorize("hasRole('MASTER') or #id == #userDetails.user.id")
+    @PreAuthorize("hasRole('MASTER') or #id == #userDetails.user.id")
     @PostMapping
     public ApiResponse<CompanyResponseDto> createCompany(
             @RequestBody CompanyRequestDto requestDto,
