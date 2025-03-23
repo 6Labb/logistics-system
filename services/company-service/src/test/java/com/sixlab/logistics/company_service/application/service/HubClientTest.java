@@ -1,7 +1,7 @@
 package com.sixlab.logistics.company_service.application.service;
 
 import com.sixlab.logistics.company_service.application.client.HubClient;
-import com.sixlab.logistics.company_service.presentation.dto.ExternalCompanyResponse;
+import com.sixlab.logistics.company_service.application.dto.ExternalCompanyResponse;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;

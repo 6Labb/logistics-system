@@ -1,5 +1,6 @@
 package com.sixlab.logistics.company_service.application.service;
 
+import com.sixlab.logistics.company_service.application.dto.HubRouteResponse;
 import com.sixlab.logistics.company_service.domain.model.CompanyType;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyRequestDto;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyResponseDto;
@@ -19,4 +20,5 @@ public interface CompanyService {
     CompanyResponseDto getCompanyById(UUID companyId);
     CompanyResponseDto updateCompany(UUID companyId, CompanyRequestDto requestDto);
     void deleteCompany(UUID companyId);
+    HubRouteResponse getHubRoute(UUID supplierId, UUID receiverId);
 }

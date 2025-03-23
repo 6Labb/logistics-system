@@ -1,4 +1,4 @@
-package com.sixlab.logistics.company_service.presentation.dto;
+package com.sixlab.logistics.company_service.application.dto;
 
 import lombok.Builder;
 import lombok.Getter;

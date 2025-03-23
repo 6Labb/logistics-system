@@ -2,6 +2,7 @@ package com.sixlab.logistics.company_service.presentation.controller;
 
 import com.sixlab.logistics.common.shared.response.ApiResponse;
 import com.sixlab.logistics.common.shared.security.UserDetailsImpl;
+import com.sixlab.logistics.company_service.application.dto.HubRouteResponse;
 import com.sixlab.logistics.company_service.application.service.CompanyService;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyRequestDto;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyResponseDto;
@@ -89,5 +90,13 @@ public class CompanyController {
         // ApiResponse로 감싸서 반환
         return ApiResponse.success(result, "업체 검색 성공");
     }
+
+    @GetMapping("/hub-route")
+    public HubRouteResponse getHubRoute(
+            @RequestParam UUID supplierId,
+            @RequestParam UUID receiverId) {
+        return companyService.getHubRoute(supplierId, receiverId);
+    }
+
 
 }

@@ -3,6 +3,8 @@ package com.sixlab.logistics.company_service.application.service;
 import com.sixlab.logistics.common.shared.exception.DuplicateResourceException;
 import com.sixlab.logistics.common.shared.exception.ResourceNotFoundException;
 import com.sixlab.logistics.company_service.application.client.HubClient;
+import com.sixlab.logistics.company_service.application.dto.HubResponse;
+import com.sixlab.logistics.company_service.application.dto.HubRouteResponse;
 import com.sixlab.logistics.company_service.domain.model.Company;
 import com.sixlab.logistics.company_service.domain.repository.CompanyRepository;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyRequestDto;
@@ -119,4 +121,21 @@ public class CompanyServiceImpl implements CompanyService {
         companyRepository.delete(company);
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public HubRouteResponse getHubRoute(UUID supplierId, UUID receiverId) {
+        log.info("Fetching hub info for supplierId: {}, receiverId: {}", supplierId, receiverId);
+
+        // Company ID로 Hub ID 조회
+        UUID departureHubId = companyRepository.findHubIdByCompanyId(supplierId)
+                .orElseThrow(() -> new ResourceNotFoundException("출발 허브 정보를 찾을 수 없습니다."));
+        UUID arrivalHubId = companyRepository.findHubIdByCompanyId(receiverId)
+                .orElseThrow(() -> new ResourceNotFoundException("도착 허브 정보를 찾을 수 없습니다."));
+
+        // 조회한 Hub ID로 Hub 정보 가져오기
+        HubResponse departureHub = hubClient.getHubById(departureHubId);
+        HubResponse arrivalHub = hubClient.getHubById(arrivalHubId);
+
+        return new HubRouteResponse(departureHub.getHubId(), arrivalHub.getHubId());
+    }
 }
