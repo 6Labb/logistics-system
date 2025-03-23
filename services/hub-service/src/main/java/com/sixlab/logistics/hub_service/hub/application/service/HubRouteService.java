@@ -21,7 +21,6 @@ public class HubRouteService {
     private final HubRouteRepository hubRouteRepository;
     private final HubRepository hubRepository;
 
-    @Transactional
     public HubRouteResponseDto createHubRoute(HubRouteRequestDto requestDto) {
         Hub departureHub = hubRepository.findById(requestDto.getDepartureHubId())
                 .orElseThrow(() -> new IllegalArgumentException("출발 허브 없음"));
@@ -61,13 +60,13 @@ public class HubRouteService {
         return HubRouteResponseDto.from(hubRoute);
     }
 
-    @Transactional
-    public HubRouteResponseDto updateHubRoute(UUID id, HubRouteRequestDto requestDto) {
-        HubRoute hubRoute = hubRouteRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 경로 ID"));
-        hubRouteRepository.update(requestDto);
-        return HubRouteResponseDto.from(hubRoute);
-    }
+//    @Transactional
+//    public HubRouteResponseDto updateHubRoute(UUID id, HubRouteRequestDto requestDto) {
+//        HubRoute hubRoute = hubRouteRepository.findById(id)
+//                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 경로 ID"));
+//        hubRouteRepository.update(requestDto);
+//        return HubRouteResponseDto.from(hubRoute);
+//    }
 
     @Transactional
     public void deleteHubRoute(UUID id) {

@@ -1,4 +1,4 @@
-package com.sixlab.logistics.delivery_service.delivery.infrastructure.config;
+package com.sixlab.logistics.company_service.config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;

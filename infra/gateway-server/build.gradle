@@ -26,9 +26,8 @@ repositories {
 ext {
 	set('springCloudVersion', "2024.0.0")
 }
-tasks.register("prepareKotlinBuildScriptModel")
+
 dependencies {
-	implementation project(':common')
 
 	implementation 'io.micrometer:micrometer-registry-prometheus'
 	implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.2.0'

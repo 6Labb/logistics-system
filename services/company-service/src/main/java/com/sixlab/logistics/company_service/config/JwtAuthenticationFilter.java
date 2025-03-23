@@ -1,4 +1,4 @@
-package com.sixlab.logistics.delivery_service.delivery.infrastructure.config;
+package com.sixlab.logistics.company_service.config;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -10,8 +10,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-
-
 
 /**
  *  Authorization 헤더에서 JWT를 가져와 검증함

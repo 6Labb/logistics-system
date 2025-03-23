@@ -3,14 +3,16 @@ package com.sixlab.logistics.hub_service.hub.presentation.controller;
 
 import com.sixlab.logistics.hub_service.hub.application.dto.hubroute.HubRouteRequestDto;
 import com.sixlab.logistics.hub_service.hub.application.dto.hubroute.HubRouteResponseDto;
+import com.sixlab.logistics.hub_service.hub.application.service.HubManagerService;
 import com.sixlab.logistics.hub_service.hub.application.service.HubRouteService;
+import com.sixlab.logistics.hub_service.hub.domain.model.Hub;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
-
+import java.util.stream.Collectors;
 
 @RefreshScope
 @RestController
@@ -21,8 +23,7 @@ public class HubRouteController {
     private final HubRouteService hubRouteService;
 
     @PostMapping
-    public ResponseEntity<HubRouteResponseDto> createHubRoute(
-            @RequestBody HubRouteRequestDto requestDto) {
+    public ResponseEntity<HubRouteResponseDto> createHubRoute(@RequestBody HubRouteRequestDto requestDto) {
         HubRouteResponseDto responseDto = hubRouteService.createHubRoute(requestDto);
         return ResponseEntity.ok(responseDto);
     }
@@ -35,7 +36,7 @@ public class HubRouteController {
     }
 
     @GetMapping("/{hubRouteId}")
-    public ResponseEntity<HubRouteResponseDto> getHubRouteId(
+    public ResponseEntity<HubRouteResponseDto> getHubRoute(
             @PathVariable UUID hubRouteId,
             @RequestParam UUID fromHubId,
             @RequestParam UUID toHubId) {
@@ -43,19 +44,20 @@ public class HubRouteController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<HubRouteResponseDto> updateHubRoute(
-            @PathVariable UUID id,
-            @RequestBody HubRouteRequestDto requestDto) {
-        HubRouteResponseDto response = hubRouteService.updateHubRoute(id, requestDto);
-        return ResponseEntity.ok(response);
-    }
+//    @PutMapping("/{id}")
+//    public ResponseEntity<HubRouteResponseDto> updateHubRoute(
+//            @PathVariable UUID id,
+//            @RequestBody HubRouteRequestDto requestDto) {
+//        HubRouteResponseDto response = hubRouteService.updateHubRoute(id, requestDto);
+//        return ResponseEntity.ok(response);
+//    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteHubRoute(@PathVariable UUID id) {
         hubRouteService.deleteHubRoute(id);
         return ResponseEntity.ok().build();
     }
+
 
 
 }

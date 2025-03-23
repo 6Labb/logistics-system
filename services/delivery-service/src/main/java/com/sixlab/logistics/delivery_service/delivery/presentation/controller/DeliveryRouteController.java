@@ -1,6 +1,7 @@
 package com.sixlab.logistics.delivery_service.delivery.presentation.controller;
 
 import com.sixlab.logistics.common.shared.response.ApiResponse;
+import com.sixlab.logistics.common.shared.security.UserDetailsImpl;
 import com.sixlab.logistics.delivery_service.delivery.application.dto.*;
 import com.sixlab.logistics.delivery_service.delivery.application.service.DeliveryRouteService;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -45,6 +47,7 @@ public class DeliveryRouteController {
         return ApiResponse.success(HttpStatus.OK, deliveryRoute, "SUCCESS");
     }
 
+    /*
     // 특정 배송 모든 경로 조회
     @GetMapping("/deliveries/{deliveryId}/routes")
     public ApiResponse<Page<DeliveryRouteResponseDto>> getAllDeliveryRouteByDeliveryId(
@@ -55,8 +58,9 @@ public class DeliveryRouteController {
         Page<DeliveryRouteResponseDto> deliveryRoute = deliveryRouteService.getAllDeliveryRouteByDeliveryId(searchDto, pageable, deliveryId);
         return ApiResponse.success(HttpStatus.OK, deliveryRoute, "SUCCESS");
     }
+    */
 
-    // 특정 배송 모든 경로 개별 조회
+    // 배송경로 개별 조회
     @GetMapping("/deliveries/{deliveryId}/routes/{id}")
     public ApiResponse<DeliveryRouteResponseDto> getDeliveryRouteByDeliveryId(
             @PathVariable UUID deliveryId,
@@ -71,9 +75,10 @@ public class DeliveryRouteController {
     public ApiResponse<DeliveryRouteResponseDto> updateDeliveryRoute(
             @PathVariable UUID deliveryId,
             @PathVariable UUID id,
-            @RequestBody DeliveryRouteRequestDto requestDto) {
+            @RequestBody DeliveryRouteRequestDto requestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        DeliveryRouteResponseDto deliveryRoute = deliveryRouteService.updateDeliveryRoute(deliveryId, id, requestDto);
+        DeliveryRouteResponseDto deliveryRoute = deliveryRouteService.updateDeliveryRoute(deliveryId, id, requestDto, userDetails);
         return ApiResponse.success(HttpStatus.OK, deliveryRoute, "SUCCESS");
     }
 
@@ -82,9 +87,10 @@ public class DeliveryRouteController {
     public ApiResponse<DeliveryRouteStatusResponseDto> updateDeliveryRouteStatus(
             @PathVariable UUID deliveryId,
             @PathVariable UUID id,
-            @RequestBody DeliveryRouteRequestDto requestDto) {
+            @RequestBody DeliveryRouteRequestDto requestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        DeliveryRouteStatusResponseDto deliveryRoute = deliveryRouteService.updateDeliveryRouteStatus(deliveryId, id, requestDto.getStatus());
+        DeliveryRouteStatusResponseDto deliveryRoute = deliveryRouteService.updateDeliveryRouteStatus(deliveryId, id, requestDto.getStatus(), userDetails);
         return ApiResponse.success(HttpStatus.OK, deliveryRoute, "SUCCESS");
     }
 
@@ -92,8 +98,10 @@ public class DeliveryRouteController {
     @DeleteMapping("/deliveries/{deliveryId}/routes/{id}")
     public ApiResponse<DeliveryRouteResponseDto> deleteDeliveryRoute(
             @PathVariable UUID deliveryId,
-            @PathVariable UUID id) {
-        deliveryRouteService.deleteDeliveryRoute(deliveryId, id);
+            @PathVariable UUID id,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        deliveryRouteService.deleteDeliveryRoute(deliveryId, id, userDetails);
         return ApiResponse.success(HttpStatus.OK, null, "SUCCESS");
     }
 

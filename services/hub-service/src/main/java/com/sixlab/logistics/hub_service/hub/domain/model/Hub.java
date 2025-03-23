@@ -31,40 +31,33 @@ public class Hub extends BasicEntity {
 
     private double longitude;
 
-    private Long hubManagerId;
-
-    @OneToMany(mappedBy = "departureHub")
-    private List<HubRoute> departureRoutes = new ArrayList<>();
-
-    @OneToMany(mappedBy = "arrivalHub")
-    private List<HubRoute> arrivalRoutes = new ArrayList<>();
-
+    private Long hubManagerUserId;
 
     @Builder
-    private Hub(String hubName, String hubAddress, double latitude, double longitude, Long hubManagerId) {
+    private Hub(String hubName, String hubAddress, double latitude, double longitude, Long hubManagerUserId) {
         this.hubName = hubName;
         this.hubAddress = hubAddress;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.hubManagerId = hubManagerId;
+        this.hubManagerUserId = hubManagerUserId;
     }
 
-    public static Hub create(String hubName, String hubAddress, double latitude, double longitude, Long hubManagerId) {
+    public static Hub create(String hubName, String hubAddress, double latitude, double longitude, Long hubManagerUserId) {
         return Hub.builder()
                 .hubName(hubName)
                 .hubAddress(hubAddress)
                 .latitude(latitude)
                 .longitude(longitude)
-                .hubManagerId(hubManagerId)
+                .hubManagerUserId(hubManagerUserId)
                 .build();
     }
 
-    public void update(String hubName, String hubAddress, double latitude, double longitude, Long hubManagerId) {
+    public void update(String hubName, String hubAddress, double latitude, double longitude, Long hubManagerUserId) {
         this.hubName = hubName;
         this.hubAddress = hubAddress;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.hubManagerId = hubManagerId;
+        this.hubManagerUserId = hubManagerUserId;
     }
 
 

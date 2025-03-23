@@ -24,7 +24,6 @@ public class HubManager extends BasicEntity {
     private Long userId;
 
     private UUID hubId;
-    // 허브매니저가 나중에 허브에 배정되면 assignHub(UUID hubId) 메서드를 호출하여 허브 ID를 설정.?
 
     @Builder
     private HubManager(Long userId, UUID hubId) {

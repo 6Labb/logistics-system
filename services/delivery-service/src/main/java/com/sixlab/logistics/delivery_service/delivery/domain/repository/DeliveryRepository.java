@@ -13,26 +13,25 @@ import java.util.UUID;
 
 public interface DeliveryRepository {
 
-    // 배송상태로 조회
-    //Optional<Delivery> findByStatus(DeliveryStatus status);
+// 배송 리스트 조회
+    // 배송 리스트 조회
+    Page<DeliveryResponseDto> searchDeliveryListForMaster(DeliverySearchDto searchDto, Pageable pageable);
 
-    // 소속 허브id로 조회
-    //Page<Delivery> findByFromHubId(UUID fromHubId, Pageable pageable);
+    Page<DeliveryResponseDto> searchDeliveryListForDeliveryAgent(DeliverySearchDto searchDto, Pageable pageable, Long deliveryAgentId);
 
-    // 배송담당자id로 조회
-    //Page<Delivery> findByDeliveryAgentId(UUID deliveryAgentId, Pageable pageable);
+    Page<DeliveryResponseDto> searchDeliveryListForHubManager(DeliverySearchDto searchDto, Pageable pageable, UUID ownHubId);
 
-    Page<DeliveryResponseDto> searchDeliveryList(DeliverySearchDto searchDto, Pageable pageable);
-
-    // id로 조회
+// 배송 개별 조회
+    // id로 조회(관리자)
     Optional<Delivery> findById(UUID id);
 
-    // 배송 삭제
-    void delete(Delivery delivery);
+    // 허브 담당자
+    Optional<Delivery> findByIdAndToHubId(UUID id, UUID hubId);
+
+    // 배송 담당자
+    Optional<Delivery> findByIdAndDeliveryAgentId(UUID id, Long currentUserId);
 
     // 배송 생성
     Delivery save(Delivery delivery);
 
-    // 마지막으로 할당된 배송순번 조회
-    Optional<Delivery> findTopByToHubIdOrderByCreatedAtDesc(UUID toHubId);
 }

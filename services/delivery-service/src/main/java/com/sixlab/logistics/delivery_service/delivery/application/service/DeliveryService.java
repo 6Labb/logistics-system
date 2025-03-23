@@ -1,6 +1,8 @@
 package com.sixlab.logistics.delivery_service.delivery.application.service;
 
 import com.sixlab.logistics.common.shared.exception.ResourceNotFoundException;
+import com.sixlab.logistics.common.shared.security.Role;
+import com.sixlab.logistics.common.shared.security.UserDetailsImpl;
 import com.sixlab.logistics.delivery_service.delivery.application.dto.*;
 import com.sixlab.logistics.delivery_service.delivery.domain.entity.Delivery;
 import com.sixlab.logistics.delivery_service.delivery.domain.entity.DeliveryStatus;
@@ -8,6 +10,7 @@ import com.sixlab.logistics.delivery_service.delivery.domain.repository.Delivery
 import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.CompanyClient;
 import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.HubClient;
 import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.dto.CompanyResponseDto;
+import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.dto.HubManagerResponseDto;
 import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.dto.HubRouteResponseDto;
 import com.sixlab.logistics.delivery_service.deliveryAgent.application.dto.DeliveryAgentResponseDto;
 import com.sixlab.logistics.delivery_service.deliveryAgent.domain.entity.DeliveryAgent;
@@ -16,6 +19,8 @@ import com.sixlab.logistics.delivery_service.deliveryAgent.domain.repository.Del
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,41 +39,111 @@ public class DeliveryService {
     private final DeliveryRouteService deliveryRouteService;
 
     // 배송 리스트 조회
-    public Page<DeliveryResponseDto> getAllDeliveries(DeliverySearchDto searchDto, Pageable pageable) {
-
+    public Page<DeliveryResponseDto> getAllDeliveries(DeliverySearchDto searchDto, Pageable pageable, UserDetailsImpl userDetails) {
         // 권한 받아오기
-            // 관리자와 업체담당자는 전부 가능
-            // 허브담당자는 본인의 허브 배송리스트만 가능
-            // 배송담당자는 본인의 배송리스트만 가능
+        Role currentRole = userDetails.getUserInfo().getRole();
+        Long currentUserId = userDetails.getUserId();
 
-        return deliveryRepository.searchDeliveryList(searchDto, pageable);
+        // 관리자와 업체담당자는 전부 가능
+        if (currentRole == Role.MASTER || currentRole == Role.TRADE_PARTNER) {
+            return deliveryRepository.searchDeliveryListForMaster(searchDto, pageable);
+        }
+
+        // 허브담당자는 본인의 허브 배송리스트만 가능
+        if (currentRole == Role.HUB_MANAGER) {
+            // 소속허브id 조회
+            //HubManagerResponseDto hubManager = hubClient.getHubIdByUserId(currentUserId);
+            //TODO: 테스트용 소속허브id 조회
+            UUID hubManager = UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120001");
+            if (hubManager == null) {
+                throw new ResourceNotFoundException("해당 아이디로 소속허브id를 찾을 수 없습니다.");
+            }
+            //return deliveryRepository.searchDeliveryListForHubManager(searchDto, pageable, hubManager.getHubId());
+            return deliveryRepository.searchDeliveryListForHubManager(searchDto, pageable, hubManager);
+        }
+        // 배송담당자는 본인의 배송리스트만 가능
+        if (currentRole == Role.DELIVERY_AGENT) {
+            return deliveryRepository.searchDeliveryListForDeliveryAgent(searchDto, pageable, currentUserId);
+        }
+
+        throw new AccessDeniedException("배송 리스트 조회 권한이 없습니다.");
     }
 
     // 배송 개별 조회
-    public DeliveryResponseDto getDelivery(UUID id) {
+    public DeliveryResponseDto getDelivery(UUID id, UserDetailsImpl userDetails) {
         // 권한 받아오기
-            // 관리자와 업체담당자는 전부 가능
-            // 허브담당자는 본인의 허브 배송만 가능
-            // 배송담당자는 본인의 배송만 가능
+        Role currentRole = userDetails.getUserInfo().getRole();
+        Long currentUserId = userDetails.getUserId();
 
-        // id로 배송 객체 찾기
-        Delivery delivery = deliveryRepository.findById(id)
-                .orElseThrow(ResourceNotFoundException::new);
+        Delivery delivery = null;
+
+        // 관리자와 업체담당자는 전부 가능
+        if(currentRole == Role.MASTER || currentRole == Role.TRADE_PARTNER) {
+            delivery = deliveryRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("배송 정보를 찾을 수 없습니다."));
+        }
+        // 허브담당자는 본인의 허브 배송만 가능
+        else if (currentRole == Role.HUB_MANAGER) {
+            // 소속허브id 조회
+            //HubManagerResponseDto hubManager = hubClient.getHubIdByUserId(currentUserId);
+            //TODO: 테스트용 소속허브id 조회
+            UUID hubManager = UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120001");
+            if (hubManager == null) {
+                throw new ResourceNotFoundException("해당 아이디로 허브 id를 찾을 수 없습니다.");
+            }
+            //delivery = deliveryRepository.findByIdAndToHubId(id, hubManager.getHubId())
+            delivery = deliveryRepository.findByIdAndToHubId(id, hubManager)
+                    .orElseThrow(() -> new AccessDeniedException("해당 배송의 조회 권한이 없습니다."));
+        }
+        // 배송담당자는 본인의 배송만 가능
+        else if (currentRole == Role.DELIVERY_AGENT) {
+            delivery = deliveryRepository.findByIdAndDeliveryAgentId(id, currentUserId).orElseThrow(
+                    () -> new AccessDeniedException("해당 배송의 조회 권한이 없습니다."));
+
+
+        }
+        else {
+            throw new AccessDeniedException("배송 조회 권한이 없습니다.");
+        }
 
         return new DeliveryResponseDto(delivery);
     }
 
     // 배송 수정
     @Transactional
-    public DeliveryResponseDto updateDelivery(UUID id, DeliveryRequestDto requestDto) {
+    public DeliveryResponseDto updateDelivery(UUID id, DeliveryRequestDto requestDto, UserDetailsImpl userDetails) {
         // 권한 받아오기
-            // 관리자
-            // 허브담당자는 본인의 허브 배송만 가능
-            // 배송담당자는 본인의 배송만 가능
+        Role currentRole = userDetails.getUserInfo().getRole();
+        Long currentUserId = userDetails.getUserId();
 
-        // id로 배송 객체 찾기
-        Delivery delivery = deliveryRepository.findById(id)
-                .orElseThrow(ResourceNotFoundException::new);
+        Delivery delivery;
+
+        // 관리자와 업체담당자는 전부 가능
+        if(currentRole == Role.MASTER || currentRole == Role.TRADE_PARTNER) {
+            delivery = deliveryRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("배송 정보를 찾을 수 없습니다."));
+        }
+        // 허브담당자는 본인의 허브 배송만 가능
+        else if (currentRole == Role.HUB_MANAGER) {
+            // 소속허브id 조회
+            //HubManagerResponseDto hubManager = hubClient.getHubIdByUserId(currentUserId);
+            //TODO: 테스트용 소속허브id 조회
+            UUID hubManager = UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120001");
+            if (hubManager == null) {
+                throw new ResourceNotFoundException("해당 아이디로 허브 id를 찾을 수 없습니다.");
+            }
+            //delivery = deliveryRepository.findByIdAndToHubId(id, hubManager.getHubId())
+            delivery = deliveryRepository.findByIdAndToHubId(id, hubManager)
+                    .orElseThrow(() -> new AccessDeniedException("해당 배송의 수정 권한이 없습니다."));
+        }
+        // 배송담당자는 본인의 배송만 가능
+        else if (currentRole == Role.DELIVERY_AGENT) {
+            delivery = deliveryRepository.findByIdAndDeliveryAgentId(id, currentUserId)
+                    .orElseThrow(() -> new AccessDeniedException("해당 배송의 수정 권한이 없습니다."));
+        }
+        else {
+            throw new AccessDeniedException("배송 수정 권한이 없습니다.");
+        }
 
         // 배송 정보 업데이트
         delivery.updateDelivery(requestDto);
@@ -78,14 +153,39 @@ public class DeliveryService {
 
     // 배송 상태 변경
     @Transactional
-    public DeliveryStatusResponseDto updateDeliveryStatus(UUID id, DeliveryStatus status) {
+    public DeliveryStatusResponseDto updateDeliveryStatus(UUID id, DeliveryStatus status, UserDetailsImpl userDetails) {
         // 권한 받아오기
-            // 관리자
-            // 허브담당자는 본인의 허브 배송만 가능
-            // 배송담당자는 본인의 배송만 가능
+        Role currentRole = userDetails.getUserInfo().getRole();
+        Long currentUserId = userDetails.getUserId();
 
-        Delivery delivery = deliveryRepository.findById(id)
-                .orElseThrow(ResourceNotFoundException::new);
+        Delivery delivery;
+
+        // 관리자와 업체담당자는 전부 가능
+        if(currentRole == Role.MASTER || currentRole == Role.TRADE_PARTNER) {
+            delivery = deliveryRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("배송 정보를 찾을 수 없습니다."));
+        }
+        // 허브담당자는 본인의 허브 배송만 가능
+        else if (currentRole == Role.HUB_MANAGER) {
+            // 소속허브id 조회
+            //HubManagerResponseDto hubManager = hubClient.getHubIdByUserId(currentUserId);
+            //TODO: 테스트용 소속허브id 조회
+            UUID hubManager = UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120001");
+            if (hubManager == null) {
+                throw new ResourceNotFoundException("해당 아이디로 허브 id를 찾을 수 없습니다.");
+            }
+            //delivery = deliveryRepository.findByIdAndToHubId(id, hubManager.getHubId())
+            delivery = deliveryRepository.findByIdAndToHubId(id, hubManager)
+                    .orElseThrow(() -> new AccessDeniedException("해당 배송의 수정 권한이 없습니다."));
+        }
+        // 배송담당자는 본인의 배송만 가능
+        else if (currentRole == Role.DELIVERY_AGENT) {
+            delivery = deliveryRepository.findByIdAndDeliveryAgentId(id, currentUserId)
+                    .orElseThrow(() -> new AccessDeniedException("해당 배송의 수정 권한이 없습니다."));
+        }
+        else {
+            throw new AccessDeniedException("배송 수정 권한이 없습니다.");
+        }
 
         delivery.updateDeliveryStatus(status);
 
@@ -94,20 +194,46 @@ public class DeliveryService {
 
     // 배송 삭제
     @Transactional
-    public DeliveryResponseDto deleteDelivery(UUID id) {
+    public DeliveryResponseDto deleteDelivery(UUID id, UserDetailsImpl userDetails) {
         // 권한 받아오기
-            // 관리자
-            // 허브담당자는 본인의 허브 배송만 가능
+        Role currentRole = userDetails.getUserInfo().getRole();
+        Long currentUserId = userDetails.getUserId();
 
-        Delivery delivery = deliveryRepository.findById(id)
-                .orElseThrow(ResourceNotFoundException::new);
+        Delivery delivery;
+
+        // 관리자와 업체담당자는 전부 가능
+        if(currentRole == Role.MASTER || currentRole == Role.TRADE_PARTNER) {
+            delivery = deliveryRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("배송 정보를 찾을 수 없습니다."));
+        }
+        // 허브담당자는 본인의 허브 배송만 가능
+        else if (currentRole == Role.HUB_MANAGER) {
+            // 소속허브id 조회
+            //HubManagerResponseDto hubManager = hubClient.getHubIdByUserId(currentUserId);
+            //TODO: 테스트용 소속허브id 조회
+            UUID hubManager = UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120001");
+            if (hubManager == null) {
+                throw new ResourceNotFoundException("해당 아이디로 허브 id를 찾을 수 없습니다.");
+            }
+            //delivery = deliveryRepository.findByIdAndToHubId(id, hubManager.getHubId())
+            delivery = deliveryRepository.findByIdAndToHubId(id, hubManager)
+                    .orElseThrow(() -> new AccessDeniedException("해당 배송의 수정 권한이 없습니다."));
+        }
+        // 배송담당자는 본인의 배송만 가능
+        else if (currentRole == Role.DELIVERY_AGENT) {
+            delivery = deliveryRepository.findByIdAndDeliveryAgentId(id, currentUserId)
+                    .orElseThrow(() -> new AccessDeniedException("해당 배송의 수정 권한이 없습니다."));
+        }
+        else {
+            throw new AccessDeniedException("배송 수정 권한이 없습니다.");
+        }
 
         // 삭제 전 유효성 검사 - 배송대기 상태일 때만 삭제 가능
         if (delivery.getStatus() != DeliveryStatus.WAITING) {
             throw new IllegalStateException("배송대기 상태의 배송만 삭제할 수 있습니다.");
         }
 
-        delivery.delete(null);
+        delivery.delete(currentUserId);
 
         return new DeliveryResponseDto(delivery);
     }
@@ -179,8 +305,9 @@ public class DeliveryService {
         // 배송 경로 생성
         DeliveryRouteResponseDto responseDto = deliveryRouteService.createDeliveryRoute(delivery.getId());
         Long companyDeliveryAgentId = responseDto.getCompanyDeliveryAgentId();
+        Long hubDeliveryAgentId = responseDto.getHubDeliveryAgentId();
 
-        delivery.updateDeliveryAgent(companyDeliveryAgentId);
+        delivery.updateDeliveryAgent(companyDeliveryAgentId, hubDeliveryAgentId);
 
         return new DeliveryResponseDto(savedDelivery);
     }
