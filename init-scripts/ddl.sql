@@ -197,7 +197,7 @@ create table products.p_product
 alter table products.p_product
     owner to postgres;
 
-create table users.p_users
+create table users.p_user
 (
     created_at timestamp(6),
     created_by bigint,
@@ -209,7 +209,7 @@ create table users.p_users
     updated_by bigint,
     password   varchar(255) not null,
     role       varchar(255) not null
-        constraint p_users_role_check
+        constraint p_user_role_check
             check ((role)::text = ANY
         ((ARRAY ['DELIVERY_AGENT'::character varying, 'TRADE_PARTNER'::character varying, 'HUB_MANAGER'::character varying, 'MASTER'::character varying])::text[])),
     slack_id   varchar(255) not null
@@ -218,7 +218,7 @@ create table users.p_users
         unique
 );
 
-alter table users.p_users
+alter table users.p_user
     owner to postgres;
 
 create table ai_core.slack
