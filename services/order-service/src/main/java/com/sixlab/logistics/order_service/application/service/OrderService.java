@@ -85,9 +85,9 @@ public class OrderService {
                 .build(); */
         ApiResponseDto<GetProductResponseDto> apiResponseDto = checkFeignClientResponse(requestProduct);
 
-        GetProductResponseDto product = ifExist((GetProductResponseDto) apiResponseDto.getData());
+        GetProductResponseDto getProduct = ifExist((GetProductResponseDto) apiResponseDto.getData());
         // *** 상품 id 기반으로 얻은 상품 객체에서 공급업체의 id 를 얻는다.
-        UUID supplierCompanyId = product.getCompanyId();
+        UUID supplierCompanyId = getProduct.getCompanyId();
 
         // (상품 id 기반으로 객체를 전달받은상태) & 요청 상품 수량이 재고 수량보다 적거나 같은지 확인
         // 상품 객체에 허브 id, 공급업체 id, (재고) 수량 필드 등이 존재하고,
@@ -100,7 +100,7 @@ public class OrderService {
             String data = "요청 수량이 재고 수량을 초과했습니다. 최대 주문 가능 수량을 확인해 주세요.\n 최대 주문 가능 수량: "+getProduct.getQuantity();
             throw new OutOfStockException(data);
         }*/
-        checkProductStock(dto.getQuantity(), product.getQuantity());
+        checkProductStock(dto.getQuantity(), getProduct.getQuantity());
 
         // 3. 재고 감소 요청하기
         // return ApiResponse.success(HttpStatus.OK, responseDto, "상품 재고 감소 성공");
@@ -165,12 +165,12 @@ public class OrderService {
         ApiResponseDto<ResponseDeliveryRegisterDto> deliveryBody = checkFeignClientResponse(deliverResponse);
 
         // ResponseDeliveryRegisterDto
-        ResponseDeliveryRegisterDto deliveryInfo = deliveryBody.getData();
+        ResponseDeliveryRegisterDto getDelivery = deliveryBody.getData();
 
         // *** deliveryInfo 가 null 일 수 있나?
 
         // 5. Order 엔터티 객체 만들어서 저장하기
-        Order order = dto.toEntity(supplierCompanyId, userId, deliveryInfo.getId());
+        Order order = dto.toEntity(supplierCompanyId, userId, getDelivery.getId());
         Order savedOrder = orderJpaRepository.save(order);
 
         //AI 호출용 RabbitMQ
@@ -340,7 +340,9 @@ public class OrderService {
     private OrderInfoMessageRequestDto createOrderMessage(UUID getOrderId,GetProductResponseDto getProduct, OrderCreateRequestDto dto, ResponseDeliveryRegisterDto getDelivery) {
         return OrderInfoMessageRequestDto.builder()
                 .orderId(getOrderId)
-                // dto 필드에 productName 없어요 getName 으로 변경했습니다.
+                // dto 필드에 productName 없어요.
+                // 상대 responseDto 변경에 따라 제가 응답을 받기 위해 dto 를 변경하면서
+                // 기존의 필드명이 바뀌었을 겁니다.getProductName() --> getName() 으로 변경했습니다.
                 .productName(getProduct.getName())
                 .quantity(dto.getQuantity())
                 .receiverName(dto.getReceiverName())
