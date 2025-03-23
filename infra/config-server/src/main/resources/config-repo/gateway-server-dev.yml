@@ -2,12 +2,21 @@ server:
   port: 19091
 
 spring:
+  webflux:
+    static-path-pattern: /swagger-ui/**
   main:
     web-application-type: reactive
   application:
     name: gateway-server
   cloud:
     gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+      forwarded-headers-strategy: framework
       discovery: # 서비스 디스커버리를 통해 동적으로 라우트를 생성항도록 설정
         locator:
           enabled: true
@@ -15,20 +24,40 @@ spring:
           - PreserveHostHeader=true # 헤더 유지
           - AddRequestHeader=Authorization, {Authorization}
       routes:
+        - id: swagger-static
+          uri: http://localhost:19091
+          predicates:
+            - Path=/swagger-ui/**
+            - Path=/v3/api-docs/**
+            - Path=/webjars/**
+            - Path=/swagger-resources/**
+
         - id: user-service-user # 라우트 식별자
           uri: lb://user-service # 'user-service'라는 이름으로 로드 밸런싱된 서비스로 라우팅
           predicates:
-            - Path=/users/** # /users/** 경로로 들어오는 요청을 이 라우트로 처리
+            - Path=/users/**
+             # /users/** 경로로 들어오는 요청을 이 라우트로 처리
+
+        - id: user-service-user-swagger
+          uri: lb://user-service
+          predicates:
+            - Path=/users/swagger-ui/**
+            - Path=/users/v3/api-docs/**
 
         - id: user-service-auth
           uri: lb://user-service
           predicates:
             - Path=/auth/**
 
+        - id: user-service-auth-swagger
+          uri: lb://user-service
+          predicates:
+            - Path=/auth/v3/api-docs/**
+
         - id: hub-service
           uri: lb://hub-service
           predicates:
-            - Path=/hubs/**, /hub-managers/**
+            - Path=/hubs/**
 
         - id: company-service
           uri: lb://company-service
@@ -65,6 +94,15 @@ eureka:
     service-url:
       defaultZone: http://localhost:19090/eureka/
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    gateway:
+      enabled: true
+
 #service:
 #  jwt:
 #    secret-key: ${SECRET_KEY}
@@ -75,5 +113,23 @@ service:
     paths:
       - "/auth/signIn"
       - "/users/signUp"
-      - "/swagger-ui/"
+      - "/swagger-ui/**"
+      - "/v3/api-docs/**"
+      - "/swagger-resources/**"
+      - "/webjars/**"
+      - "/auth/v3/api-docs"
+      - "/hubs/v3/api-docs"
+      - "/users/v3/api-docs"
+      - "/auth/v3/api-docs/**"
+      - "/hubs/v3/api-docs/**"
+      - "/users/v3/api-docs/**"
 
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui
+    urls:
+      - name: user-service-user
+        url: /users/v3/api-docs
+      - name: user-service-auth
+        url: /auth/v3/api-docs
