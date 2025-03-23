@@ -38,22 +38,23 @@ public class HubManagerService {
 //                .build();
 //    }
 
+    @Transactional
     public HubManagerCreateResponseDto createManager(HubManagerCreateRequestDto request) {
 
-        System.out.println("🚀 FeignClient 호출: userId=" + request.getUserId());
+        System.out.println("FeignClient 호출: userId=" + request.getUserId());
 
         // SecurityContext에서 현재 로그인한 사용자 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || authentication.getName() == null) {
-            throw new IllegalStateException("🚨 SecurityContext에서 사용자 정보를 찾을 수 없음!");
+            throw new IllegalStateException("SecurityContext에서 사용자 정보를 찾을 수 없음");
         }
 
         String currentUserId = authentication.getName();
         String currentUserRole = authentication.getAuthorities().stream()
                 .findFirst().map(GrantedAuthority::getAuthority).orElse("ROLE_USER");
 
-        System.out.println("✅ 현재 로그인한 사용자 ID: " + currentUserId + ", 역할: " + currentUserRole);
+        System.out.println("현재 로그인한 사용자 ID: " + currentUserId + ", 역할: " + currentUserRole);
 
         String token = authentication.getCredentials().toString();
 

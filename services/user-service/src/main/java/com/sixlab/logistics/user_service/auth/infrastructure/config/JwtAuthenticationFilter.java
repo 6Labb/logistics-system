@@ -43,8 +43,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // 요청 헤더 확인용 로그 추가
-        System.out.println("🚀 Backend 요청 헤더: " + request.getHeaderNames());
-        System.out.println("🚀 Backend Authorization 헤더: " + request.getHeader("Authorization"));
+        System.out.println("Backend 요청 헤더: " + request.getHeaderNames());
+        System.out.println("Backend Authorization 헤더: " + request.getHeader("Authorization"));
 
         String token = resolveToken(request);
 
@@ -52,15 +52,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Authentication auth = jwtTokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(auth);
 
-            if (auth == null) { // ✅ auth가 null이면 401 Unauthorized 반환
-                System.out.println("🚨 getAuthentication() 실패 - SecurityContext에 저장 안 됨!");
+            if (auth == null) { // auth가 null이면 401 Unauthorized 반환
+                System.out.println("getAuthentication() 실패 - SecurityContext에 저장 안 됨!");
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
                 return;
             }
 
             //SecurityContextHolder.getContext().setAuthentication(auth);
-            System.out.println("✅ SecurityContext 저장된 사용자: " + auth.getName());
-            System.out.println("✅ SecurityContext 저장된 권한: " + auth.getAuthorities());
+            System.out.println("SecurityContext 저장된 사용자: " + auth.getName());
+            System.out.println("SecurityContext 저장된 권한: " + auth.getAuthorities());
         } else {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
             return;
@@ -73,21 +73,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
 
         if (bearerToken == null) {
-            System.out.println("🚨 Authorization 헤더가 존재하지 않음!");
+            System.out.println("Authorization 헤더가 존재하지 않음!");
             return null;
         }
 
-        System.out.println("🚀 요청에서 추출된 Authorization 헤더: " + bearerToken);
+        System.out.println("요청에서 추출된 Authorization 헤더: " + bearerToken);
 
         if (bearerToken.startsWith(BEARER_PREFIX)) {
             String token = bearerToken.substring(7);
-            System.out.println("✅ 추출된 JWT: " + token);
+            System.out.println("추출된 JWT: " + token);
             return token;
         }
 
-        System.out.println("🚨 Authorization 헤더 형식이 올바르지 않음!");
+        System.out.println("Authorization 헤더 형식이 올바르지 않음!");
         return null;
     }
-
 
 }

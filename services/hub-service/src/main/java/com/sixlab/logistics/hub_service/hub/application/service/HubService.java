@@ -22,6 +22,7 @@ public class HubService {
     private final HubRepository hubRepository;
     private final HubManagerRepository hubManagerRepository;
 
+    @Transactional
     public HubResponseDto createHub(HubCreateRequestDto requestDto) {
 
         hubManagerRepository.findByUserId(requestDto.getHubManagerUserId())
@@ -34,6 +35,7 @@ public class HubService {
         return HubMapper.toDto(savedHub);
     }
 
+    @Transactional(readOnly = true)
     public HubResponseDto getHubById(UUID id) {
         Hub hub = hubRepository.findById(id)
                 .filter(h -> h.getDeletedAt() == null) // 삭제된 데이터 제외

@@ -47,15 +47,6 @@ public class UserController {
     /**
      *  사용자 상세정보를 조회하여 응답합니다.
      */
-//    @GetMapping("/{id}")
-//    public ApiResponse<UserDetailsResponseDto> getUser(
-//            @PathVariable("id") Long id,
-//            @AuthenticationPrincipal UserDetailsImpl userDetails
-//    ) {
-//        UserDetailsResponseDto response = userService.getUser(id, userDetails);
-//        return ApiResponse.success(response, "조회되었습니다.");
-//    }
-
     @GetMapping("/{id}")
     public ApiResponse<UserResponseDto> getUser(@PathVariable("id") Long id,
                                                 @RequestHeader("X-User-Id") String userIdHeader,
@@ -75,17 +66,9 @@ public class UserController {
         return ApiResponse.success(response, "사용자 정보 조회 성공");
     }
 
-//    @PatchMapping("/{id}")
-//    public ApiResponse<Void> updateUser(
-//            @PathVariable("id") Long id,
-//            @Valid @RequestBody UserUpdateRequestDto requestDto,
-//            BindingResult bindingResult,
-//            @AuthenticationPrincipal UserDetailsImpl userDetails) {
-//
-//        ApiResponseDto<Void> responseDto = menuService.updateMenu(menuId, requestDto, userDetails);
-//
-//        return ResponseEntity.status(responseDto.getStatus()).body(responseDto);
-//    }
+
+
+
 
 
 

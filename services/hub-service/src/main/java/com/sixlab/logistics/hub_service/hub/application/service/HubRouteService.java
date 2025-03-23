@@ -21,6 +21,8 @@ public class HubRouteService {
     private final HubRouteRepository hubRouteRepository;
     private final HubRepository hubRepository;
 
+
+    @Transactional
     public HubRouteResponseDto createHubRoute(HubRouteRequestDto requestDto) {
         Hub departureHub = hubRepository.findById(requestDto.getDepartureHubId())
                 .orElseThrow(() -> new IllegalArgumentException("출발 허브 없음"));

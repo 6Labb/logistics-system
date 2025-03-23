@@ -23,30 +23,19 @@ import java.util.UUID;
 @RequestMapping("/hubs")
 public class HubController {
 
-    @Value("${server.port}")
-    private String serverPort;
-
-    @Value("${message}")
-    private String message;
-
-    @GetMapping("/test")
-    public String getHub() {
-        return "info!!! From port : " + serverPort + "and message : " + message;
-    }
-
     private final HubService hubService;
 
     @PreAuthorize("hasRole('MASTER')")
     @PostMapping
     public ApiResponse<HubResponseDto> createHub(@Valid @RequestBody HubCreateRequestDto requestDto) {
         HubResponseDto response = hubService.createHub(requestDto);
-        return ApiResponse.success(response, "Hub created");
+        return ApiResponse.success(response, "허브가 생성되었습니다.");
     }
 
     @GetMapping("/{id}")
     public ApiResponse<HubResponseDto> getHub(@PathVariable UUID id) {
         HubResponseDto response = hubService.getHubById(id);
-        return ApiResponse.success(response, "Hub found");
+        return ApiResponse.success(response, "허브를 조회하였습니다.");
     }
 
     @PutMapping("/{id}")
@@ -55,19 +44,19 @@ public class HubController {
             @Valid @RequestBody HubUpdateRequestDto requestDto) {
 
         HubResponseDto response = hubService.updateHub(id, requestDto);
-        return ApiResponse.success(response, "Hub updated");
+        return ApiResponse.success(response, "허브가 수정되었습니다.");
     }
 
     @DeleteMapping("/{id}")
-    public ApiResponse<Void> softDeleteHub(@PathVariable UUID id) {
+    public ApiResponse<Void> deleteHub(@PathVariable UUID id) {
         hubService.deleteHub(id);
-        return ApiResponse.success(null, "Hub soft deleted");
+        return ApiResponse.success(null, "허브매니저가 삭제되었습니다.");
     }
 
     @GetMapping("/managers/{userId}")
     public ApiResponse<HubManagerResponseDto> getHubManagerByUserId(@PathVariable Long userId) {
         HubManagerResponseDto response = hubService.getManagerByUserId(userId);
-        return ApiResponse.success(response, "HubManager retrieved");
+        return ApiResponse.success(response, "허브매니저를 조회했습니다.");
     }
 
 
