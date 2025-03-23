@@ -11,10 +11,10 @@ import java.util.UUID;
 @NoArgsConstructor
 public class HubRouteResponseDto {
 
-    private UUID id;
-    private UUID fromHubId;
-    private UUID toHubId;
-    private Integer totalDuration; // 소요시간
-    private Double routeDistance; // 이동거리
+    private UUID routeId;
+    private UUID departureHubId;
+    private UUID arrivalHubId;
+    private double distance; // 이동거리
+    private int duration; // 소요시간
 
 }

@@ -1,7 +1,7 @@
 SET search_path TO hubs;
-INSERT INTO p_hub (id, hub_name, hub_address, latitude, longitude) VALUES
-('11e98756-d7a2-f948-b1b1-0242ac120001', '서울특별시 센터', '서울특별시 송파구 송파대로 55', 37.4742027808565, 127.123621185562),
-('11e98756-d7a2-f948-b1b1-0242ac120002', '경기 북부 센터', '경기도 고양시 덕양구 권율대로 570', 37.6403771056018, 126.87379545786);
+INSERT INTO p_hub (id, hub_name, hub_address, latitude, longitude, hub_manager_user_id) VALUES
+('11e98756-d7a2-f948-b1b1-0242ac120001', '서울특별시 센터', '서울특별시 송파구 송파대로 55', 37.4742027808565, 127.123621185562, 1),
+('11e98756-d7a2-f948-b1b1-0242ac120002', '경기 북부 센터', '경기도 고양시 덕양구 권율대로 570', 37.6403771056018, 126.87379545786, 2);
 
 SET search_path TO companies;
 INSERT INTO p_company (id, name, address, type, hub_id) VALUES
@@ -32,7 +32,7 @@ INSERT INTO p_hub_manager (id, user_id, hub_id) VALUES
 -- 경기 북부 센터
 ('11e9-8756-d7a2-f948-b1b1-0242ac141002', 2, '11e98756-d7a2-f948-b1b1-0242ac120002');
 
-INSERT INTO p_hub_route (id, total_duration, route_distance, from_hub_id, to_hub_id) VALUES
+INSERT INTO p_hub_route (id, duration, distance, departure_hub_id, arrival_hub_id) VALUES
 -- 서울특별시 센터 -> 경기 북부 센터
 ('11e9-8756-d7a2-f948-b1b1-0242ac130001', 90, 120.5, '11e98756-d7a2-f948-b1b1-0242ac120001', '11e98756-d7a2-f948-b1b1-0242ac120002'),
 -- 경기 북부 센터 -> 서울특별시 센터
@@ -43,7 +43,7 @@ SET search_path TO deliveries;
 INSERT INTO p_delivery_agent (user_id, type, delivery_sequence, hub_id, slack_id) VALUES
 -- 서울특별시 센터
 -- 업체 배송 담당자 (COMPANY 타입)
-(3, 'COMPANY', 0, '11e98756-d7a2-f948-b1b1-0242ac120001', 'delivery1@gmail.com'),
+(3, 'COMPANY', 0, '11e98756-d7a2-f948-b1b1-0242ac120002', 'delivery1@gmail.com'),
 -- 서울특별시 센터 허브 배송 담당자 (HUB 타입)
 (4, 'HUB', 0, '11e98756-d7a2-f948-b1b1-0242ac120001', 'delivery2@gmail.com'),
 -- 경기 북부 센터

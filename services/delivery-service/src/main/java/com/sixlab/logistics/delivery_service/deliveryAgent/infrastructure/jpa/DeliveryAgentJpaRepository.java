@@ -16,8 +16,12 @@ import java.util.UUID;
 @Repository
 public interface DeliveryAgentJpaRepository extends JpaRepository<DeliveryAgent, Long> {
 
-    // userId로 조회
+    // 배송 담당자 개별 조회
+    // id로 조회(관리자, 배송담당자 본인)
     Optional<DeliveryAgent> findByUserId(Long userId);
+
+    // 허브 담당자
+    Optional<DeliveryAgent> findByUserIdAndHubId(Long userId, UUID hubId);
 
     // 배송담당자 저장
     DeliveryAgent save(DeliveryAgent deliveryAgent);

@@ -105,8 +105,8 @@ create table hubs.p_hub
     deleted_by  bigint,
     updated_at  timestamp(6),
     updated_by  bigint,
-    id          uuid             not null
-        primary key,
+    id          uuid             not null   primary key,
+    hub_manager_user_id bigint,
     hub_address varchar(255),
     hub_name    varchar(255)
 );
@@ -134,18 +134,18 @@ alter table hubs.p_hub_manager
 
 create table hubs.p_hub_route
 (
-    route_distance double precision not null,
-    total_duration integer,
+    distance double precision not null,
+    duration integer,
     created_at     timestamp(6),
     created_by     bigint,
     deleted_at     timestamp(6),
     deleted_by     bigint,
     updated_at     timestamp(6),
     updated_by     bigint,
-    from_hub_id    uuid,
+    departure_hub_id    uuid,
     id             uuid             not null
         primary key,
-    to_hub_id      uuid
+    arrival_hub_id      uuid
 );
 
 alter table hubs.p_hub_route

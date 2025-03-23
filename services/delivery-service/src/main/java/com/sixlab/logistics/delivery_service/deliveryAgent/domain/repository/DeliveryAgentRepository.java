@@ -1,5 +1,7 @@
 package com.sixlab.logistics.delivery_service.deliveryAgent.domain.repository;
 
+import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliveryResponseDto;
+import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliverySearchDto;
 import com.sixlab.logistics.delivery_service.delivery.domain.entity.Delivery;
 import com.sixlab.logistics.delivery_service.deliveryAgent.application.dto.DeliveryAgentResponseDto;
 import com.sixlab.logistics.delivery_service.deliveryAgent.application.dto.DeliveryAgentSearchDto;
@@ -16,9 +18,17 @@ import java.util.UUID;
 
 public interface DeliveryAgentRepository {
 
-    Page<DeliveryAgentResponseDto> searchDeliveryAgentList(DeliveryAgentSearchDto searchDto, Pageable pageable);
+// 배송 담당자 리스트 조회
+    Page<DeliveryAgentResponseDto> searchDeliveryAgentListForMaster(DeliveryAgentSearchDto searchDto, Pageable pageable);
 
+    Page<DeliveryAgentResponseDto> searchDeliveryAgentListForHubMaster(DeliveryAgentSearchDto searchDto, Pageable pageable, UUID hubId);
+
+// 배송 담당자 개별 조회
+    // id로 조회(관리자, 배송담당자 본인)
     Optional<DeliveryAgent> findByUserId(Long userId);
+
+    // 허브 담당자
+    Optional<DeliveryAgent> findByUserIdAndHubId(Long userId, UUID hubId);
 
     DeliveryAgent save(DeliveryAgent deliveryAgent);
 

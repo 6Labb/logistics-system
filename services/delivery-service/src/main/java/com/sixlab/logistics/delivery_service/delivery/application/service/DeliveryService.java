@@ -8,34 +8,30 @@ import com.sixlab.logistics.delivery_service.delivery.domain.entity.Delivery;
 import com.sixlab.logistics.delivery_service.delivery.domain.entity.DeliveryStatus;
 import com.sixlab.logistics.delivery_service.delivery.domain.repository.DeliveryRepository;
 import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.CompanyClient;
-import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.HubClient;
+import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.CompanyService;
+import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.HubService;
 import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.dto.CompanyResponseDto;
 import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.dto.HubManagerResponseDto;
 import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.dto.HubRouteResponseDto;
-import com.sixlab.logistics.delivery_service.deliveryAgent.application.dto.DeliveryAgentResponseDto;
-import com.sixlab.logistics.delivery_service.deliveryAgent.domain.entity.DeliveryAgent;
-import com.sixlab.logistics.delivery_service.deliveryAgent.domain.entity.DeliveryAgentType;
 import com.sixlab.logistics.delivery_service.deliveryAgent.domain.repository.DeliveryAgentRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j(topic = "DeliveryService")
 public class DeliveryService {
 
-    private final HubClient hubClient;
-    private final CompanyClient companyClient;
+    private final HubService hubService;
+    private final CompanyService companyService;
     private final DeliveryRepository deliveryRepository;
-    private final DeliveryAgentRepository deliveryAgentRepository;
     private final DeliveryRouteService deliveryRouteService;
 
     // 배송 리스트 조회
@@ -52,7 +48,7 @@ public class DeliveryService {
         // 허브담당자는 본인의 허브 배송리스트만 가능
         if (currentRole == Role.HUB_MANAGER) {
             // 소속허브id 조회
-            HubManagerResponseDto hubManager = hubClient.getHubIdByUserId(currentUserId);
+            HubManagerResponseDto hubManager = hubService.getHubIdByUserId(currentUserId);
             //TODO: 테스트용 소속허브id 조회
             //UUID hubManager = UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120001");
             if (hubManager == null) {
@@ -75,7 +71,7 @@ public class DeliveryService {
         Role currentRole = userDetails.getUserInfo().getRole();
         Long currentUserId = userDetails.getUserId();
 
-        Delivery delivery = null;
+        Delivery delivery;
 
         // 관리자와 업체담당자는 전부 가능
         if(currentRole == Role.MASTER || currentRole == Role.TRADE_PARTNER) {
@@ -85,7 +81,7 @@ public class DeliveryService {
         // 허브담당자는 본인의 허브 배송만 가능
         else if (currentRole == Role.HUB_MANAGER) {
             // 소속허브id 조회
-            HubManagerResponseDto hubManager = hubClient.getHubIdByUserId(currentUserId);
+            HubManagerResponseDto hubManager = hubService.getHubIdByUserId(currentUserId);
             //TODO: 테스트용 소속허브id 조회
             //UUID hubManager = UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120001");
             if (hubManager == null) {
@@ -97,10 +93,8 @@ public class DeliveryService {
         }
         // 배송담당자는 본인의 배송만 가능
         else if (currentRole == Role.DELIVERY_AGENT) {
-            delivery = deliveryRepository.findByIdAndDeliveryAgentId(id, currentUserId).orElseThrow(
-                    () -> new AccessDeniedException("해당 배송의 조회 권한이 없습니다."));
-
-
+            delivery = deliveryRepository.findByIdAndDeliveryAgentId(id, currentUserId)
+                    .orElseThrow(() -> new AccessDeniedException("해당 배송의 조회 권한이 없습니다."));
         }
         else {
             throw new AccessDeniedException("배송 조회 권한이 없습니다.");
@@ -126,7 +120,7 @@ public class DeliveryService {
         // 허브담당자는 본인의 허브 배송만 가능
         else if (currentRole == Role.HUB_MANAGER) {
             // 소속허브id 조회
-            HubManagerResponseDto hubManager = hubClient.getHubIdByUserId(currentUserId);
+            HubManagerResponseDto hubManager = hubService.getHubIdByUserId(currentUserId);
             //TODO: 테스트용 소속허브id 조회
             //UUID hubManager = UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120001");
             if (hubManager == null) {
@@ -168,7 +162,7 @@ public class DeliveryService {
         // 허브담당자는 본인의 허브 배송만 가능
         else if (currentRole == Role.HUB_MANAGER) {
             // 소속허브id 조회
-            HubManagerResponseDto hubManager = hubClient.getHubIdByUserId(currentUserId);
+            HubManagerResponseDto hubManager = hubService.getHubIdByUserId(currentUserId);
             //TODO: 테스트용 소속허브id 조회
             //UUID hubManager = UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120001");
             if (hubManager == null) {
@@ -209,7 +203,7 @@ public class DeliveryService {
         // 허브담당자는 본인의 허브 배송만 가능
         else if (currentRole == Role.HUB_MANAGER) {
             // 소속허브id 조회
-            HubManagerResponseDto hubManager = hubClient.getHubIdByUserId(currentUserId);
+            HubManagerResponseDto hubManager = hubService.getHubIdByUserId(currentUserId);
             //TODO: 테스트용 소속허브id 조회
             //UUID hubManager = UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120001");
             if (hubManager == null) {
@@ -217,15 +211,15 @@ public class DeliveryService {
             }
             delivery = deliveryRepository.findByIdAndToHubId(id, hubManager.getHubId())
             //delivery = deliveryRepository.findByIdAndToHubId(id, hubManager)
-                    .orElseThrow(() -> new AccessDeniedException("해당 배송의 수정 권한이 없습니다."));
+                    .orElseThrow(() -> new AccessDeniedException("해당 배송의 삭제 권한이 없습니다."));
         }
         // 배송담당자는 본인의 배송만 가능
         else if (currentRole == Role.DELIVERY_AGENT) {
             delivery = deliveryRepository.findByIdAndDeliveryAgentId(id, currentUserId)
-                    .orElseThrow(() -> new AccessDeniedException("해당 배송의 수정 권한이 없습니다."));
+                    .orElseThrow(() -> new AccessDeniedException("해당 배송의 삭제 권한이 없습니다."));
         }
         else {
-            throw new AccessDeniedException("배송 수정 권한이 없습니다.");
+            throw new AccessDeniedException("배송 삭제 권한이 없습니다.");
         }
 
         // 삭제 전 유효성 검사 - 배송대기 상태일 때만 삭제 가능
@@ -289,29 +283,24 @@ public class DeliveryService {
     // 배송 생성
     @Transactional
     public DeliveryResponseDto createDelivery(DeliveryRequestDto requestDto) {
+        //TODO: 테스트 - 수령업체id, 공급업체id의 소속허브id
         //UUID fromHubId = UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120001");
-        //UUID toHubId = UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120003");
+        //UUID toHubId = UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120002");
 
         // 요청 DTO에서 공급업체 ID와 수령업체 ID 가져오기
         UUID supplierCompanyId = requestDto.getSupplierCompanyId();
         UUID receiverCompanyId = requestDto.getReceiverCompanyId();
 
         // 공급업체 정보 조회하여 출발지 허브 id 가져오기
-        CompanyResponseDto supplyCompany = companyClient.getCompanyId(supplierCompanyId);
-        if (supplyCompany == null) {
-            throw new ResourceNotFoundException("공급업체를 찾을 수 없습니다.");
+        CompanyResponseDto hubId = companyService.getCompanyId(supplierCompanyId, receiverCompanyId);
+        if (hubId == null) {
+            throw new ResourceNotFoundException("소속허브Id를 찾을 수 없습니다.");
         }
-        UUID fromHubId = supplyCompany.getHubId();
-
-        // 수령 업체 정보 조회해서 도착지 허브 id 가져오기
-        CompanyResponseDto receiveCompany = companyClient.getCompanyId(receiverCompanyId);
-        if (receiveCompany == null) {
-            throw new ResourceNotFoundException("수령 업체를 찾을 수 없습니다.");
-        }
-        UUID toHubId = receiveCompany.getHubId();
+        UUID fromHubId = hubId.getSupplierId();
+        UUID toHubId = hubId.getReceiverId();
 
         // 허브이동관리 id 조회
-        HubRouteResponseDto hubRoute = hubClient.getHubRouteId(fromHubId, toHubId);
+        HubRouteResponseDto hubRoute = hubService.getHubRouteId(fromHubId, toHubId);
         if (hubRoute == null) {
             throw new ResourceNotFoundException("허브 이동 경로 정보를 찾을 수 없습니다.");
         }
@@ -325,13 +314,20 @@ public class DeliveryService {
 
         // 배송 저장
         Delivery savedDelivery = deliveryRepository.save(delivery);
-
         // 배송 경로 생성
         DeliveryRouteResponseDto responseDto = deliveryRouteService.createDeliveryRoute(delivery.getId());
         Long companyDeliveryAgentId = responseDto.getCompanyDeliveryAgentId();
         Long hubDeliveryAgentId = responseDto.getHubDeliveryAgentId();
 
         delivery.updateDeliveryAgent(companyDeliveryAgentId, hubDeliveryAgentId);
+        log.info("savedDelivery id, {}", savedDelivery.getId());
+        log.info("savedDelivery status, {}", savedDelivery.getStatus());
+        log.info("savedDelivery deliveryAddress, {}", savedDelivery.getDeliveryAddress());
+        log.info("savedDelivery receiveName, {}", savedDelivery.getReceiveName());
+        log.info("savedDelivery companyDeliveryAgentId, {}", savedDelivery.getCompanyDeliveryAgentId());
+        log.info("savedDelivery hubDeliveryAgentId, {}", savedDelivery.getHubDeliveryAgentId());
+        log.info("savedDelivery fromHubId, {}", savedDelivery.getFromHubId());
+        log.info("savedDelivery toHubId, {}", savedDelivery.getToHubId());
 
         return new DeliveryResponseDto(savedDelivery);
     }

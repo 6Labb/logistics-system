@@ -11,6 +11,9 @@ import java.util.UUID;
 @NoArgsConstructor
 public class CompanyResponseDto {
 
-    private UUID companyId;
-    private UUID hubId;
+    //private UUID departureHubId;
+    //private UUID arrivalHubId;
+    private UUID supplierId;
+    private UUID receiverId;
+
 }

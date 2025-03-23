@@ -9,14 +9,14 @@ import com.sixlab.logistics.delivery_service.delivery.domain.entity.DeliveryRout
 import com.sixlab.logistics.delivery_service.delivery.domain.entity.DeliveryRouteStatus;
 import com.sixlab.logistics.delivery_service.delivery.domain.repository.DeliveryRepository;
 import com.sixlab.logistics.delivery_service.delivery.domain.repository.DeliveryRouteRepository;
-import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.HubClient;
+import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.HubService;
 import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.dto.HubManagerResponseDto;
 import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.dto.HubRouteResponseDto;
 import com.sixlab.logistics.delivery_service.deliveryAgent.application.service.DeliveryAgentService;
 import com.sixlab.logistics.delivery_service.deliveryAgent.domain.entity.DeliveryAgent;
 import com.sixlab.logistics.delivery_service.deliveryAgent.domain.entity.DeliveryAgentType;
-import com.sixlab.logistics.delivery_service.deliveryAgent.domain.repository.DeliveryAgentRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -27,9 +27,10 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j(topic = "DeliveryRouteService")
 public class DeliveryRouteService {
 
-    private final HubClient hubClient;
+    private final HubService hubService;
     private final DeliveryRouteRepository deliveryRouteRepository;
     private final DeliveryRepository deliveryRepository;
     private final DeliveryAgentService deliveryAgentService;
@@ -75,7 +76,8 @@ public class DeliveryRouteService {
         // 허브담당자
         else if (currentRole == Role.HUB_MANAGER) {
             // 소속허브id 조회
-            HubManagerResponseDto hubManager = hubClient.getHubIdByUserId(currentUserId);
+            HubManagerResponseDto hubManager = hubService.getHubIdByUserId(currentUserId);
+
             //TODO: 테스트용 소속허브id 조회
             //UUID hubManager = UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120001");
             if (hubManager == null) {
@@ -116,7 +118,7 @@ public class DeliveryRouteService {
         // 허브담당자
         else if (currentRole == Role.HUB_MANAGER) {
             // 소속허브id 조회
-            HubManagerResponseDto hubManager = hubClient.getHubIdByUserId(currentUserId);
+            HubManagerResponseDto hubManager = hubService.getHubIdByUserId(currentUserId);
             //TODO: 테스트용 소속허브id 조회
             //UUID hubManager = UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120001");
             if (hubManager == null) {
@@ -156,7 +158,7 @@ public class DeliveryRouteService {
         // 허브담당자
         else if (currentRole == Role.HUB_MANAGER) {
             // 소속허브id 조회
-            HubManagerResponseDto hubManager = hubClient.getHubIdByUserId(currentUserId);
+            HubManagerResponseDto hubManager = hubService.getHubIdByUserId(currentUserId);
             //TODO: 테스트용 소속허브id 조회
             //UUID hubManager = UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120001");
             if (hubManager == null) {
@@ -189,6 +191,7 @@ public class DeliveryRouteService {
     @Transactional
     public DeliveryRouteResponseDto createDeliveryRoute(UUID deliveryId) {
         // 배송 존재 여부 확인
+        log.info("createDeliveryRoute, deliveryId: {}", deliveryId);
         Delivery delivery = deliveryRepository.findById(deliveryId)
                 .orElseThrow(() -> new ResourceNotFoundException("해당 배송을 찾을 수 없습니다."));
 
@@ -198,7 +201,8 @@ public class DeliveryRouteService {
         DeliveryAgentType toType = DeliveryAgentType.COMPANY;
 
         // 허브이동관리 id 조회
-        HubRouteResponseDto hubRoute = hubClient.getHubRouteId(fromHubId, toHubId);
+        HubRouteResponseDto hubRoute = hubService.getHubRouteId(fromHubId, toHubId);
+        log.info("getHubRoutes, {}, {}, {}", fromHubId, toHubId, hubRoute);
         // TODO: 테스트용 허브 경로
 //        HubRouteResponseDto hubRoute = new HubRouteResponseDto(
 //                UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac130002"),//UUID id
@@ -215,10 +219,10 @@ public class DeliveryRouteService {
         // 배송 기록 생성
         DeliveryRoute deliveryRoute = DeliveryRoute.builder()
                 .deliveryId(deliveryId)
-                .estimatedDistance(hubRoute.getRouteDistance())
-                .estimatedTime(hubRoute.getTotalDuration())
-                .actualDistance(hubRoute.getRouteDistance())
-                .actualTime(hubRoute.getTotalDuration())
+                .estimatedDistance(hubRoute.getDistance())
+                .estimatedTime(hubRoute.getDuration())
+                .actualDistance(hubRoute.getDistance())
+                .actualTime(hubRoute.getDuration())
                 .fromHubId(delivery.getFromHubId())
                 .toHubId(delivery.getToHubId())
                 .companyDeliveryAgentId(toDeliveryAgent.getUserId())
