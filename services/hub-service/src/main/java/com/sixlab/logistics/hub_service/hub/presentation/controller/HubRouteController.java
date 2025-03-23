@@ -1,6 +1,8 @@
 package com.sixlab.logistics.hub_service.hub.presentation.controller;
 
 
+import com.sixlab.logistics.common.shared.response.ApiResponse;
+import com.sixlab.logistics.hub_service.hub.application.dto.hubroute.HubRouteCreateRequestDto;
 import com.sixlab.logistics.hub_service.hub.application.dto.hubroute.HubRouteRequestDto;
 import com.sixlab.logistics.hub_service.hub.application.dto.hubroute.HubRouteResponseDto;
 import com.sixlab.logistics.hub_service.hub.application.service.HubManagerService;
@@ -23,27 +25,25 @@ public class HubRouteController {
     private final HubRouteService hubRouteService;
 
     @PostMapping
-    public ResponseEntity<HubRouteResponseDto> createHubRoute(@RequestBody HubRouteRequestDto requestDto) {
+    public ApiResponse<HubRouteResponseDto> createHubRoute(@RequestBody HubRouteCreateRequestDto requestDto) {
         HubRouteResponseDto responseDto = hubRouteService.createHubRoute(requestDto);
-        return ResponseEntity.ok(responseDto);
+        return ApiResponse.success(responseDto, "허브 이동 경로가 정상적으로 등록되었습니다.");
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<HubRouteResponseDto> getHubRoutes(
-            @PathVariable UUID Id) {
-        HubRouteResponseDto responseDto = hubRouteService.getHubRoutes(Id);
-        return ResponseEntity.ok(responseDto);
+    @GetMapping
+    public ApiResponse<HubRouteResponseDto> getHubRoutes(@RequestParam UUID departureHubId, @RequestParam UUID arrivalHubId) {
+        HubRouteResponseDto response = hubRouteService.getHubRoutes(departureHubId, arrivalHubId);
+        return ApiResponse.success(response, "허브 이동 경로가 정상적으로 조회되었습니다.");
     }
 
-    @GetMapping("/{hubRouteId}")
-    public ResponseEntity<HubRouteResponseDto> getHubRoute(
-            @PathVariable UUID hubRouteId,
-            @RequestParam UUID fromHubId,
-            @RequestParam UUID toHubId) {
-        HubRouteResponseDto response = hubRouteService.getHubRoute(hubRouteId, fromHubId, toHubId);
-        return ResponseEntity.ok(response);
-    }
-
+//    @GetMapping("/{hubRouteId}")
+//    public ResponseEntity<HubRouteResponseDto> getHubRoute(
+//            @RequestParam UUID fromHubId,
+//            @RequestParam UUID toHubId) {
+//        HubRouteResponseDto response = hubRouteService.getHubRoute(fromHubId, toHubId);
+//        return ResponseEntity.ok(response);
+//    }
+//
 //    @PutMapping("/{id}")
 //    public ResponseEntity<HubRouteResponseDto> updateHubRoute(
 //            @PathVariable UUID id,
