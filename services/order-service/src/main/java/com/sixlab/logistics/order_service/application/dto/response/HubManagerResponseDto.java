@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -13,4 +14,6 @@ public class HubManagerResponseDto {
     private UUID id;
     private Long userId;
     private UUID hubId;
+    private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
 }
