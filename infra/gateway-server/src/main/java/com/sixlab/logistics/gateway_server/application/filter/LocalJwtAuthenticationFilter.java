@@ -38,17 +38,19 @@ public class LocalJwtAuthenticationFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
 
-        // 🚀 Gateway에서 JWT 검증 전 Authorization 헤더 확인
-        System.out.println("🚀 LocalJwtAuthenticationFilter - 요청 URL: " + request.getURI());
-        System.out.println("🚀 LocalJwtAuthenticationFilter - Authorization 헤더: " + request.getHeaders().getFirst("Authorization"));
+        // Gateway에서 JWT 검증 전 Authorization 헤더 확인
+        System.out.println("LocalJwtAuthenticationFilter - 요청 URL: " + request.getURI());
+        System.out.println("LocalJwtAuthenticationFilter - Authorization 헤더: " + request.getHeaders().getFirst("Authorization"));
 
         String path = exchange.getRequest().getURI().getPath();
+        System.out.println("요청 path: " + path);
         if (isWhitelisted(path)) {
+            System.out.println("whitelist 경로 - 토큰 없이 통과");
             return chain.filter(exchange);
         }
 
         String token = extractToken(exchange);
-        System.out.println("🚀 LocalJwtAuthenticationFilter - Extracted Token: " + token);
+        System.out.println("LocalJwtAuthenticationFilter - Extracted Token: " + token);
 
         Claims claims = extractClaims(token);
         if (token == null || claims == null) {
@@ -62,7 +64,7 @@ public class LocalJwtAuthenticationFilter implements GlobalFilter, Ordered {
             return unauthorizedResponse(exchange);
         }
 
-        log.info("💚 userId {} role {}", userId, role);
+        log.info("userId {} role {}", userId, role);
 
         ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
                 //.header("Authorization", exchange.getRequest().getHeaders().getFirst("Authorization"))
@@ -71,7 +73,7 @@ public class LocalJwtAuthenticationFilter implements GlobalFilter, Ordered {
                 .header("X-User-Role", role) // 사용자 역할 추가
                 .build();
 
-        System.out.println("🚀 Gateway → Backend 요청 헤더");
+        System.out.println("Gateway → Backend 요청 헤더");
         System.out.println("   Authorization: " + token);
         System.out.println("   X-User-Id: " + userId);
         System.out.println("   X-User-Role: " + role);
@@ -94,7 +96,7 @@ public class LocalJwtAuthenticationFilter implements GlobalFilter, Ordered {
 
     private Claims extractClaims(String token) {
         try {
-            log.info("🚀 extractClaims() 호출됨 - Token: {}", token);
+            log.info("extractClaims() 호출됨 - Token: {}", token);
 
             SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(secretKey));
             Claims claims = Jwts.parser()
@@ -103,17 +105,17 @@ public class LocalJwtAuthenticationFilter implements GlobalFilter, Ordered {
                     .parseSignedClaims(token)
                     .getPayload();
 
-            log.info("✅ JWT 파싱 성공! claims: {}", claims);
+            log.info("JWT 파싱 성공! claims: {}", claims);
 
             Date expiration = claims.getExpiration();
             if (expiration != null && expiration.before(new Date())) {
-                log.warn("🚨 JWT 만료됨! Expiration: {}", expiration);
+                log.warn("JWT 만료됨 Expiration: {}", expiration);
                 return null;
             }
 
             return claims;
         } catch (Exception e) {
-            log.error("🚨 Invalid token: {}", e.getMessage(), e);
+            log.error("Invalid token: {}", e.getMessage(), e);
             return null;
         }
     }
