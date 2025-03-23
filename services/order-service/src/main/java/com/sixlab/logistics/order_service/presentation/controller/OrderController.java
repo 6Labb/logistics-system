@@ -34,7 +34,7 @@ public class OrderController {
             @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
         // log.info("createOrder: {}", requestDto);
         // userId 만 서비스에 전달, createdBy 세팅할 예정
-        OrderCreateResponseDto order = orderService.createOrder(requestDto, , userDetails.getUserId());
+        OrderCreateResponseDto order = orderService.createOrder(requestDto, userDetails.getUserId());
         return ApiResponse.success(order, "주문이 성공적으로 등록되었습니다.");
     }
 
