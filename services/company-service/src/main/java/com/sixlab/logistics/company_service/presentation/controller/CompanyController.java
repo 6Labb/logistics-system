@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +25,7 @@ public class CompanyController {
     private final CompanyService companyService;
 
     // 업체 등록
-    //@PreAuthorize("hasRole('MASTER') or #id == #userDetails.user.id")
+    @PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER')")
     @PostMapping
     public ApiResponse<CompanyResponseDto> createCompany(
             @RequestBody CompanyRequestDto requestDto,
@@ -34,6 +35,7 @@ public class CompanyController {
     }
 
     // 업체 목록 조회
+    @PreAuthorize("hasAnyRole('MASTER','TRADE_PARTNER')")
     @GetMapping
     public ApiResponse<PaginationResponseDto<CompanyResponseDto>> getAllCompanies(
             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -44,6 +46,7 @@ public class CompanyController {
     }
 
     // 업체 단건 조회
+    @PreAuthorize("hasAnyRole('MASTER','TRADE_PARTNER','HUB_MANAGER')")
     @GetMapping("/{companyId}")
     public ApiResponse<CompanyResponseDto> getCompanyById(
             @PathVariable UUID companyId) {
@@ -52,6 +55,7 @@ public class CompanyController {
     }
 
     // 업체 수정
+    @PreAuthorize("hasAnyRole('MASTER','TRADE_PARTNER','HUB_MANAGER')")
     @PutMapping("/{companyId}")
     public ApiResponse<CompanyResponseDto> updateCompany(
             @PathVariable UUID companyId,
@@ -61,6 +65,7 @@ public class CompanyController {
     }
 
     // 업체 삭제
+    @PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER')")
     @DeleteMapping("/{companyId}")
     public ApiResponse<Void> deleteCompany (
             @PathVariable UUID companyId){
@@ -68,6 +73,7 @@ public class CompanyController {
         return ApiResponse.success(HttpStatus.OK, null, "업체가 정상적으로 삭제되었습니다.");
     }
 
+    @PreAuthorize("hasAnyRole('MASTER','TRADE_PARTNER','HUB_MANAGER')")
     @GetMapping("/search")
     public ApiResponse<PaginationResponseDto<CompanyResponseDto>> searchCompanies(
             @RequestParam(required = false) String name,

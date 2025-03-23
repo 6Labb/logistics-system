@@ -10,6 +10,7 @@ import com.sixlab.logistics.product_service.presentaion.dto.ProductResponseDto;
 import com.sixlab.logistics.product_service.presentaion.dto.ProductStockResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public class ProductController {
     private final ProductService productService;
 
     // 상품 등록
+    @PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER','TRADE_PARTNER')")
     @PostMapping
     public ApiResponse<ProductResponseDto> createProduct(
             @RequestBody ProductRequestDto requestDto) {
@@ -30,6 +32,7 @@ public class ProductController {
     }
 
     // 상품 목록 조회
+    @PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER','TRADE_PARTNER','DELIVERY_AGENT')")
     @GetMapping
     public ApiResponse<PaginationResponseDto<ProductResponseDto>> getAllProducts(
             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -41,6 +44,7 @@ public class ProductController {
     }
 
     // 상품 단건 조회
+    @PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER','TRADE_PARTNER','DELIVERY_AGENT')")
     @GetMapping("/{productId}")
     public ApiResponse<ProductResponseDto> getProductById(
             @PathVariable UUID productId) {
@@ -49,6 +53,7 @@ public class ProductController {
     }
 
     // 상품 수정
+    @PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER','TRADE_PARTNER')")
     @PutMapping("/{productId}")
     public ApiResponse<ProductResponseDto> updateProduct(
             @PathVariable UUID productId,
@@ -58,6 +63,7 @@ public class ProductController {
     }
 
     // 상품 삭제
+    @PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER')")
     @DeleteMapping("/{productId}")
     public ApiResponse<Void> deleteProduct(
             @PathVariable UUID productId) {
@@ -66,6 +72,7 @@ public class ProductController {
     }
 
     // 상품 재고 감소
+    @PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER','TRADE_PARTNER','DELIVERY_AGENT')")
     @PutMapping("/{productId}/decrease-stock")
     public ApiResponse<ProductStockResponseDto> decreaseStock(
             @PathVariable UUID productId,
@@ -75,6 +82,7 @@ public class ProductController {
     }
 
     // 상품 재고 복원
+    @PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER','TRADE_PARTNER','DELIVERY_AGENT')")
     @PutMapping("/{productId}/restore-stock")
     public ApiResponse<ProductStockResponseDto> restoreStock(
             @PathVariable UUID productId,
