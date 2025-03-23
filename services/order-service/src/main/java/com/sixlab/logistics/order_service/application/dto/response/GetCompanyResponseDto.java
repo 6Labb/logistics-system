@@ -9,6 +9,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class GetCompanyResponseDto {
     private UUID id; // 업체 고유 id
     private String name; // 업체명
