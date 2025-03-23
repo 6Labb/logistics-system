@@ -20,7 +20,7 @@ public interface HubClient {
             @RequestParam UUID toHubId);
 
     // user_id로 소속허브 id 조회
-    @GetMapping("/hubs/manager/{userId}")
+    @GetMapping("/hubs/managers/{userId}")
     HubManagerResponseDto getHubIdByUserId(@PathVariable Long userId);
 
 }
