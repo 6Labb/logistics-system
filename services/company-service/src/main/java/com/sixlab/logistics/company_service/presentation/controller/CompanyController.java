@@ -2,6 +2,7 @@ package com.sixlab.logistics.company_service.presentation.controller;
 
 import com.sixlab.logistics.common.shared.response.ApiResponse;
 import com.sixlab.logistics.company_service.application.service.CompanyService;
+import com.sixlab.logistics.company_service.config.UserDetailsImpl;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyRequestDto;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyResponseDto;
 import com.sixlab.logistics.company_service.presentation.dto.PaginationResponseDto;
@@ -10,10 +11,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -23,9 +24,11 @@ public class CompanyController {
     private final CompanyService companyService;
 
     // 업체 등록
+    //@PreAuthorize("hasRole('MASTER') or #id == #userDetails.user.id")
     @PostMapping
     public ApiResponse<CompanyResponseDto> createCompany(
-            @RequestBody CompanyRequestDto requestDto){
+            @RequestBody CompanyRequestDto requestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails){
         CompanyResponseDto responseDto = companyService.createCompany(requestDto);
         return ApiResponse.success(HttpStatus.CREATED, responseDto, "업체가 정상적으로 등록되었습니다.");
     }
