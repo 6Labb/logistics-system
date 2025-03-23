@@ -1,11 +1,10 @@
 package com.sixlab.logistics.hub_service.hub.application.service;
 
 
-import com.sixlab.logistics.hub_service.hub.application.dto.hub.HubCreateRequestDto;
-import com.sixlab.logistics.hub_service.hub.application.dto.hub.HubCreateResponseDto;
-import com.sixlab.logistics.hub_service.hub.application.dto.hub.HubResponseDto;
-import com.sixlab.logistics.hub_service.hub.application.dto.hub.HubUpdateRequestDto;
+import com.sixlab.logistics.common.shared.exception.ResourceNotFoundException;
+import com.sixlab.logistics.hub_service.hub.application.dto.hub.*;
 import com.sixlab.logistics.hub_service.hub.domain.model.Hub;
+import com.sixlab.logistics.hub_service.hub.domain.repository.HubManagerRepository;
 import com.sixlab.logistics.hub_service.hub.domain.repository.HubRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -19,17 +18,18 @@ import java.util.UUID;
 public class HubService {
 
     private final HubRepository hubRepository;
+    private final HubManagerRepository hubManagerRepository;
 
-    public HubCreateResponseDto createHub(HubCreateRequestDto requestDto) {
+    public HubResponseDto createHub(HubCreateRequestDto requestDto) {
 
-        Hub hub = Hub.create(requestDto.getHubName(), requestDto.getHubAddress(), requestDto.getLatitude(), requestDto.getLongitude(), requestDto.getHubManagerId());
+        hubManagerRepository.findByUserId(requestDto.getHubManagerUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("해당 id는 허브 매니저가 아닙니다."));
 
-        hubRepository.save(hub);
+        Hub hub = HubMapper.toEntity(requestDto);
 
-        return HubCreateResponseDto.builder()
-                .hubName(requestDto.getHubName())
-                .address(requestDto.getHubAddress())
-                .build();
+        Hub savedHub = hubRepository.save(hub);
+
+        return HubMapper.toDto(savedHub);
     }
 
     public HubResponseDto getHubById(UUID id) {
@@ -51,7 +51,7 @@ public class HubService {
                 requestDto.getHubAddress() != null ? requestDto.getHubAddress() : hub.getHubAddress(),
                 requestDto.getLatitude() != null ? requestDto.getLatitude() : hub.getLatitude(),
                 requestDto.getLongitude() != null ? requestDto.getLongitude() : hub.getLongitude(),
-                requestDto.getHubManagerId() != null ? requestDto.getHubManagerId() : hub.getHubManagerId()
+                requestDto.getHubManagerUserId() != null ? requestDto.getHubManagerUserId() : hub.getHubManagerUserId()
         );
 
         return HubResponseDto.of(hub);

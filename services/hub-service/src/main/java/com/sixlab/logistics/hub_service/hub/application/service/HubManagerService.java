@@ -1,15 +1,16 @@
 package com.sixlab.logistics.hub_service.hub.application.service;
 
+import com.sixlab.logistics.hub_service.hub.application.dto.hubmanager.*;
 import com.sixlab.logistics.hub_service.hub.infrastructure.feign.UserClient;
 import com.sixlab.logistics.hub_service.hub.infrastructure.feign.UserResponseDto;
-import com.sixlab.logistics.hub_service.hub.application.dto.hubmanager.HubManagerResponseDto;
-import com.sixlab.logistics.hub_service.hub.application.dto.hubmanager.HubManagerUpdateRequestDto;
 import com.sixlab.logistics.hub_service.hub.domain.model.HubManager;
 import com.sixlab.logistics.hub_service.hub.domain.repository.HubManagerRepository;
-import com.sixlab.logistics.hub_service.hub.application.dto.hubmanager.HubManagerCreateRequestDto;
-import com.sixlab.logistics.hub_service.hub.application.dto.hubmanager.HubManagerCreateResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -85,6 +86,13 @@ public class HubManagerService {
         return HubManagerResponseDto.of(hubManager);
     }
 
+    public HubManagerResponseDto getManagerByUserId(Long id) {
+        HubManager hubManager = hubManagerRepository.findByUserId(id)
+                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 매니저 ID 입니다."));
+
+        return HubManagerResponseDto.of(hubManager);
+    }
+
     @Transactional
     public HubManagerResponseDto updateManager(UUID id, @Valid HubManagerUpdateRequestDto request) {
         HubManager hubManager = hubManagerRepository.findById(id)
@@ -103,5 +111,19 @@ public class HubManagerService {
 
         hubManager.delete(3L); // BasicEntity의 softDelete() 호출
     }
+
+    @Transactional(readOnly = true)
+    public Page<HubManagerResponseDto> search(HubManagerSearchCondition condition, Pageable pageable) {
+        Specification<HubManager> spec = Specification
+                .where(HubManagerSpecification.userIdEq(condition.getUserId()))
+                .and(HubManagerSpecification.hubIdEq(condition.getHubId()));
+
+        return hubManagerRepository.findAll(spec, pageable)
+                .map(HubManagerResponseDto::of); // 엔티티 → DTO 변환
+    }
+
+
+
+
 
 }

@@ -11,15 +11,15 @@ public class HubUpdateRequestDto {
     private String hubAddress;
     private Double latitude;
     private Double longitude;
-    private Long hubManagerId;
+    private Long hubManagerUserId;
 
     @Builder
-    public HubUpdateRequestDto(String hubName, String hubAddress, Double latitude, Double longitude, Long hubManagerId) {
+    public HubUpdateRequestDto(String hubName, String hubAddress, Double latitude, Double longitude, Long hubManagerUserId) {
         this.hubName = hubName;
         this.hubAddress = hubAddress;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.hubManagerId = hubManagerId;
+        this.hubManagerUserId = hubManagerUserId;
     }
 }
 
