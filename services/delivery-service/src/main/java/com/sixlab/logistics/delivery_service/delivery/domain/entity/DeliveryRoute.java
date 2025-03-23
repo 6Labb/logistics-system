@@ -44,7 +44,11 @@ public class DeliveryRoute extends BasicEntity {
 
     private UUID toHubId;
 
-    private Long deliveryAgentId;
+    private Long companyDeliveryAgentId;
+
+    private Long hubDeliveryAgentId;
+
+    private UUID hubRouteId;
 
     @Builder
     public DeliveryRoute(Integer sequence,
@@ -56,18 +60,22 @@ public class DeliveryRoute extends BasicEntity {
                          UUID deliveryId,
                          UUID fromHubId,
                          UUID toHubId,
-                         Long deliveryAgentId
+                         Long companyDeliveryAgentId,
+                         Long hubDeliveryAgentId,
+                         UUID hubRouteId
                          ) {
-        this.sequence = sequence;
+        this.sequence = 0;
         this.estimatedDistance = estimatedDistance;
         this.estimatedTime = estimatedTime;
         this.actualDistance = actualDistance;
         this.actualTime = actualTime;
-        this.status = status;
+        this.status = DeliveryRouteStatus.WAITING;
         this.deliveryId = UUID.randomUUID();
         this.fromHubId = UUID.randomUUID();
         this.toHubId = UUID.randomUUID();
-        this.deliveryAgentId = deliveryAgentId;
+        this.companyDeliveryAgentId = companyDeliveryAgentId;
+        this.hubDeliveryAgentId = hubDeliveryAgentId;
+        this.hubRouteId = hubRouteId;
     }
 
     public void updateDeliveryRoute(DeliveryRouteRequestDto requestDto) {
@@ -75,7 +83,8 @@ public class DeliveryRoute extends BasicEntity {
         this.actualTime = requestDto.getActualTime();
         this.estimatedDistance = requestDto.getEsimateDistance();
         this.estimatedTime = requestDto.getEsimateTime();
-        this.deliveryAgentId = requestDto.getDeliveryAgentId();
+        this.companyDeliveryAgentId = requestDto.getCompanyDeliveryAgentId();
+        this.hubDeliveryAgentId = requestDto.getHubDeliveryAgentId();
     }
 
     public void updateDeliveryRouteStatus(DeliveryRouteStatus status) {

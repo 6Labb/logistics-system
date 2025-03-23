@@ -4,6 +4,7 @@ package com.sixlab.logistics.product_service.presentaion.controller;
 import com.sixlab.logistics.common.shared.response.ApiResponse;
 import com.sixlab.logistics.product_service.application.service.ProductService;
 import com.sixlab.logistics.product_service.domain.model.Product;
+import com.sixlab.logistics.product_service.presentaion.dto.PaginationResponseDto;
 import com.sixlab.logistics.product_service.presentaion.dto.ProductRequestDto;
 import com.sixlab.logistics.product_service.presentaion.dto.ProductResponseDto;
 import com.sixlab.logistics.product_service.presentaion.dto.ProductStockResponseDto;
@@ -30,8 +31,12 @@ public class ProductController {
 
     // 상품 목록 조회
     @GetMapping
-    public ApiResponse<List<ProductResponseDto>> getAllProducts() {
-        List<ProductResponseDto> products = productService.getAllProducts();
+    public ApiResponse<PaginationResponseDto<ProductResponseDto>> getAllProducts(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "name", required = false) String name
+    ) {
+        PaginationResponseDto<ProductResponseDto> products = productService.getAllProducts(page, size, name);
         return ApiResponse.success(products, "상품 목록 조회 성공");
     }
 

@@ -23,7 +23,8 @@ public class DeliveryRouteResponseDto {
     private UUID deliveryId;
     private UUID fromHubId;
     private UUID toHubId;
-    private Long deliveryAgentId;
+    private Long companyDeliveryAgentId;
+    private Long hubDeliveryAgentId;
 
     public DeliveryRouteResponseDto(DeliveryRoute deliveryRoute) {
         this.id = deliveryRoute.getId();
@@ -36,6 +37,7 @@ public class DeliveryRouteResponseDto {
         this.deliveryId = deliveryRoute.getDeliveryId();
         this.fromHubId = deliveryRoute.getFromHubId();
         this.toHubId = deliveryRoute.getToHubId();
-        this.deliveryAgentId = deliveryRoute.getDeliveryAgentId();
+        this.companyDeliveryAgentId = deliveryRoute.getCompanyDeliveryAgentId();
+        this.hubDeliveryAgentId = deliveryRoute.getHubDeliveryAgentId();
     }
 }

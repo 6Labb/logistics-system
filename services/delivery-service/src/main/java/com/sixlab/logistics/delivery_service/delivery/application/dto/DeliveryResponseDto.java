@@ -15,8 +15,8 @@ public class DeliveryResponseDto {
     private DeliveryStatus status;
     private String deliveryAddress;
     private String receiveName;
-    private Long deliveryAgentId;
-    private UUID hubTotalRouteId;
+    private Long companyDeliveryAgentId;
+    private Long hubDeliveryAgentId;
     private UUID fromHubId;
     private UUID toHubId;
 
@@ -25,8 +25,8 @@ public class DeliveryResponseDto {
         this.status = delivery.getStatus();
         this.deliveryAddress = delivery.getDeliveryAddress();
         this.receiveName = delivery.getReceiveName();
-        this.deliveryAgentId = delivery.getDeliveryAgentId();
-        this.hubTotalRouteId = delivery.getHubTotalRouteId();
+        this.companyDeliveryAgentId = delivery.getCompanyDeliveryAgentId();
+        this.hubDeliveryAgentId = delivery.getHubDeliveryAgentId();
         this.fromHubId = delivery.getFromHubId();
         this.toHubId = delivery.getToHubId();
     }
@@ -34,4 +34,5 @@ public class DeliveryResponseDto {
     public DeliveryResponseDto(DeliveryStatus status) {
         this.status = status;
     }
+
 }

@@ -1,6 +1,7 @@
 package com.sixlab.logistics.delivery_service.delivery.presentation.controller;
 
 import com.sixlab.logistics.common.shared.response.ApiResponse;
+import com.sixlab.logistics.common.shared.security.UserDetailsImpl;
 import com.sixlab.logistics.delivery_service.delivery.application.dto.*;
 import com.sixlab.logistics.delivery_service.delivery.application.service.DeliveryService;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -39,16 +42,19 @@ public class DeliveryController {
     @GetMapping("/deliveries")
     public ApiResponse<Page<DeliveryResponseDto>> getAllDeliveries(
             @ModelAttribute DeliverySearchDto searchDto,
-            @PageableDefault(page = 0, size = 10, sort = "deliveryAgentId", direction = Sort.Direction.ASC) Pageable pageable) {
+            @PageableDefault(page = 0, size = 10, sort = "updatedAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        Page<DeliveryResponseDto> deliveries = deliveryService.getAllDeliveries(searchDto, pageable);
+        Page<DeliveryResponseDto> deliveries = deliveryService.getAllDeliveries(searchDto, pageable, userDetails);
         return ApiResponse.success(HttpStatus.OK, deliveries, "SUCCESS");
     }
 
     // 배송 개별 조회
     @GetMapping("/deliveries/{id}")
-    public ApiResponse<DeliveryResponseDto> getDelivery(@PathVariable("id") UUID id) {
-        DeliveryResponseDto delivery = deliveryService.getDelivery(id);
+    public ApiResponse<DeliveryResponseDto> getDelivery(
+            @PathVariable("id") UUID id,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        DeliveryResponseDto delivery = deliveryService.getDelivery(id, userDetails);
         return ApiResponse.success(HttpStatus.OK, delivery, "SUCCESS");
     }
 
@@ -56,9 +62,10 @@ public class DeliveryController {
     @PutMapping("/deliveries/{id}")
     public ApiResponse<DeliveryResponseDto> updateDelivery(
             @PathVariable UUID id,
-            @RequestBody DeliveryRequestDto requestDto) {
+            @RequestBody DeliveryRequestDto requestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        DeliveryResponseDto updateDelivery = deliveryService.updateDelivery(id, requestDto);
+        DeliveryResponseDto updateDelivery = deliveryService.updateDelivery(id, requestDto, userDetails);
         return ApiResponse.success(HttpStatus.OK, updateDelivery, "SUCCESS");
     }
 
@@ -66,16 +73,20 @@ public class DeliveryController {
     @PatchMapping("/deliveries/{id}/status")
     public ApiResponse<DeliveryStatusResponseDto> updateDeliveryStatus(
             @PathVariable UUID id,
-            @RequestBody DeliveryStatusRequestDto requestDto) {
+            @RequestBody DeliveryStatusRequestDto requestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        DeliveryStatusResponseDto updateDeliveryStatus = deliveryService.updateDeliveryStatus(id, requestDto.getStatus());
+        DeliveryStatusResponseDto updateDeliveryStatus = deliveryService.updateDeliveryStatus(id, requestDto.getStatus(), userDetails);
         return ApiResponse.success(HttpStatus.OK, updateDeliveryStatus, "SUCCESS");
     }
 
     // 배송 삭제
     @DeleteMapping("/deliveries/{id}")
-    public ApiResponse<Void> deleteDelivery(@PathVariable UUID id) {
-        deliveryService.deleteDelivery(id);
+    public ApiResponse<Void> deleteDelivery(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        deliveryService.deleteDelivery(id, userDetails);
         return ApiResponse.success(HttpStatus.OK, null, "SUCCESS");
     }
 
@@ -85,7 +96,5 @@ public class DeliveryController {
         DeliveryResponseDto createDelivery = deliveryService.createDelivery(requestDto);
         return ApiResponse.success(HttpStatus.CREATED, createDelivery, "SUCCESS");
     }
-
-    // 업체 배송 담당자 배정
 
 }

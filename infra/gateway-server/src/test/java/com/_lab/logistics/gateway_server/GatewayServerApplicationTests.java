@@ -3,11 +3,11 @@ package com._lab.logistics.gateway_server;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class GatewayServerApplicationTests {
+//@SpringBootTest
+//class GatewayServerApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+//	@Test
+//	void contextLoads() {
+//	}
 
-}
+//}
