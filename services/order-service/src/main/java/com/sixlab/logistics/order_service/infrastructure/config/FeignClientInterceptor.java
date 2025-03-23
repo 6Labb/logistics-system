@@ -2,16 +2,19 @@ package com.sixlab.logistics.order_service.infrastructure.config;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 @Configuration
+@Slf4j(topic = "feignclient 인터셉터")
 public class FeignClientInterceptor implements RequestInterceptor {
 
     @Override
     public void apply(RequestTemplate requestTemplate) {
+        log.info("apply 메서드 작동");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.getCredentials() instanceof String token) {
