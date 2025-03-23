@@ -10,6 +10,7 @@ import com.sixlab.logistics.delivery_service.delivery.domain.entity.DeliveryRout
 import com.sixlab.logistics.delivery_service.delivery.domain.repository.DeliveryRepository;
 import com.sixlab.logistics.delivery_service.delivery.domain.repository.DeliveryRouteRepository;
 import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.HubClient;
+import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.dto.HubManagerResponseDto;
 import com.sixlab.logistics.delivery_service.delivery.infrastructure.client.dto.HubRouteResponseDto;
 import com.sixlab.logistics.delivery_service.deliveryAgent.application.service.DeliveryAgentService;
 import com.sixlab.logistics.delivery_service.deliveryAgent.domain.entity.DeliveryAgent;
@@ -74,14 +75,14 @@ public class DeliveryRouteService {
         // 허브담당자
         else if (currentRole == Role.HUB_MANAGER) {
             // 소속허브id 조회
-            //HubManagerResponseDto hubManager = hubClient.getHubIdByUserId(currentUserId);
+            HubManagerResponseDto hubManager = hubClient.getHubIdByUserId(currentUserId);
             //TODO: 테스트용 소속허브id 조회
-            UUID hubManager = UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120001");
+            //UUID hubManager = UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120001");
             if (hubManager == null) {
                 throw new ResourceNotFoundException("해당 아이디로 허브 id를 찾을 수 없습니다.");
             }
-            //deliveryRoute = deliveryRouteRepository.findByIdAndToHubId(id, hubManager.getHubId())
-            deliveryRoute = deliveryRouteRepository.findByIdAndToHubId(id, hubManager)
+            deliveryRoute = deliveryRouteRepository.findByIdAndToHubId(id, hubManager.getHubId())
+            //deliveryRoute = deliveryRouteRepository.findByIdAndToHubId(id, hubManager)
                     .orElseThrow(() -> new AccessDeniedException("해당 배송 경로의 수정 권한이 없습니다."));
         }
         // 배송담당자는 본인의 배송만 가능
@@ -115,14 +116,14 @@ public class DeliveryRouteService {
         // 허브담당자
         else if (currentRole == Role.HUB_MANAGER) {
             // 소속허브id 조회
-            //HubManagerResponseDto hubManager = hubClient.getHubIdByUserId(currentUserId);
+            HubManagerResponseDto hubManager = hubClient.getHubIdByUserId(currentUserId);
             //TODO: 테스트용 소속허브id 조회
-            UUID hubManager = UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120001");
+            //UUID hubManager = UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120001");
             if (hubManager == null) {
                 throw new ResourceNotFoundException("해당 아이디로 허브 id를 찾을 수 없습니다.");
             }
-            //deliveryRoute = deliveryRouteRepository.findByIdAndToHubId(id, hubManager.getHubId())
-            deliveryRoute = deliveryRouteRepository.findByIdAndToHubId(id, hubManager)
+            deliveryRoute = deliveryRouteRepository.findByIdAndToHubId(id, hubManager.getHubId())
+            //deliveryRoute = deliveryRouteRepository.findByIdAndToHubId(id, hubManager)
                     .orElseThrow(() -> new AccessDeniedException("해당 배송 경로의 수정 권한이 없습니다."));
         }
         // 배송담당자
@@ -155,14 +156,14 @@ public class DeliveryRouteService {
         // 허브담당자
         else if (currentRole == Role.HUB_MANAGER) {
             // 소속허브id 조회
-            //HubManagerResponseDto hubManager = hubClient.getHubIdByUserId(currentUserId);
+            HubManagerResponseDto hubManager = hubClient.getHubIdByUserId(currentUserId);
             //TODO: 테스트용 소속허브id 조회
-            UUID hubManager = UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120001");
+            //UUID hubManager = UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120001");
             if (hubManager == null) {
                 throw new ResourceNotFoundException("해당 아이디로 허브 id를 찾을 수 없습니다.");
             }
-            //deliveryRoute = deliveryRouteRepository.findByIdAndToHubId(id, hubManager.getHubId())
-            deliveryRoute = deliveryRouteRepository.findByIdAndToHubId(id, hubManager)
+            deliveryRoute = deliveryRouteRepository.findByIdAndToHubId(id, hubManager.getHubId())
+            //deliveryRoute = deliveryRouteRepository.findByIdAndToHubId(id, hubManager)
                     .orElseThrow(() -> new AccessDeniedException("해당 배송 경로의 수정 권한이 없습니다."));
         }
         // 배송담당자
@@ -197,15 +198,15 @@ public class DeliveryRouteService {
         DeliveryAgentType toType = DeliveryAgentType.COMPANY;
 
         // 허브이동관리 id 조회
-        //HubRouteResponseDto hubRoute = hubClient.getHubRouteId(fromHubId, toHubId);
+        HubRouteResponseDto hubRoute = hubClient.getHubRouteId(fromHubId, toHubId);
         // TODO: 테스트용 허브 경로
-        HubRouteResponseDto hubRoute = new HubRouteResponseDto(
-                UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac130002"),//UUID id
-                UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120001"),//fromHubId;
-                UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120003"),//toHubId;
-                80,// totalDuration; // 소요시간
-                110.3// routeDistance; // 이동거리
-        );
+//        HubRouteResponseDto hubRoute = new HubRouteResponseDto(
+//                UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac130002"),//UUID id
+//                UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120001"),//fromHubId;
+//                UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120003"),//toHubId;
+//                80,// totalDuration; // 소요시간
+//                110.3// routeDistance; // 이동거리
+//        );
 
         // 순번이 허브 첫 배송인 경우 해당 허브 소속의 배송담당자 순번 0인 사람 배정
         DeliveryAgent fromDeliveryAgent = new DeliveryAgent(deliveryAgentService.getDeliveryAgentByHubIdAndType(fromHubId, fromType)); // 공급업체 소속 허브 ID, 허브 타입
