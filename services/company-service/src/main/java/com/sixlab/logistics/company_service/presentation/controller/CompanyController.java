@@ -2,7 +2,6 @@ package com.sixlab.logistics.company_service.presentation.controller;
 
 import com.sixlab.logistics.common.shared.response.ApiResponse;
 import com.sixlab.logistics.company_service.application.service.CompanyService;
-import com.sixlab.logistics.company_service.config.UserDetailsImpl;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyRequestDto;
 import com.sixlab.logistics.company_service.presentation.dto.CompanyResponseDto;
 import com.sixlab.logistics.company_service.presentation.dto.PaginationResponseDto;
@@ -11,7 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
