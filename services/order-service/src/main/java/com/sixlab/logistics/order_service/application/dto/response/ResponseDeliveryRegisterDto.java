@@ -9,14 +9,14 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class ResponseDeliveryRegisterDto {
-    private UUID id; // 배송 id
-    private DeliveryStatus status;
-    private String deliveryAddress; // 배송지
-    private String receiveName; // 수령인
-    private Long deliveryAgentId;
-    private UUID hubRouteId;
-    private UUID fromHubId;
-    private UUID toHubId;
+        private UUID id; // private UUID id; // 배송 id
+        private DeliveryStatus status; // private DeliveryStatus status;
+        private String deliveryAddress; // private String deliveryAddress; // 배송지
+        private String receiveName; // private String receiveName; // 수령인
+        private Long companyDeliveryAgentId; // private Long deliveryAgentId;
+        private Long hubDeliveryAgentId; // private UUID hubRouteId;
+        private UUID fromHubId; // private UUID fromHubId;
+        private UUID toHubId; // private UUID toHubId;
 
     public enum DeliveryStatus {
         WAITING, // 배송대기
