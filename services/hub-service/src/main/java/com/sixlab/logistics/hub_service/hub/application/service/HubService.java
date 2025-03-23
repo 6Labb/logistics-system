@@ -3,7 +3,9 @@ package com.sixlab.logistics.hub_service.hub.application.service;
 
 import com.sixlab.logistics.common.shared.exception.ResourceNotFoundException;
 import com.sixlab.logistics.hub_service.hub.application.dto.hub.*;
+import com.sixlab.logistics.hub_service.hub.application.dto.hubmanager.HubManagerResponseDto;
 import com.sixlab.logistics.hub_service.hub.domain.model.Hub;
+import com.sixlab.logistics.hub_service.hub.domain.model.HubManager;
 import com.sixlab.logistics.hub_service.hub.domain.repository.HubManagerRepository;
 import com.sixlab.logistics.hub_service.hub.domain.repository.HubRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -64,6 +66,14 @@ public class HubService {
                 .orElseThrow(() -> new EntityNotFoundException("허브를 찾을 수 없습니다."));
 
         hub.delete(3L); // BasicEntity의 softDelete() 메서드 호출
+    }
+
+    @Transactional(readOnly = true)
+    public HubManagerResponseDto getManagerByUserId(Long userId) {
+        HubManager hubManager = hubManagerRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 매니저 ID 입니다."));
+
+        return HubManagerResponseDto.of(hubManager);
     }
 
 }

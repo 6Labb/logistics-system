@@ -6,6 +6,7 @@ import com.sixlab.logistics.hub_service.hub.application.dto.hub.HubCreateRequest
 import com.sixlab.logistics.hub_service.hub.application.dto.hub.HubCreateResponseDto;
 import com.sixlab.logistics.hub_service.hub.application.dto.hub.HubResponseDto;
 import com.sixlab.logistics.hub_service.hub.application.dto.hub.HubUpdateRequestDto;
+import com.sixlab.logistics.hub_service.hub.application.dto.hubmanager.HubManagerResponseDto;
 import com.sixlab.logistics.hub_service.hub.application.service.HubService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -63,6 +64,11 @@ public class HubController {
         return ApiResponse.success(null, "Hub soft deleted");
     }
 
+    @GetMapping("/managers/{userId}")
+    public ApiResponse<HubManagerResponseDto> getHubManagerByUserId(@PathVariable Long userId) {
+        HubManagerResponseDto response = hubService.getManagerByUserId(userId);
+        return ApiResponse.success(response, "HubManager retrieved");
+    }
 
 
 
