@@ -67,7 +67,7 @@ public class OrderService {
 
     // 모든 권한 접근 허용, 주문 생성 메서드
     public OrderCreateResponseDto createOrder(OrderCreateRequestDto dto, Long userId) throws Exception{
-        // log.info("service 계층: createOrder() 호출됨");
+        log.info("service 계층: createOrder() 호출됨");
 
 
         // 1. 상품서비스의 상품 조회기능 호출
