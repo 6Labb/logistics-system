@@ -54,11 +54,8 @@ public class OrderService {
     private final ProductClient productClient;
     private final CompanyClient companyClient;
     private final HubClient hubClient; // 허브 매니저를 조회하기 위한
-
     private final OrderJpaRepository orderJpaRepository;
-
     private final RabbitTemplate rabbitTemplate;
-    private final HubClient hubClient;
 
     @Value("${message.exchange}")
     private String exchange;
