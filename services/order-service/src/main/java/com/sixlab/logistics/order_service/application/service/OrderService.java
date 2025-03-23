@@ -3,14 +3,17 @@ package com.sixlab.logistics.order_service.application.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sixlab.logistics.common.shared.exception.OutOfStockException;
 import com.sixlab.logistics.common.shared.exception.ResourceNotFoundException;
+import com.sixlab.logistics.common.shared.exception.UnauthorizedAccessException;
+import com.sixlab.logistics.common.shared.response.ApiResponse;
 import com.sixlab.logistics.common.shared.response.ApiResponseDto;
+import com.sixlab.logistics.common.shared.security.Role;
+import com.sixlab.logistics.common.shared.security.UserDetailsImpl;
+import com.sixlab.logistics.common.shared.security.UserInfo;
 import com.sixlab.logistics.order_service.application.client.CompanyClient;
 import com.sixlab.logistics.order_service.application.client.DeliveryClient;
+import com.sixlab.logistics.order_service.application.client.HubClient;
 import com.sixlab.logistics.order_service.application.client.ProductClient;
-import com.sixlab.logistics.order_service.application.dto.UserInfo;
 import com.sixlab.logistics.order_service.application.dto.request.OrderCreateRequestDto;
-
-import com.sixlab.logistics.order_service.application.dto.request.OrderInfoMessageRequestDto;
 import com.sixlab.logistics.order_service.application.dto.request.OrderInfoMessageRequestDto;
 import com.sixlab.logistics.order_service.application.dto.request.OrderInfoUpdateRequestDto;
 import com.sixlab.logistics.order_service.application.dto.request.RequestDeliveryRegisterDto;
@@ -20,19 +23,16 @@ import com.sixlab.logistics.order_service.infrastructure.persistence.OrderJpaRep
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.*;
-import java.util.*;
 
 @Service
 @Slf4j
@@ -53,10 +53,8 @@ public class OrderService {
     private final DeliveryClient deliveryClient;
     private final ProductClient productClient;
     private final CompanyClient companyClient;
-    // private final HubClient hubClient;
-
+    private final HubClient hubClient; // 허브 매니저를 조회하기 위한
     private final OrderJpaRepository orderJpaRepository;
-
     private final RabbitTemplate rabbitTemplate;
 
     @Value("${message.exchange}")
@@ -205,17 +203,16 @@ public class OrderService {
         return data;
     }
 
-    // 권한확인 x
     // 주문 단건 조회 서비스
-    public OrderFindOneResponseDto findOneOrder(UUID orderId) {
-        return new OrderFindOneResponseDto(findByIdOneOrderInfo(orderId));
+    public OrderFindOneResponseDto findOneOrder(UUID orderId, UserDetailsImpl userDetails) {
+        return new OrderFindOneResponseDto(findByIdOneOrderInfo(orderId, userDetails));
     }
 
     @Transactional
     // 마스터와 허브 매니저만 호출 가능한 수정 메서드
-    public OrderInfoUpdateResponseDto orderInfoUpdate(UUID orderId, OrderInfoUpdateRequestDto dto) {
+    public OrderInfoUpdateResponseDto orderInfoUpdate(UUID orderId, OrderInfoUpdateRequestDto dto, UserDetailsImpl userDetails) {
         // 1. 주문정보가 존재하는지 먼저 확인
-        Order order = findByIdOneOrderInfo(orderId);
+        Order order = findByIdOneOrderInfo(orderId, userDetails);
 
         // 2. 기존 주문했던 물품 요청 수량과 수정 요청 수량이 다르다면
         log.info("기존 물품 요청 수량: {}, 수정 요청 수량: {}", order.getQuantity(), dto.getQuantity());
@@ -264,18 +261,76 @@ public class OrderService {
     }
 
     // orderId 에 기반하여 주문정보 확인하는 메서드 -> 주문정보 존재한다면 Order 객체를 반환
-    private Order findByIdOneOrderInfo(UUID orderId) {
-        return orderJpaRepository.findById(orderId).orElseThrow(() -> {
+    private Order findByIdOneOrderInfo(UUID orderId, UserDetailsImpl userDetails) {
+        UserInfo userInfo = userDetails.getUserInfo();
+        String authority = userInfo.getRole().getAuthority();
+        Role role = userInfo.getRole();
+        Long userId = userInfo.getUserId();
+
+        // findByIdOneOrderInfo() 메서드 호출 - userId: 1, Role: MASTER, authority: ROLE_MASTER
+        log.info("findByIdOneOrderInfo() 메서드 호출 - userId: {}, Role: {}, authority: {}",
+                userId, role, authority);
+        
+        // 1. 주문 정보 여부를 확인
+        Order order = orderJpaRepository.findById(orderId).orElseThrow(() -> {
             log.info("주문정보가 없음");
-            return new ResourceNotFoundException("주문 정보를 찾을 수 없습니다.");
+            throw new ResourceNotFoundException("주문 정보를 찾을 수 없습니다.");
         });
+
+        // 여기까지 오면 주문 정보가 있다는 것
+        switch(role) {
+            case MASTER -> {}
+            case HUB_MANAGER -> {
+                log.info("role 이 hub_manager");
+                
+                // 2. 주문 정보에서 productId 를 얻고, product-service 호출해서
+                // product 객체 얻은 후 hubId 를 얻는다.
+                ResponseEntity<ApiResponseDto<GetProductResponseDto>> productResponse = productClient.getProductById(order.getProductId());
+
+                ApiResponseDto<GetProductResponseDto> apiResponseDto = checkFeignClientResponse(productResponse);
+
+                GetProductResponseDto productInfo = apiResponseDto.getData();
+                // hubId
+                UUID hubId = productInfo.getHubId();
+
+                // hubId 를 통해 hub 객체를 얻고, hub 객체에서 userId 꺼내 비교하기
+                // (현재 유저가 허브 담당자인지 확인하기)
+
+                ResponseEntity<ApiResponse<HubResponseDto>> hubById = hubClient.getHubById(hubId);
+                
+                // checkFeignClientResponse() 메서드는 ApiResponseDto 타입을 받는다.
+                if(!hubById.getStatusCode().is2xxSuccessful() ||
+                        hubById.getBody() == null || !hubById.getBody().getStatusCode().is2xxSuccessful()) {
+                    throw new RuntimeException("FeignClient 호출 문제 발생 - http 상태 코드: "+ hubById.getStatusCode()); }
+
+                // 허브 객체에 저장되어 있는 허브 담당자의 userId
+                Long hubManagerUserId = hubById.getBody().getBody().getData().getHubManagerUserId();
+
+                if(!userId.equals(hubManagerUserId)) {
+                    log.info("해당 허브의 담당자가 아님");
+                    throw new UnauthorizedAccessException("주문 조회에 접근할 권한이 없습니다. 허브 담당자가 아닙니다.");
+                }
+                // 여기까지 오면 허브 담당자임.
+                log.info("userId: {}, hubManagerUserId: {}", userId, hubManagerUserId);
+                log.info("허브 담당자 인증 완료");
+            }
+            case DELIVERY_AGENT, TRADE_PARTNER -> {
+                if(!userId.equals(order.getUserId())) {
+                    throw new UnauthorizedAccessException("주문 조회에 접근할 권한이 없습니다.");
+                }
+            }
+            default -> {
+                throw new IllegalArgumentException("role 이 뭘까? - "+role);
+            }
+        }
+        return order;
     }
 
     // 주문 삭제 메서드, 마스터와 담당! 허브 관리자만이 삭제를 할 수 있다.
     @Transactional
-    public OrderDeleteResponseDto deleteOrder(UUID orderId) {
+    public OrderDeleteResponseDto deleteOrder(UUID orderId, UserDetailsImpl userDetails) {
         // 1. 주문정보 확인(주문 id)
-        Order order = findByIdOneOrderInfo(orderId);
+        Order order = findByIdOneOrderInfo(orderId, userDetails);
 
         // 2. 권한 확인
         // 허브관리자라면 담당 허브 관리자인지 확인
