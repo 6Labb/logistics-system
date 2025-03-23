@@ -12,8 +12,6 @@ import java.util.UUID;
 
 public interface HubRouteRepository extends JpaRepository<HubRoute, UUID> {
 
-//    List<HubRoute> findAllByDeletedAtIsNull(UUID id);
-//    void update(HubRouteRequestDto requestDto);
 
     Optional<HubRoute> findByIdAndDeletedAtIsNull(UUID hubRouteId);
 
