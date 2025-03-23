@@ -9,6 +9,7 @@ import com.sixlab.logistics.product_service.domain.repository.ProductRepository;
 import com.sixlab.logistics.product_service.presentaion.dto.PaginationResponseDto;
 import com.sixlab.logistics.product_service.presentaion.dto.ProductRequestDto;
 import com.sixlab.logistics.product_service.presentaion.dto.ProductResponseDto;
+import com.sixlab.logistics.product_service.presentaion.dto.ProductStockResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,5 +84,29 @@ public class ProductServiceImpl implements ProductService {
             throw new RuntimeException("해당 상품을 찾을 수 없습니다.");
         }
         productRepository.deleteById(productId);
+    }
+
+    @Transactional
+    @Override
+    public ProductStockResponseDto decreaseStock(UUID productId, int quantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
+
+        product.decreaseStock(quantity);  // 재고 감소
+        productRepository.save(product);
+
+        return ProductStockResponseDto.fromEntity(product);  // 변경된 상품 정보 반환
+    }
+
+    @Transactional
+    @Override
+    public ProductStockResponseDto restoreStock(UUID productId, int quantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
+
+        product.increaseStock(quantity);  // 재고 복원
+        productRepository.save(product);
+
+        return ProductStockResponseDto.fromEntity(product);  // 변경된 상품 정보 반환
     }
 }

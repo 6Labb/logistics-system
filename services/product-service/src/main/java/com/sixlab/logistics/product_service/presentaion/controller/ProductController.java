@@ -3,9 +3,11 @@ package com.sixlab.logistics.product_service.presentaion.controller;
 
 import com.sixlab.logistics.common.shared.response.ApiResponse;
 import com.sixlab.logistics.product_service.application.service.ProductService;
+import com.sixlab.logistics.product_service.domain.model.Product;
 import com.sixlab.logistics.product_service.presentaion.dto.PaginationResponseDto;
 import com.sixlab.logistics.product_service.presentaion.dto.ProductRequestDto;
 import com.sixlab.logistics.product_service.presentaion.dto.ProductResponseDto;
+import com.sixlab.logistics.product_service.presentaion.dto.ProductStockResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -61,5 +63,23 @@ public class ProductController {
             @PathVariable UUID productId) {
         productService.deleteProduct(productId);
         return ApiResponse.success(HttpStatus.OK, null, "상품이 정상적으로 삭제되었습니다.");
+    }
+
+    // 상품 재고 감소
+    @PutMapping("/{productId}/decrease-stock")
+    public ApiResponse<ProductStockResponseDto> decreaseStock(
+            @PathVariable UUID productId,
+            @RequestParam int quantity) {
+        ProductStockResponseDto responseDto = productService.decreaseStock(productId, quantity);
+        return ApiResponse.success(HttpStatus.OK, responseDto, "상품 재고 감소 성공");
+    }
+
+    // 상품 재고 복원
+    @PutMapping("/{productId}/restore-stock")
+    public ApiResponse<ProductStockResponseDto> restoreStock(
+            @PathVariable UUID productId,
+            @RequestParam int quantity) {
+        ProductStockResponseDto responseDto = productService.restoreStock(productId, quantity);
+        return ApiResponse.success(HttpStatus.OK, responseDto, "상품 재고 복원 성공");
     }
 }
