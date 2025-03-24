@@ -21,7 +21,6 @@ import com.sixlab.logistics.order_service.application.dto.response.*;
 import com.sixlab.logistics.order_service.domain.model.Order;
 import com.sixlab.logistics.order_service.domain.model.Status;
 import com.sixlab.logistics.order_service.infrastructure.persistence.OrderJpaRepository;
-import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -74,16 +73,6 @@ public class OrderService {
         // 1. 상품서비스의 상품 조회기능 호출
         ResponseEntity<ApiResponseDto<GetProductResponseDto>> requestProduct = productClient.getProductById(dto.getProductId());
 
-        /* 상기코드 실행시 전달받을 객체, 지금은 Product 객체 직접 생성
-        GetProductResponseDto getProduct = GetProductResponseDto.builder()
-                .id(productId) // 50c3068a-6b09-4f45-a3af-c119168a7676
-                .companyId(companyId)
-                .hubId(hubId)
-                .name("지우개")
-                .quantity(40)
-                // .createdBy(40) // 이 상품을 생성한 사용자
-                .createdAt(LocalDateTime.now().minusWeeks(1))
-                .build(); */
         ApiResponseDto<GetProductResponseDto> apiResponseDto = checkFeignClientResponse(requestProduct);
 
         GetProductResponseDto getProduct = ifExist((GetProductResponseDto) apiResponseDto.getData());
@@ -92,15 +81,8 @@ public class OrderService {
 
         // (상품 id 기반으로 객체를 전달받은상태) & 요청 상품 수량이 재고 수량보다 적거나 같은지 확인
         // 상품 객체에 허브 id, 공급업체 id, (재고) 수량 필드 등이 존재하고,
-        // 여기서 (재고) 수량은 허브 id 가 관리하는 수량으로 정의함 (은선님과 대화를 통해 정의함)
+        // 여기서 (재고) 수량은 허브 id 가 관리하는 수량으로 정의함 (product-service 개발자(정은선님)와 정의함)
         // *** 클라이언트로부터 요청수량 0 미만으로는 받지 못하도록 설정 @Min(value=1)
-        /*
-        if(dto.getQuantity() > getProduct.getQuantity()) {
-            log.info("요청 수량이 재고 수량보다 많음");
-            log.info("요청 수량: {}, 재고 수량: {}", dto.getQuantity(), getProduct.getQuantity());
-            String data = "요청 수량이 재고 수량을 초과했습니다. 최대 주문 가능 수량을 확인해 주세요.\n 최대 주문 가능 수량: "+getProduct.getQuantity();
-            throw new OutOfStockException(data);
-        }*/
         checkProductStock(dto.getQuantity(), getProduct.getQuantity());
 
         // 3. 재고 감소 요청하기
@@ -119,27 +101,17 @@ public class OrderService {
         // 4. company-service 의 조회 메서드 호출하기
         // 클라이언트로부터 전달받은 수령업체가 존재하는지 확인
         // *** 수령업체가 존재하는지 확인할 필요가 있는가? 사실상 수령업체의 데이터를 확인할 이유를 이제는 잘 모르겠다.
+        log.info("수령업체 id: {}", dto.getReceiverId());
         ResponseEntity<ApiResponseDto<GetCompanyResponseDto>> response = companyClient.getCompanyById(dto.getReceiverId());
 
-        // ApiResponse.success(company, "업체 조회 성공");
+        // company-service 에서 반환된 값은 ResponseEntity 가 감싸고 있고,
+        // 감싸져 있는 값이 ApiResponse.success(company, "업체 조회 성공");
         // company 의 타입은 GetCompanyResponseDto
         // GetCompanyResponseDto 객체의 필드는
         // UUID id, String name, String address, CompanyType type, UUID hubId, LocalDateTime createdAt;
-
-        // return response.getBody() - ApiResponseDto<GetCompanyResponseDto>;
         ApiResponseDto<GetCompanyResponseDto> getBody = checkFeignClientResponse(response);
         GetCompanyResponseDto receiverCompanyInfo = getBody.getData();
 
-
-        /* 상기 코드 호출시 하기의 객체를 전달받음
-        GetCompanyResponseDto getCompanyInfo = GetCompanyResponseDto.builder()
-                .type(GetCompanyResponseDto.CompanyType.RECEIVER)
-                .name("스파르타")
-                // 업체 정보 생성한 일자 정보
-                .createdAt(LocalDateTime.now().minusWeeks(1))
-                .hubId(hubId) // 업체 테이블에 왜 hub id 가??
-                .id(receiverCompanyId) // 수령업체 id 여야함. 지금 이 객체에서는
-                .build();*/
         if(receiverCompanyInfo == null || receiverCompanyInfo.getType() != GetCompanyResponseDto.CompanyType.RECEIVER) {
             // company-service 의 조회 메서드 호출 후 전달받은 company 객체가 null 이라면 또는
             // null 이 아닌데 객체에서 업체 타입의 정보가 RECEIVER 가 아니라면
@@ -150,6 +122,7 @@ public class OrderService {
         UUID receiverCompanyId = receiverCompanyInfo.getId();
 
         // 4. 배송등록 마이크로 서비스 호출에 전달할 데이터 생성
+        /* *** 배송 서비스 호출 오류로 잠정 주석 처리 -------------------------------------------------------
         RequestDeliveryRegisterDto requestDeliveryRegisterDto = RequestDeliveryRegisterDto.builder()
                 .supplierCompanyId(supplierCompanyId) // 공급업체 id
                 .receiverCompanyId(receiverCompanyId) // 수령업체 id
@@ -169,21 +142,25 @@ public class OrderService {
         ResponseDeliveryRegisterDto getDelivery = deliveryBody.getData();
 
         // *** deliveryInfo 가 null 일 수 있나?
+         ------------------------------------------------------------------------------*/
 
         // 5. Order 엔터티 객체 만들어서 저장하기
-        Order order = dto.toEntity(supplierCompanyId, userId, getDelivery.getId());
+        // *** 배송 서비스 호출 완료시 복원해야할 코드: Order order = dto.toEntity(supplierCompanyId, userId, getDelivery.getId());
+        UUID mockDeliveryId = UUID.randomUUID(); // 배송 서비스 호출 되면 주석처리 예정 코드
+        Order order = dto.toEntity(supplierCompanyId, userId, mockDeliveryId); // 배송 서비스 호출 되면 주석처리 예정 코드
         Order savedOrder = orderJpaRepository.save(order);
 
-        //AI 호출용 RabbitMQ
-        OrderInfoMessageRequestDto message = createOrderMessage(savedOrder.getOrderId(),getProduct, dto, getDelivery);
+        //AI 호출용 RabbitMQ: 배송 서비스 호출 완료하면 복원해놓겠어 --------------------------------------------------------------
+        /*OrderInfoMessageRequestDto message = createOrderMessage(savedOrder.getOrderId(),getProduct, dto, getDelivery);
         rabbitTemplate.convertAndSend(exchange, "order.created", message);
         System.out.println("📤 주문 메시지 전송됨: " +exchange+" : "+ queueOrder+" : "+message); //테스트후  삭제
-
+        --------------------------------------------------------------------------------------------------*/
+        log.info("saved orderId: {}", savedOrder.getOrderId());
         return new OrderCreateResponseDto(savedOrder);
     }
 
     // FeignClient 호출시 반환 값 검증: 메서드 호출에 문제가 없었는지에 대한 확인 절차
-    private static <T> ApiResponseDto<T> checkFeignClientResponse(ResponseEntity<ApiResponseDto<T>> response) {
+    private static <T> ApiResponseDto<T> checkFeignClientResponse(ResponseEntity<ApiResponseDto <T>> response) {
         log.info("checkFeignClientResponse() 메서드 호출");
         if(!response.getStatusCode().is2xxSuccessful() || response.getBody() == null || Integer.toString(response.getBody().getStatus()).charAt(0) != '2') {
             throw new RuntimeException("FeignClient 호출 문제 발생 - http 상태 코드: "+ response.getStatusCode());
@@ -259,32 +236,14 @@ public class OrderService {
         log.info("기존 물품 요청 수량: {}, 수정 요청 수량: {}", order.getQuantity(), dto.getQuantity());
         if(!order.getQuantity().equals(dto.getQuantity()))
         {
-            // 3. productId 를 기반으로 상품 서비스 조회 호출
-            // ResponseEntity<ApiResponseDto<GetProductResponseDto>> response = productClient.getProductById(order.getProductId());
-            // GetProductResponseDto getProduct = response.getBody().getData();
-            /* 상기 상품 서비스 호출시 전달받을 물품 객체
-            GetProductResponseDto getProduct = GetProductResponseDto.builder()
-                    .id(order.getProductId())// .id(productId) // 50c3068a-6b09-4f45-a3af-c119168a7676
-                    .companyId(companyId)
-                    .hubId(hubId)
-                    .name("지우개")
-                    .quantity(40)
-                    // .createdBy(40) // 이 상품을 생성한 사용자
-                    .createdAt(LocalDateTime.now().minusWeeks(1))
-                    .build();*/
-            /* ------------------------------------------------------------
-            if(getProduct == null) {
-                log.info("상품이 존재하지 않을 경우 이 로그가 찍힌다.");
-                throw new ResourceNotFoundException("존재하지 않는 상품입니다.");
-            }*/
-            // getProduct 가 null 이라면 예외 발생
-            // ifExist(getProduct);
-
             // 요청수량이 상품 재고 수량보다 많으면 예외 발생
             checkProductStock(dto.getQuantity(), productInfo.getQuantity());
-
+            // 예외가 발생하지 않으면 기존 order 객체에 요청수량이 세팅됨(수정)
             order.setQuantity(dto.getQuantity());
         }
+
+        // 생각해보니 물품 수량을 요청해서 order 객체에 주문 수량이 바뀌면
+        // 다시 company-service 에게 재고 감소 수량을 요청해야 함. 나중에 develop 예정
 
         log.info("기존 요청 메시지: {}, 수정 요청 메시지: {}", order.getMessage(), dto.getMessage());
         if(!order.getMessage().trim().equals(dto.getMessage().trim())) order.setMessage(dto.getMessage());
@@ -339,8 +298,9 @@ public class OrderService {
                 // hubId 를 통해 hub 객체를 얻고, hub 객체에서 userId 꺼내 비교하기
                 // (현재 유저가 허브 담당자인지 확인하기)
 
+                // ResponseEntity<ApiResponseDto<HubResponseDto>> hubById = hubClient.getHubById(hubId);
                 ResponseEntity<ApiResponse<HubResponseDto>> hubById = hubClient.getHubById(hubId);
-                
+
                 // checkFeignClientResponse() 메서드는 ApiResponseDto 타입을 받는다.
                 if(!hubById.getStatusCode().is2xxSuccessful() ||
                         hubById.getBody() == null || !hubById.getBody().getStatusCode().is2xxSuccessful()) {
@@ -372,8 +332,6 @@ public class OrderService {
     // 주문 삭제 메서드, 마스터와 담당! 허브 관리자만이 삭제를 할 수 있다.
     @Transactional
     public OrderDeleteResponseDto deleteOrder(UUID orderId, UserDetailsImpl userDetails) {
-        // 1. 주문정보 확인(주문 id)
-        // 기존: Order order = findByIdOneOrderInfo(orderId, userDetails);
         UserInfo userInfo = userDetails.getUserInfo();
         Long userId = userInfo.getUserId();
 
@@ -402,6 +360,7 @@ public class OrderService {
         // hubId 를 통해 hub 객체를 얻고, hub 객체에서 userId 꺼내 비교하기
         // (현재 유저가 허브 담당자인지 확인하기)
 
+        log.info("hubId: {}", hubId);
         ResponseEntity<ApiResponse<HubResponseDto>> hubById = hubClient.getHubById(hubId);
 
         // checkFeignClientResponse() 메서드는 ApiResponseDto 타입을 받는다.

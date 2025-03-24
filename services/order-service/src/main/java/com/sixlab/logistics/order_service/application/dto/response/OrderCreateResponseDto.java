@@ -21,7 +21,7 @@ public class OrderCreateResponseDto {
     private final String receiverName; // 수령인
 
     public OrderCreateResponseDto(Order order) {
-        this.orderId = getOrderId();
+        this.orderId = order.getOrderId();
         this.supplierId = order.getSupplierId();
         this.receiverId = order.getReceiverId();
         this.deliveryId = order.getDeliveryId();
