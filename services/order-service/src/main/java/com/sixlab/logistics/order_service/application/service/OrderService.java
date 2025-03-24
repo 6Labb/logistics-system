@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static com.sixlab.logistics.common.shared.security.Role.HUB_MANAGER;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -214,13 +216,51 @@ public class OrderService {
         // 1. 주문정보가 존재하는지 먼저 확인
         Order order = findByIdOneOrderInfo(orderId, userDetails);
 
+        // 2. 권한 확인 MASTER 와 담당 허브 매니저만이 수정할 수 있다.
+        UserInfo userInfo = userDetails.getUserInfo();
+        Long userId = userInfo.getUserId(); // 현재 유저
+        Role role = userInfo.getRole(); // 현재 유저의 권한
+
+        // 컨트롤러에서 이미 @PreAuthorize() 어노테이션으로
+        // role 이 MASTER 와 HUB_MANAGER 만 들어온 상태
+
+        // *** 우선 productId 로 product 객체 얻기
+        ResponseEntity<ApiResponseDto<GetProductResponseDto>> productResponse = productClient.getProductById(order.getProductId());
+        ApiResponseDto<GetProductResponseDto> apiResponseDto = checkFeignClientResponse(productResponse);
+        GetProductResponseDto productInfo = apiResponseDto.getData();
+        ifExist(productInfo);
+
+        if(role == HUB_MANAGER) {
+            // hubId
+            UUID hubId = productInfo.getHubId();
+
+            // hubId 를 통해 hub 객체를 얻고, hub 객체에서 userId 꺼내 비교하기
+            // (현재 유저가 허브 담당자인지 확인하기)
+
+            ResponseEntity<ApiResponse<HubResponseDto>> hubById = hubClient.getHubById(hubId);
+
+            // checkFeignClientResponse() 메서드는 ApiResponseDto 타입을 받는다.
+            if(!hubById.getStatusCode().is2xxSuccessful() ||
+                    hubById.getBody() == null || !hubById.getBody().getStatusCode().is2xxSuccessful()) {
+                throw new RuntimeException("FeignClient 호출 문제 발생 - http 상태 코드: "+ hubById.getStatusCode()); }
+
+            // 허브 객체에 저장되어 있는 허브 담당자의 userId
+            Long hubManagerUserId = hubById.getBody().getBody().getData().getHubManagerUserId();
+
+            if(!userId.equals(hubManagerUserId)) {
+                log.info("해당 허브의 담당자가 아님");
+                throw new UnauthorizedAccessException("주문 조회에 접근할 권한이 없습니다. 허브 담당자가 아닙니다.");
+            }
+        }
+        // 여기까지 오면 허브 담당자 또는 MASTER 임.
+
         // 2. 기존 주문했던 물품 요청 수량과 수정 요청 수량이 다르다면
         log.info("기존 물품 요청 수량: {}, 수정 요청 수량: {}", order.getQuantity(), dto.getQuantity());
         if(!order.getQuantity().equals(dto.getQuantity()))
         {
             // 3. productId 를 기반으로 상품 서비스 조회 호출
-            ResponseEntity<ApiResponseDto<GetProductResponseDto>> response = productClient.getProductById(order.getProductId());
-            GetProductResponseDto getProduct = response.getBody().getData();
+            // ResponseEntity<ApiResponseDto<GetProductResponseDto>> response = productClient.getProductById(order.getProductId());
+            // GetProductResponseDto getProduct = response.getBody().getData();
             /* 상기 상품 서비스 호출시 전달받을 물품 객체
             GetProductResponseDto getProduct = GetProductResponseDto.builder()
                     .id(order.getProductId())// .id(productId) // 50c3068a-6b09-4f45-a3af-c119168a7676
@@ -237,10 +277,10 @@ public class OrderService {
                 throw new ResourceNotFoundException("존재하지 않는 상품입니다.");
             }*/
             // getProduct 가 null 이라면 예외 발생
-            ifExist(getProduct);
+            // ifExist(getProduct);
 
             // 요청수량이 상품 재고 수량보다 많으면 예외 발생
-            checkProductStock(dto.getQuantity(), getProduct.getQuantity());
+            checkProductStock(dto.getQuantity(), productInfo.getQuantity());
 
             order.setQuantity(dto.getQuantity());
         }
@@ -274,7 +314,8 @@ public class OrderService {
         // 1. 주문 정보 여부를 확인
         Order order = orderJpaRepository.findById(orderId).orElseThrow(() -> {
             log.info("주문정보가 없음");
-            throw new ResourceNotFoundException("주문 정보를 찾을 수 없습니다.");
+            // throw 를 return 으로 변경
+            return new ResourceNotFoundException("주문 정보를 찾을 수 없습니다.");
         });
 
         // 여기까지 오면 주문 정보가 있다는 것

@@ -25,14 +25,26 @@ public class DeliveryAgentRepositoryImpl implements DeliveryAgentRepository {
     private final DeliveryAgentJpaRepository deliveryAgentJpaRepository;
     private final DeliveryAgentQueryRepository deliveryAgentQueryRepository;
 
+    // 관리자
     @Override
-    public Page<DeliveryAgentResponseDto> searchDeliveryAgentList(DeliveryAgentSearchDto searchDto, Pageable pageable) {
+    public Page<DeliveryAgentResponseDto> searchDeliveryAgentListForMaster(DeliveryAgentSearchDto searchDto, Pageable pageable) {
+        return deliveryAgentQueryRepository.searchDeliveryAgentList(searchDto, pageable);
+    }
+
+    // 허브 관리자
+    @Override
+    public Page<DeliveryAgentResponseDto> searchDeliveryAgentListForHubMaster(DeliveryAgentSearchDto searchDto, Pageable pageable, UUID hubId) {
         return deliveryAgentQueryRepository.searchDeliveryAgentList(searchDto, pageable);
     }
 
     @Override
     public Optional<DeliveryAgent> findByUserId(Long userId) {
         return deliveryAgentJpaRepository.findByUserId(userId);
+    }
+
+    @Override
+    public Optional<DeliveryAgent> findByUserIdAndHubId(Long userId, UUID hubId) {
+        return deliveryAgentJpaRepository.findByUserIdAndHubId(userId, hubId);
     }
 
     @Override
