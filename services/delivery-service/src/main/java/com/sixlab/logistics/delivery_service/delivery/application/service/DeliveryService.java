@@ -284,8 +284,8 @@ public class DeliveryService {
     @Transactional
     public DeliveryResponseDto createDelivery(DeliveryRequestDto requestDto) {
         //TODO: 테스트 - 수령업체id, 공급업체id의 소속허브id
-        //UUID fromHubId = UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120001");
-        //UUID toHubId = UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120002");
+//        UUID fromHubId = UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120001");
+//        UUID toHubId = UUID.fromString("11e98756-d7a2-f948-b1b1-0242ac120002");
 
         // 요청 DTO에서 공급업체 ID와 수령업체 ID 가져오기
         UUID supplierCompanyId = requestDto.getSupplierCompanyId();
@@ -296,8 +296,8 @@ public class DeliveryService {
         if (hubId == null) {
             throw new ResourceNotFoundException("소속허브Id를 찾을 수 없습니다.");
         }
-        UUID fromHubId = hubId.getSupplierId();
-        UUID toHubId = hubId.getReceiverId();
+        UUID fromHubId = hubId.getDepartureHubId();
+        UUID toHubId = hubId.getArrivalHubId();
 
         // 허브이동관리 id 조회
         HubRouteResponseDto hubRoute = hubService.getHubRouteId(fromHubId, toHubId);

@@ -133,9 +133,9 @@ public class CompanyServiceImpl implements CompanyService {
                 .orElseThrow(() -> new ResourceNotFoundException("도착 허브 정보를 찾을 수 없습니다."));
 
         // 조회한 Hub ID로 Hub 정보 가져오기
-        HubResponse departureHub = hubClient.getHubById(departureHubId);
-        HubResponse arrivalHub = hubClient.getHubById(arrivalHubId);
+//        HubResponse departureHub = hubClient.getHubById(departureHubId);
+//        HubResponse arrivalHub = hubClient.getHubById(arrivalHubId);
 
-        return new HubRouteResponse(departureHub.getHubId(), arrivalHub.getHubId());
+        return new HubRouteResponse(departureHubId, arrivalHubId);
     }
 }

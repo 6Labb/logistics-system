@@ -21,13 +21,13 @@ public interface HubClient {
     // ApiResponse = ResponseEntity<ApiResponseDto>
     // 허브 이동관리 id 조회
     @GetMapping("/hubs/routes")
-    ApiResponse<HubRouteResponseDto> getHubRouteId(
+    ResponseEntity<ApiResponseDto<HubRouteResponseDto>> getHubRouteId(
             @RequestParam("departureHubId") UUID fromHubId,
             @RequestParam("arrivalHubId") UUID toHubId);
 
     // user_id로 소속허브 id 조회
     @GetMapping("/hubs/managers/{userId}")
-    ApiResponse<HubManagerResponseDto> getHubIdByUserId(@PathVariable Long userId);
+    ResponseEntity<ApiResponseDto<HubManagerResponseDto>> getHubIdByUserId(@PathVariable Long userId);
 
     /*
     @GetMapping

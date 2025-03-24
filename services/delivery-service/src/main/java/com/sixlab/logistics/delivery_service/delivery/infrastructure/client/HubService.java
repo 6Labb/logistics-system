@@ -17,13 +17,13 @@ public class HubService {
     private final HubClient hubClient;
 
     public HubRouteResponseDto getHubRouteId(UUID fromHubId, UUID toHubId) {
-        ApiResponse<HubRouteResponseDto> response = hubClient.getHubRouteId(fromHubId, toHubId);
-        return Objects.requireNonNull(response.getBody()).getData();
+        ResponseEntity<ApiResponseDto<HubRouteResponseDto>> response = hubClient.getHubRouteId(fromHubId, toHubId);
+        return response.getBody().getData();
     }
 
     public HubManagerResponseDto getHubIdByUserId(Long userId) {
-        ApiResponse<HubManagerResponseDto> response = hubClient.getHubIdByUserId(userId);
-        return Objects.requireNonNull(response.getBody()).getData();
+        ResponseEntity<ApiResponseDto<HubManagerResponseDto>> response = hubClient.getHubIdByUserId(userId);
+        return response.getBody().getData();
     }
 
     /*
