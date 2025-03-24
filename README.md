@@ -1,35 +1,58 @@
-- **[README.md](http://README.md) 파일 필수**
-    - 팀원 역할분담
-    - 서비스 구성 및 실행방법
-        - **각각의 endpoint 기재 필수**
-    - 프로젝트 목적/상세
-    - ERD
-    - 기술 스택
-    - **트러블슈팅**
-    - (선택)API docs
+# 대규모 AI 시스템 프로젝트 - 6Lab
+
+## 📌 프로젝트 목적
+
+본 프로젝트는 B2B 기반의 물류관리 및 배송 시스템을 구축하여,  
+**공급업체와 수령업체 간의 상품 주문, 재고 관리, 배송 과정을 디지털화하고 자동화**하는 것을 목표로 합니다.  
+허브(물류센터)를 중심으로 한 효율적인 재고 관리, 허브 간 배송 추적,  
+예측 기반 출고 시점 안내, 실시간 알림 기능 등을 통해  
+**현실적인 물류 환경에 적용 가능한 시스템을 설계**하였습니다.
 
 
+## 📦 프로젝트 상세
 
-# 프로젝트명-삼~쉽조-30
+본 시스템은 공급업체와 수령업체가 사용하는 B2B 기반의 물류 플랫폼으로,  
+다음과 같은 흐름을 중심으로 구성되어 있습니다:
+
+1. **업체 등록 및 허브 지정**  
+ 공급업체와 수령업체는 시스템에 등록되며, 각 업체는 하나 이상의 물류 허브(센터)와 연결됩니다.  
+ 허브는 재고 보관, 출고, 배송의 출발지 또는 경유지로 활용됩니다.
+
+2. **상품 재고 관리**  
+ 공급업체는 허브에 상품 재고를 사전 입고하여 관리합니다.  
+ 상품 정보는 도메인별로 관리되며, 수량, 카테고리, 위치 등의 정보가 포함됩니다.
+
+3. **주문 생성 및 처리**  
+ 수령업체가 공급업체에 상품을 주문하면 주문이 생성되고,  
+ 주문 정보는 허브 단위로 연결되어 출고 준비가 시작됩니다.  
+ 이 과정에서 허브 재고가 차감됩니다.
+
+4. **배송 프로세스**  
+ 출고가 확정되면 배송이 시작되며, 허브 간 사전에 정의된 이동 경로를 따라 배송이 진행됩니다.  
+ 배송 상태(출발, 허브 도착, 이동 중, 완료 등)는 단계별로 업데이트되며,  
+ 배송 이력 또한 시스템에 기록됩니다.
+
+5. **출고 시점 예측 및 알림**  
+ AI 시스템은 요청된 도착 시간에 맞춰 언제 출고해야 할지를 계산하여,  
+ 발송 허브 담당자에게 배송 예상 시간 정보를 제공합니다.  
+ 또한, Slack을 통해 주문이 발생한 시점에  
+ **주문 번호, 주문자 정보, 요청사항, 발송지, 경유지, 도착지, 배송 담당자** 등의 정보를  
+ 자동으로 발송 허브 담당자에게 전달함으로써 신속한 대응을 가능하게 합니다.
+
+본 시스템은 MSA(Microservice Architecture) 기반으로,  
+도메인별로 독립적인 서비스를 구성하였으며  
+Eureka, Config Server, Gateway, JWT 인증 시스템을 통해 전체 서비스를 유기적으로 연결하였습니다.
+
+
+### ⏰ 프로젝트 기간
 ---
-## 📌 프로젝트 소개
-**온·오프라인 주문 관리 플랫폼**으로, 사용자와 매장이 원활하게 주문을 처리하고 관리할 수 있도록 돕는 **백엔드 API**입니다.
-### 🎯 주요 기능
-- 🛒 **주문 관리**: 고객이 웹/모바일 또는 매장에서 상품을 주문할 수 있음 (온라인/오프라인 통합)
-- 📦 **상품 관리**: 가게 주인이 상품을 등록, 수정, 삭제하고 재고를 관리할 수 있음
-- 🍽 **음식점 관리**: 메뉴 관리, 가게 정보 수정 기능 제공
-- 🚚 **배송 및 픽업 관리**: 배달/픽업 주문 관리 기능 제공
-- ⭐ **리뷰 및 피드백**: 고객이 주문한 상품에 대한 리뷰 작성 가능
-- 🤖 **AI 상품 상세설명 시스템**: Google Gemini API를 활용한 상품 상세 설명 기능
-### ⏰프로젝트 기간
----
-📅**2025-02-12 ~ 2025-02-25**
-### 참여인원
+📅**2025-03-11 ~ 2025-03-25**
+### 👥 참여인원
 |                                                                                          |                                                                                          |                                                                                          |                                                                                          |                                                                                                |
 |:----------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------:|
 | <img src="https://avatars.githubusercontent.com/u/197976648?v=4" width="120px;" alt=""/> | <img src="https://avatars.githubusercontent.com/u/189347549?v=4" width="120px;" alt=""/> | <img src="https://avatars.githubusercontent.com/u/158035502?v=4" width="120px;" alt=""/> | <img src="https://avatars.githubusercontent.com/u/142812547?v=4" width="120px;" alt=""/> | <img src="https://avatars.githubusercontent.com/u/123526228?s=400&v=4" width="120px;" alt=""/> |
-|                            [김 훈](https://github.com/Hooni-i)                             |                         [김민주](https://https://github.com/mjjmjmjmj)                          |                         [정은선](https://https://github.com/)                         |                            [박성주](https://github.com/)                            |                              [엄은진](https://github.com/)                               |
-|                                       ** 기능 구현**                                       |                                    **기능 구현**                                  |                                  **기능 구현**                                   |                             ** 기능 구현 /  구현**                             |                               ** 기능 구현**                               |
+|                            [김 훈](https://github.com/Hooni-i)                             |                         [김민주](https://github.com/mjjmjmjmj)                          |                         [정은선](https://https://github.com/jeongeunsun)                         |                            [박성주](https://github.com/goodperiodt)                            |                              [엄은진](https://github.com/mummumm)                               |
+|                                       **공통 모듈, 추천 알고리즘 연동 및 AI 응답 처리, 슬랙 알림 기능 및 Webhook 연동**                                       |                                    **Gateway, Config Server, Eureka, 인증/인가(JWT+Security), 사용자,허브 도메인 개발**                                  |                                  **물류 네트워크 내의 협력 업체 관리를 위한 업체 도메인의 기획 및 개발, 입출고 관리의 기반이 되는 상품 도메인 개발**                                   |                             **물류 시스템 내에서 주문의 생성부터 상태 전이까지 전반적인 흐름을 관리하는 주문 도메인의 설계 및 구현**                             |                               **상품의 출고 및 배송 프로세스를 담당하는 배송 도메인을 설계하고 구현**                               |
 ---
 ## 📋 목차
 1. [기술 스택](#기술-스택)
@@ -65,7 +88,6 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white)
 ![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat&logo=redis&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)
-![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat&logo=linux&logoColor=black)
 ![Zipkin](https://img.shields.io/badge/Zipkin-000000?style=flat&logo=apache&logoColor=white)
 ![IntelliJ IDEA](https://img.shields.io/badge/IntelliJIDEA-000000?style=flat&logo=intellijidea&logoColor=white)
 ![Git](https://img.shields.io/badge/Git-F05032?style=flat&logo=git&logoColor=white)
