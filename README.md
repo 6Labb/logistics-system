@@ -47,3 +47,28 @@
 - **CI/CD:** GitHub Actions, Docker
 - **Infra:** AWS EC2
 - **Security:** Spring Security, JWT
+
+
+## 📝 Technologies & Tools (BE) 📝
+![Java](https://img.shields.io/badge/Java-007396?style=flat&logo=java&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-6DB33F?style=flat&logo=springboot&logoColor=white)
+![Spring Security](https://img.shields.io/badge/Spring%20Security-6DB33F?style=flat&logo=springsecurity&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-black?style=flat&logo=jsonwebtokens&logoColor=white)
+![Spring Cloud Gateway](https://img.shields.io/badge/Spring%20Cloud%20Gateway-6DB33F?style=flat)
+![Eureka](https://img.shields.io/badge/Eureka-6DB33F?style=flat)
+![Spring Cloud Config](https://img.shields.io/badge/Config%20Server-6DB33F?style=flat&logo=spring&logoColor=white)
+![Feign Client](https://img.shields.io/badge/FeignClient-000000?style=flat)
+![RabbitMQ](https://img.shields.io/badge/RabbitMQ-FF6600?style=flat&logo=rabbitmq&logoColor=white)
+![Resilience4j](https://img.shields.io/badge/Resilience4j-4B8BBE?style=flat)
+![Slack API](https://img.shields.io/badge/Slack%20API-4A154B?style=flat&logo=slack&logoColor=white)
+![Gemini API](https://img.shields.io/badge/Gemini%20API-ffca28?style=flat&logo=google&logoColor=black)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat&logo=redis&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)
+![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat&logo=linux&logoColor=black)
+![Zipkin](https://img.shields.io/badge/Zipkin-000000?style=flat&logo=apache&logoColor=white)
+![IntelliJ IDEA](https://img.shields.io/badge/IntelliJIDEA-000000?style=flat&logo=intellijidea&logoColor=white)
+![Git](https://img.shields.io/badge/Git-F05032?style=flat&logo=git&logoColor=white)
+![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)
+![Notion](https://img.shields.io/badge/Notion-000000?style=flat&logo=notion&logoColor=white)
+![Slack](https://img.shields.io/badge/Slack-4A154B?style=flat&logo=slack&logoColor=white)
