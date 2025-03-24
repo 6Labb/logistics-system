@@ -197,7 +197,7 @@ create table products.p_product
 alter table products.p_product
     owner to postgres;
 
-create table users.p_users
+create table users.p_user
 (
     created_at timestamp(6),
     created_by bigint,
@@ -218,7 +218,7 @@ create table users.p_users
         unique
 );
 
-alter table users.p_users
+alter table users.p_user
     owner to postgres;
 
 create table ai_core.slack

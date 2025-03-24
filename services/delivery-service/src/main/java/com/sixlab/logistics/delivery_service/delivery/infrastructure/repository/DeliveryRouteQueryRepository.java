@@ -3,9 +3,13 @@ package com.sixlab.logistics.delivery_service.delivery.infrastructure.repository
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliveryResponseDto;
 import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliveryRouteResponseDto;
 import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliveryRouteSearchDto;
-import com.sixlab.logistics.delivery_service.delivery.domain.model.QDeliveryRoute;
+import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliverySearchDto;
+import com.sixlab.logistics.delivery_service.delivery.domain.entity.QDelivery;
+import com.sixlab.logistics.delivery_service.delivery.domain.entity.QDeliveryRoute;
+import com.sixlab.logistics.delivery_service.deliveryAgent.domain.entity.QDeliveryAgent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

@@ -43,21 +43,21 @@ SET search_path TO deliveries;
 INSERT INTO p_delivery_agent (user_id, type, delivery_sequence, hub_id, slack_id) VALUES
 -- 서울특별시 센터
 -- 업체 배송 담당자 (COMPANY 타입)
-(3, 'COMPANY', 0, '11e98756-d7a2-f948-b1b1-0242ac120002', 'hu185@naver.com'),
+(3, 'COMPANY', 0, '11e98756-d7a2-f948-b1b1-0242ac120002', 'delivery1@gmail.com'),
 -- 서울특별시 센터 허브 배송 담당자 (HUB 타입)
-(4, 'HUB', 0, '11e98756-d7a2-f948-b1b1-0242ac120001', 'hu185@naver.com'),
+(4, 'HUB', 0, '11e98756-d7a2-f948-b1b1-0242ac120001', 'delivery2@gmail.com'),
 -- 경기 북부 센터
 -- 업체 배송 담당자 (COMPANY 타입)
-(5, 'COMPANY', 0, '11e98756-d7a2-f948-b1b1-0242ac141002', 'hu185@naver.com'),
+(5, 'COMPANY', 0, '11e98756-d7a2-f948-b1b1-0242ac141002', 'delivery3@gmail.com'),
 -- 경기 북부 센터 허브 배송 담당자 (HUB 타입)
-(6, 'HUB', 0, '11e98756-d7a2-f948-b1b1-0242ac141002', 'hu185@naver.com');
+(6, 'HUB', 0, '11e98756-d7a2-f948-b1b1-0242ac141002', 'delivery4@gmail.com');
 
 SET search_path TO users;
 -- 회원 데이터 삽입
-INSERT INTO p_users (id, username, password, role, slack_id) VALUES
-(1, 'hub1', '$2a$10$dGq8O5RmfBcxTT2KwcTJ3.aXSRz0TW6KxsMIINxdPTn5ux9hBX4Ke', 'HUB_MANAGER', 'hu185@naver.com'),
-(2, 'hub2', '$2a$10$dGq8O5RmfBcxTT2KwcTJ3.aXSRz0TW6KxsMIINxdPTn5ux9hBX4Ke', 'HUB_MANAGER', 'hu185@naver.com'),
-(3, 'deliver1', '$2a$10$dGq8O5RmfBcxTT2KwcTJ3.aXSRz0TW6KxsMIINxdPTn5ux9hBX4Ke', 'DELIVERY_AGENT', 'hu185@naver.com'),
-(4, 'deliver2', '$2a$10$dGq8O5RmfBcxTT2KwcTJ3.aXSRz0TW6KxsMIINxdPTn5ux9hBX4Ke', 'DELIVERY_AGENT', 'hu185@naver.com'),
-(5, 'deliver3', '$2a$10$dGq8O5RmfBcxTT2KwcTJ3.aXSRz0TW6KxsMIINxdPTn5ux9hBX4Ke', 'DELIVERY_AGENT', 'hu185@naver.com'),
-(6, 'deliver4', '$2a$10$dGq8O5RmfBcxTT2KwcTJ3.aXSRz0TW6KxsMIINxdPTn5ux9hBX4Ke', 'DELIVERY_AGENT', 'hu185@naver.com');
+INSERT INTO p_user (id, username, password, role, slack_id) VALUES
+(1, 'hub1', '$2a$10$dGq8O5RmfBcxTT2KwcTJ3.aXSRz0TW6KxsMIINxdPTn5ux9hBX4Ke', 'HUB_MANAGER', 'hub1@gmail.com'),
+(2, 'hub2', '$2a$10$dGq8O5RmfBcxTT2KwcTJ3.aXSRz0TW6KxsMIINxdPTn5ux9hBX4Ke', 'HUB_MANAGER', 'hub2@gmail.com'),
+(3, 'deliver1', '$2a$10$dGq8O5RmfBcxTT2KwcTJ3.aXSRz0TW6KxsMIINxdPTn5ux9hBX4Ke', 'DELIVERY_AGENT', 'delivery1@gmail.com'),
+(4, 'deliver2', '$2a$10$dGq8O5RmfBcxTT2KwcTJ3.aXSRz0TW6KxsMIINxdPTn5ux9hBX4Ke', 'DELIVERY_AGENT', 'delivery2@gmail.com'),
+(5, 'deliver3', '$2a$10$dGq8O5RmfBcxTT2KwcTJ3.aXSRz0TW6KxsMIINxdPTn5ux9hBX4Ke', 'DELIVERY_AGENT', 'delivery3@gmail.com'),
+(6, 'deliver4', '$2a$10$dGq8O5RmfBcxTT2KwcTJ3.aXSRz0TW6KxsMIINxdPTn5ux9hBX4Ke', 'DELIVERY_AGENT', 'delivery4@gmail.com');
