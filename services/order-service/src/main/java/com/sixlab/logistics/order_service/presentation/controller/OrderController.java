@@ -67,10 +67,11 @@ public class OrderController {
         return ApiResponse.success(findOrder, "주문이 성공적으로 조회되었습니다.");
     }
 
-    // 마스터와 허브매니저만 호출할 수 있는 수정 메서드
+    // 마스터와 담당 허브매니저만 호출할 수 있는 수정 메서드
     // *** 수정할 수 있는 사항은 상품수량과 요청사항으로 한정한다.
     @Operation(summary = "주문 수정")
     @PatchMapping("/{orderId}")
+    @PreAuthorize("hasAnyRole('MASTER', 'HUB_MANAGER')")
     public ApiResponse<OrderInfoUpdateResponseDto> orderInfoUpdate(@PathVariable UUID orderId,
                                           @RequestBody OrderInfoUpdateRequestDto dto,
                                                                    @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
