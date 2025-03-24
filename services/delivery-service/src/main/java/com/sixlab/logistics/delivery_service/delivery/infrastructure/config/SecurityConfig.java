@@ -40,6 +40,21 @@ public class SecurityConfig {
                 // CSRF 보호를 비활성화합니다. CSRF 보호는 주로 브라우저 클라이언트를 대상으로 하는 공격을 방지하기 위해 사용됩니다.
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/docs", // 추가
+                                "/api-docs-delivery-service",
+                                "/api-docs-delivery-service/**", // 추가
+                                "/delivery/v3/api-docs", // 변경
+                                "/delivery/v3/api-docs/**", // 변경
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/swagger-resources/**",
+                                "/swagger-resources",
+                                "/swagger-resources/configuration/ui",
+                                "/swagger-resources/configuration/security",
+                                "/webjars/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 // 세션 관리 정책을 정의합니다. 여기서는 세션을 사용하지 않도록 STATELESS로 설정합니다. 지금은 jwt 사용할 것이기 때문.
