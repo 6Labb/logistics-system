@@ -38,9 +38,9 @@ dependencies {
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.15.0'
 
 	// zipkin
-	implementation 'io.micrometer:micrometer-tracing-bridge-brave'
-	implementation 'io.github.openfeign:feign-micrometer' // 추가
-	implementation 'io.zipkin.reporter2:zipkin-reporter-brave' // 추가
+//	implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+//	implementation 'io.github.openfeign:feign-micrometer' // 추가
+//	implementation 'io.zipkin.reporter2:zipkin-reporter-brave' // 추가
 
 	// redis
 	implementation 'org.springframework.session:spring-session-data-redis'

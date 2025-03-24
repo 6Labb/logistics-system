@@ -3,6 +3,7 @@ package com.sixlab.logistics.company_service.application.service;
 import com.sixlab.logistics.common.shared.exception.DuplicateResourceException;
 import com.sixlab.logistics.common.shared.exception.ResourceNotFoundException;
 import com.sixlab.logistics.company_service.application.client.HubClient;
+import com.sixlab.logistics.company_service.application.dto.ExternalCompanyResponse;
 import com.sixlab.logistics.company_service.application.dto.HubResponse;
 import com.sixlab.logistics.company_service.application.dto.HubRouteResponse;
 import com.sixlab.logistics.company_service.domain.model.Company;
@@ -32,11 +33,12 @@ public class CompanyServiceImpl implements CompanyService {
     @Transactional
     @Override
     public CompanyResponseDto createCompany(CompanyRequestDto requestDto) {
+
         // hubId가 실제 Hub 서비스에 존재하는지 검증
-//        ExternalCompanyResponse hubResponse = hubClient.getHubById(requestDto.getHubId());
-//        if (hubResponse == null) {
-//            throw new ResourceNotFoundException("해당 hubId가 존재하지 않습니다.");
-//        }
+        HubResponse hubResponse = hubClient.getHubById(requestDto.getHubId());
+        if (hubResponse == null) {
+            throw new ResourceNotFoundException("해당 hubId가 존재하지 않습니다.");
+        }
 
         // 중복 검사
         if (companyRepository.existsByName(requestDto.getName())) {
