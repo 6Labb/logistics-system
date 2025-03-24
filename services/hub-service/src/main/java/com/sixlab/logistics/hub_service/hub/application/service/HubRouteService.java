@@ -75,7 +75,7 @@ public class HubRouteService {
         return HubRouteResponseDto.from(hubRoute);
     }
 
-    // 삭제 만드는 중
+    // 삭제 잘 됨
     @Transactional
     public void deleteHubRoute(UUID id, Long userId) {
         HubRoute hubRoute = hubRouteRepository.findById(id)
