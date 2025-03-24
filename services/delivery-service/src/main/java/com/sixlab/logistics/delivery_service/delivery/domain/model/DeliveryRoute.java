@@ -1,4 +1,4 @@
-package com.sixlab.logistics.delivery_service.delivery.domain.entity;
+package com.sixlab.logistics.delivery_service.delivery.domain.model;
 
 import com.sixlab.logistics.common.shared.domain.BasicEntity;
 import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliveryRouteRequestDto;

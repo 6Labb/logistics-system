@@ -1,11 +1,8 @@
 package com.sixlab.logistics.delivery_service.delivery.infrastructure.repository;
 
-import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliveryResponseDto;
 import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliveryRouteResponseDto;
 import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliveryRouteSearchDto;
-import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliverySearchDto;
-import com.sixlab.logistics.delivery_service.delivery.domain.entity.Delivery;
-import com.sixlab.logistics.delivery_service.delivery.domain.entity.DeliveryRoute;
+import com.sixlab.logistics.delivery_service.delivery.domain.model.DeliveryRoute;
 import com.sixlab.logistics.delivery_service.delivery.domain.repository.DeliveryRouteRepository;
 import com.sixlab.logistics.delivery_service.delivery.infrastructure.jpa.DeliveryRouteJpaRepository;
 import lombok.RequiredArgsConstructor;
