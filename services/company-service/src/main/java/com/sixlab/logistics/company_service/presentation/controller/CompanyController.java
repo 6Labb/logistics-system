@@ -98,11 +98,11 @@ public class CompanyController {
     }
 
     @GetMapping("/hub-route")
-    public HubRouteResponse getHubRoute(
+    public ApiResponse<HubRouteResponse> getHubRoute(
             @RequestParam UUID supplierId,
             @RequestParam UUID receiverId) {
-        return companyService.getHubRoute(supplierId, receiverId);
+        HubRouteResponse hubRouteResponse = companyService.getHubRoute(supplierId, receiverId);
+        return ApiResponse.success(hubRouteResponse, "허브 경로 조회 성공");
     }
-
 
 }
