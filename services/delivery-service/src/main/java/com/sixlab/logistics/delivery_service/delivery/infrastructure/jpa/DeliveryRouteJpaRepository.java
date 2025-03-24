@@ -1,6 +1,7 @@
 package com.sixlab.logistics.delivery_service.delivery.infrastructure.jpa;
 
-import com.sixlab.logistics.delivery_service.delivery.domain.model.DeliveryRoute;
+import com.sixlab.logistics.delivery_service.delivery.domain.entity.Delivery;
+import com.sixlab.logistics.delivery_service.delivery.domain.entity.DeliveryRoute;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

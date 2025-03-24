@@ -1,11 +1,16 @@
 package com.sixlab.logistics.delivery_service.deliveryAgent.domain.repository;
 
+import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliveryResponseDto;
+import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliverySearchDto;
+import com.sixlab.logistics.delivery_service.delivery.domain.entity.Delivery;
 import com.sixlab.logistics.delivery_service.deliveryAgent.application.dto.DeliveryAgentResponseDto;
 import com.sixlab.logistics.delivery_service.deliveryAgent.application.dto.DeliveryAgentSearchDto;
 import com.sixlab.logistics.delivery_service.deliveryAgent.domain.entity.DeliveryAgent;
 import com.sixlab.logistics.delivery_service.deliveryAgent.domain.entity.DeliveryAgentType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;

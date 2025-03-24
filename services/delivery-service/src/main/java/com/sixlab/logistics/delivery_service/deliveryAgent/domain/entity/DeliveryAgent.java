@@ -1,6 +1,8 @@
 package com.sixlab.logistics.delivery_service.deliveryAgent.domain.entity;
 
 import com.sixlab.logistics.common.shared.domain.BasicEntity;
+import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliveryRequestDto;
+import com.sixlab.logistics.delivery_service.delivery.domain.entity.DeliveryStatus;
 import com.sixlab.logistics.delivery_service.deliveryAgent.application.dto.DeliveryAgentRequestDto;
 import com.sixlab.logistics.delivery_service.deliveryAgent.application.dto.DeliveryAgentResponseDto;
 import jakarta.persistence.*;

@@ -1,7 +1,7 @@
 package com.sixlab.logistics.delivery_service.delivery.application.dto;
 
-import com.sixlab.logistics.delivery_service.delivery.domain.model.Delivery;
-import com.sixlab.logistics.delivery_service.delivery.domain.model.DeliveryStatus;
+import com.sixlab.logistics.delivery_service.delivery.domain.entity.Delivery;
+import com.sixlab.logistics.delivery_service.delivery.domain.entity.DeliveryStatus;
 import lombok.*;
 
 import java.util.UUID;
