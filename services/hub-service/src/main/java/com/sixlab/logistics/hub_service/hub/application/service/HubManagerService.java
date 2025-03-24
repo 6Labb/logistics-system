@@ -27,17 +27,6 @@ public class HubManagerService {
 
     private final UserClient userClient;
 
-//    @Transactional
-//    public HubManagerCreateResponseDto createManager(HubManagerCreateRequestDto request) {
-//
-//        HubManager hubManager = HubManager.create(request.getUserId(), request.getHubId());
-//        hubManagerRepository.save(hubManager);
-//
-//        return HubManagerCreateResponseDto.builder()
-//                .id(hubManager.getId())
-//                .build();
-//    }
-
     @Transactional
     public HubManagerCreateResponseDto createManager(HubManagerCreateRequestDto request) {
 
@@ -62,10 +51,10 @@ public class HubManagerService {
         //UserResponseDto userResponse = userClient.getUser(request.getUserId(), "Bearer " + token);
         UserResponseDto userResponse = userClient.getUser(request.getUserId());
 
-        System.out.println("✅ FeignClient 응답 수신: " + userResponse);
+        System.out.println("FeignClient 응답 수신: " + userResponse);
 
         if (userResponse == null) {
-            throw new IllegalArgumentException("🚨 유효하지 않은 사용자 ID입니다: " + request.getUserId());
+            throw new IllegalArgumentException("유효하지 않은 사용자 ID입니다: " + request.getUserId());
         }
 
         // HubManager 생성
@@ -112,19 +101,5 @@ public class HubManagerService {
 
         hubManager.delete(3L); // BasicEntity의 softDelete() 호출
     }
-
-    @Transactional(readOnly = true)
-    public Page<HubManagerResponseDto> search(HubManagerSearchCondition condition, Pageable pageable) {
-        Specification<HubManager> spec = Specification
-                .where(HubManagerSpecification.userIdEq(condition.getUserId()))
-                .and(HubManagerSpecification.hubIdEq(condition.getHubId()));
-
-        return hubManagerRepository.findAll(spec, pageable)
-                .map(HubManagerResponseDto::of); // 엔티티 → DTO 변환
-    }
-
-
-
-
 
 }

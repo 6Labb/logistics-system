@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -44,6 +45,7 @@ public class HubManagerController {
         return ApiResponse.success(response, "HubManager retrieved");
     }
 
+    @PreAuthorize("hasRole('MASTER')")
     @PutMapping("/{managerId}")
     public ApiResponse<HubManagerResponseDto> updateHubManager(
             @PathVariable UUID managerId,
@@ -53,26 +55,14 @@ public class HubManagerController {
         return ApiResponse.success(response, "HubManager updated");
     }
 
+    @PreAuthorize("hasRole('MASTER')")
     @DeleteMapping("/{managerId}")
-    public ApiResponse<Void> softDeleteHubManager(@PathVariable UUID managerId) {
+    public ApiResponse<Void> deleteHubManager(@PathVariable UUID managerId) {
         hubManagerService.deleteManager(managerId);
         return ApiResponse.success(null, "HubManager soft deleted");
     }
 
-    @GetMapping("/search")
-    public ApiResponse<Page<HubManagerResponseDto>> searchHubManagers(
-            @ModelAttribute HubManagerSearchCondition condition,
-            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
-    ) {
-        // 사이즈 제한 필터링
-        int size = pageable.getPageSize();
-        if (size != 10 && size != 30 && size != 50) {
-            pageable = PageRequest.of(pageable.getPageNumber(), 10, pageable.getSort());
-        }
 
-        Page<HubManagerResponseDto> result = hubManagerService.search(condition, pageable);
-        return ApiResponse.success(result, "HubManager searched");
-    }
 
 
 
