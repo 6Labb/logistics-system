@@ -50,6 +50,7 @@ public class Order extends BasicEntity {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
+    @Setter
     private Status status; // 주문 상태
 
     @Column(name = "user_id")

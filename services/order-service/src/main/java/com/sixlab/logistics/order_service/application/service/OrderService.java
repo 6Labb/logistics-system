@@ -19,6 +19,7 @@ import com.sixlab.logistics.order_service.application.dto.request.OrderInfoUpdat
 import com.sixlab.logistics.order_service.application.dto.request.RequestDeliveryRegisterDto;
 import com.sixlab.logistics.order_service.application.dto.response.*;
 import com.sixlab.logistics.order_service.domain.model.Order;
+import com.sixlab.logistics.order_service.domain.model.Status;
 import com.sixlab.logistics.order_service.infrastructure.persistence.OrderJpaRepository;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
@@ -303,13 +304,14 @@ public class OrderService {
     // orderId 에 기반하여 주문정보 확인하는 메서드 -> 주문정보 존재한다면 Order 객체를 반환
     private Order findByIdOneOrderInfo(UUID orderId, UserDetailsImpl userDetails) {
         UserInfo userInfo = userDetails.getUserInfo();
-        String authority = userInfo.getRole().getAuthority();
+        // String authority = userInfo.getRole().getAuthority();
         Role role = userInfo.getRole();
         Long userId = userInfo.getUserId();
 
-        // findByIdOneOrderInfo() 메서드 호출 - userId: 1, Role: MASTER, authority: ROLE_MASTER
-        log.info("findByIdOneOrderInfo() 메서드 호출 - userId: {}, Role: {}, authority: {}",
-                userId, role, authority);
+        // findByIdOneOrderInfo() 메서드 호출 - userId: 1, Role: MASTER,
+        //  - authority: ROLE_MASTER
+        log.info("findByIdOneOrderInfo() 메서드 호출 - userId: {}, Role: {}",
+                userId, role);
         
         // 1. 주문 정보 여부를 확인
         Order order = orderJpaRepository.findById(orderId).orElseThrow(() -> {
@@ -371,7 +373,17 @@ public class OrderService {
     @Transactional
     public OrderDeleteResponseDto deleteOrder(UUID orderId, UserDetailsImpl userDetails) {
         // 1. 주문정보 확인(주문 id)
-        Order order = findByIdOneOrderInfo(orderId, userDetails);
+        // 기존: Order order = findByIdOneOrderInfo(orderId, userDetails);
+        UserInfo userInfo = userDetails.getUserInfo();
+        Long userId = userInfo.getUserId();
+
+        // 1. 주문 정보 여부를 확인
+        Order order = orderJpaRepository.findById(orderId).orElseThrow(() -> {
+            log.info("주문정보가 없음");
+            // throw 를 return 으로 변경
+            return new ResourceNotFoundException("주문 정보를 찾을 수 없습니다.");
+        });
+
 
         // 2. 권한 확인
         // 허브관리자라면 담당 허브 관리자인지 확인
@@ -379,6 +391,32 @@ public class OrderService {
         // 1) product 서비스 호출: productId 를 기반으로 product 객체를 얻고,
         // 2) hub 서비스 호출: product 객체에서 얻은 hubId 를 기반으로 hub 객체를 얻고,
         // --> 그리고 비교해서 맞지 않다면 접근 권한이 없다고 리턴한다.
+        ResponseEntity<ApiResponseDto<GetProductResponseDto>> productResponse = productClient.getProductById(order.getProductId());
+
+        ApiResponseDto<GetProductResponseDto> apiResponseDto = checkFeignClientResponse(productResponse);
+
+        GetProductResponseDto productInfo = apiResponseDto.getData();
+        // hubId
+        UUID hubId = productInfo.getHubId();
+
+        // hubId 를 통해 hub 객체를 얻고, hub 객체에서 userId 꺼내 비교하기
+        // (현재 유저가 허브 담당자인지 확인하기)
+
+        ResponseEntity<ApiResponse<HubResponseDto>> hubById = hubClient.getHubById(hubId);
+
+        // checkFeignClientResponse() 메서드는 ApiResponseDto 타입을 받는다.
+        if(!hubById.getStatusCode().is2xxSuccessful() ||
+                hubById.getBody() == null || !hubById.getBody().getStatusCode().is2xxSuccessful()) {
+            throw new RuntimeException("FeignClient 호출 문제 발생 - http 상태 코드: "+ hubById.getStatusCode()); }
+
+        // 허브 객체에 저장되어 있는 허브 담당자의 userId
+        Long hubManagerUserId = hubById.getBody().getBody().getData().getHubManagerUserId();
+
+        if(!userId.equals(hubManagerUserId)) {
+            log.info("해당 허브의 담당자가 아님");
+            throw new UnauthorizedAccessException("주문 삭제에 접근할 권한이 없습니다. 허브 담당자가 아닙니다.");
+        }
+        // 여기까지 오면 허브 담당자 또는 마스터임.
 
         // 3. 상품 서비스에게 수량 만큼의 복원을 요청한다.
         ResponseEntity<ApiResponseDto<ProductStockResponseDto>> response =
@@ -395,16 +433,26 @@ public class OrderService {
 
             String errorMessage = "Error response from ProductService. HTTP Status: " + response.getStatusCode() + ", " +"API Response Status: " + response.getBody().getStatus();
 
-            throw new FeignException.FeignClientException(response.getStatusCode().value(),
-                    errorMessage, null, null, null);
+            throw new RuntimeException(errorMessage);
         }
 
         // 4. 배송 서비스에게 배송 id 삭제를 요청한다.
+        // return ApiResponse.success(HttpStatus.OK, null, "SUCCESS");
         // {"message": "SUCCESS", "data":null}
-        // deliveryClient.requestDeliveryDelete(order.getDeliveryId());
+        ResponseEntity<ApiResponse<Void>> deliveryResponse = deliveryClient.requestDeliveryDelete(order.getDeliveryId());
+
+        if(!deliveryResponse.getStatusCode().is2xxSuccessful()
+                || deliveryResponse.getBody() == null || !deliveryResponse.getBody().getStatusCode().is2xxSuccessful()) {
+            log.info("배송 id 삭제 요청 후 getStatusCode(): {}", deliveryResponse.getStatusCode());
+            log.info("getBody() - ApiResponse<Void> 타입: {}", deliveryResponse.getBody());
+            throw new RuntimeException("배송 서비스 호출에 오류 발생");
+        }
+
+        // 여기까지 오면 배송 서비스에 배송 id 삭제 요청 후 문제가 없었다는 거임
 
         // 5. 주문을 삭제한다(소프트 삭제)
-        order.delete(mockUserId);
+        order.delete(userId);
+        order.setStatus(Status.FAIL);
         return new OrderDeleteResponseDto(order);
     }
 
