@@ -33,7 +33,7 @@ public class OrderController {
     @Operation(summary = "주문 등록")
     @PostMapping
     // 모든 권한 접근 허용
-    // @PreAuthorize()
+    @PreAuthorize("hasAnyRole('MASTER', 'HUB_MANAGER', 'DELIVERY_AGENT', 'TRADE_PARTNER')")
     public ApiResponse<OrderCreateResponseDto> createOrder(
             @RequestBody @Valid OrderCreateRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {

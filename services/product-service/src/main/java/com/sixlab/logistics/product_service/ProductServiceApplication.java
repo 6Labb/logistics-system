@@ -2,7 +2,6 @@ package com.sixlab.logistics.product_service;
 
 import com.sixlab.logistics.common.infrastructure.config.JpaConfig;
 import com.sixlab.logistics.common.infrastructure.config.QueryDslConfig;
-import com.sixlab.logistics.common.infrastructure.config.SwaggerConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
@@ -14,7 +13,6 @@ import org.springframework.context.annotation.Import;
 @Import({
 		JpaConfig.class,
 		QueryDslConfig.class,
-		SwaggerConfig.class
 })
 public class ProductServiceApplication {
 
