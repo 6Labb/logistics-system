@@ -1,4 +1,4 @@
-package com.sixlab.logistics.delivery_service.delivery.domain.entity;
+package com.sixlab.logistics.delivery_service.delivery.domain.model;
 
 public enum DeliveryStatus {
     WAITING, // 배송대기

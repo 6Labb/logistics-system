@@ -1,7 +1,5 @@
 package com.sixlab.logistics.delivery_service.deliveryAgent.application.dto;
 
-import com.sixlab.logistics.delivery_service.delivery.domain.entity.Delivery;
-import com.sixlab.logistics.delivery_service.delivery.domain.entity.DeliveryStatus;
 import com.sixlab.logistics.delivery_service.deliveryAgent.domain.entity.DeliveryAgent;
 import com.sixlab.logistics.delivery_service.deliveryAgent.domain.entity.DeliveryAgentType;
 import lombok.AllArgsConstructor;

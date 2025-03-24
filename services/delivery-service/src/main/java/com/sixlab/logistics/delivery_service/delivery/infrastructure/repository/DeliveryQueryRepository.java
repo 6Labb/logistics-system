@@ -5,7 +5,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliveryResponseDto;
 import com.sixlab.logistics.delivery_service.delivery.application.dto.DeliverySearchDto;
-import com.sixlab.logistics.delivery_service.delivery.domain.entity.QDelivery;
+import com.sixlab.logistics.delivery_service.delivery.domain.model.QDelivery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

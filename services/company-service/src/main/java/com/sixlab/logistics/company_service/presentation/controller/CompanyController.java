@@ -97,6 +97,7 @@ public class CompanyController {
         return ApiResponse.success(result, "업체 검색 성공");
     }
 
+    @PreAuthorize("hasAnyRole('MASTER','TRADE_PARTNER','HUB_MANAGER')")
     @GetMapping("/hub-route")
     public ApiResponse<HubRouteResponse> getHubRoute(
             @RequestParam UUID supplierId,

@@ -1,11 +1,7 @@
 package com.sixlab.logistics.delivery_service.deliveryAgent.infrastructure.jpa;
 
-import com.sixlab.logistics.delivery_service.delivery.domain.entity.Delivery;
-import com.sixlab.logistics.delivery_service.deliveryAgent.application.dto.DeliveryAgentSearchDto;
 import com.sixlab.logistics.delivery_service.deliveryAgent.domain.entity.DeliveryAgent;
 import com.sixlab.logistics.delivery_service.deliveryAgent.domain.entity.DeliveryAgentType;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

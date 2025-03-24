@@ -27,16 +27,16 @@ services:
     networks:
       - logistics-network
 
-  zipkin:
-    image: openzipkin/zipkin:latest
-    container_name: zipkin
-    restart: unless-stopped
-    ports:
-      - "9411:9411"
-    networks:
-      - logistics-network
-    environment:
-      - JAVA_OPTS=-XX:UseSVE=0
+#  zipkin:
+#    image: openzipkin/zipkin:latest
+#    container_name: zipkin
+#    restart: unless-stopped
+#    ports:
+#      - "9411:9411"
+#    networks:
+#      - logistics-network
+#    environment:
+#      - JAVA_OPTS=-XX:UseSVE=0
 
 networks:
   logistics-network:

@@ -1,6 +1,6 @@
 package com.sixlab.logistics.delivery_service.delivery.application.dto;
 
-import com.sixlab.logistics.delivery_service.delivery.domain.entity.DeliveryRouteStatus;
+import com.sixlab.logistics.delivery_service.delivery.domain.model.DeliveryRouteStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
