@@ -79,23 +79,4 @@ public class AuthSecurityConfig {
         return SecurityContextHolder.getContextHolderStrategy();
     }
 
-//    @Bean
-//    public WebSecurityCustomizer webSecurityCustomizer() {
-//        return web -> web.ignoring().requestMatchers(
-//                "/auth/v3/api-docs",
-//                "/auth/v3/api-docs/**",
-//                "/users/v3/api-docs",
-//                "/users/v3/api-docs/**",
-//                "/v3/api-docs/**",
-//                "/swagger-ui.html",
-//                "/swagger-ui/**",
-//                "/swagger-resources/**",
-//                "/swagger-resources",
-//                "/swagger-resources/configuration/ui",
-//                "/swagger-resources/configuration/security",
-//                "/webjars/**"
-//        );
-//    }
-
-
 }

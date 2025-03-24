@@ -44,12 +44,10 @@ public class User extends BasicEntity {
         return new User(username, password, slackId, role);
     }
 
-    // 엔티티클래스에서 업데이트 메서드 작성하는게 맞을까?
-    public void updatedUser(String username, String password, String slackId, String email) {
-        this.username = StringUtils.hasText(username) ? username : this.username;
-        this.password = StringUtils.hasText(password) ? password : this.password;
-        this.slackId = StringUtils.hasText(slackId) ? slackId : this.slackId;
+    public void update(String username, String password, String slackId, Role role) {
+        this.username = username;
+        this.password = password;
+        this.slackId = slackId;
+        this.role = role;
     }
-
-
 }

@@ -1,16 +1,14 @@
 package com.sixlab.logistics.user_service.auth.infrastructure.config;
 
+import com.sixlab.logistics.user_service.user.application.dto.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -57,23 +55,24 @@ public class JwtTokenProvider {
                 .parseSignedClaims(token)
                 .getPayload();
 
-        Long userId = Long.parseLong(claims.get("userId", String.class));
-        String role = claims.get("role", String.class);
+        try {
 
-        if (userId == null || role == null) {
-            System.out.println("getAuthentication 실패 - userId 또는 role이 null임!");
-            throw new RuntimeException("Invalid JWT: userId 또는 role이 없음");
+            Long userId = Long.parseLong(claims.get("userId", String.class));
+            String roleStr = claims.get("role", String.class);
+            Role role = Role.valueOf(roleStr);
+
+            UserInfo userInfo = new UserInfo("UNUSED", "UNUSED", userId ,role);
+            UserDetails userDetails = new UserDetailsImpl(userInfo);
+            System.out.println("✅ getAuthentication - userId: " + userId + ", role: " + role);
+
+            return new UsernamePasswordAuthenticationToken(userDetails, token, userDetails.getAuthorities());
+
+        } catch (Exception e) {
+
+            System.out.println("JWT 파싱 실패: " + e.getMessage());
+            throw new RuntimeException("Invalid JWT: userId 또는 role 파싱 실패", e);
+
         }
-
-        UserInfo userInfo = new UserInfo("UNUSED", "UNUSED", userId ,role);
-        UserDetails userDetails = new UserDetailsImpl(userInfo);
-
-        if (!role.startsWith("ROLE_")) { role = "ROLE_" + role; }
-        System.out.println("getAuthentication - userId: " + userId + ", role: " + role);
-
-        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(role);
-
-        return new UsernamePasswordAuthenticationToken(userDetails, token, authorities);
     }
 
 }

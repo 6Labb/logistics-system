@@ -60,7 +60,7 @@ public class HubManagerService {
 
         // FeignClient 호출 (JWT 자동 포함됨)
         //UserResponseDto userResponse = userClient.getUser(request.getUserId(), "Bearer " + token);
-        UserResponseDto userResponse = userClient.getUser(request.getUserId(), currentUserId, currentUserRole);
+        UserResponseDto userResponse = userClient.getUser(request.getUserId());
 
         System.out.println("✅ FeignClient 응답 수신: " + userResponse);
 
