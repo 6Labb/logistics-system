@@ -8,27 +8,27 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
-public class SwaggerConfig {
-
-    @Bean
-    public OpenAPI openAPI() {
-        Info info = new Info()
-                .title("6Lab API")
-                .version("1.0")
-                .description("6Lab API Docs");
-
-        SecurityScheme securityScheme = new SecurityScheme()
-                .type(SecurityScheme.Type.HTTP)
-                .scheme("bearer")
-                .bearerFormat("JWT")
-                .in(SecurityScheme.In.HEADER)
-                .name("Authorization");
-        SecurityRequirement securityRequirement = new SecurityRequirement().addList("bearerAuth");
-
-        return new OpenAPI()
-                .components(new Components().addSecuritySchemes("bearerAuth", securityScheme))
-                .addSecurityItem(securityRequirement)
-                .info(info);
-    }
-}
+//@Configuration
+//public class SwaggerConfig {
+//
+//    @Bean
+//    public OpenAPI openAPI() {
+//        Info info = new Info()
+//                .title("6Lab API")
+//                .version("1.0")
+//                .description("6Lab API Docs");
+//
+//        SecurityScheme securityScheme = new SecurityScheme()
+//                .type(SecurityScheme.Type.HTTP)
+//                .scheme("bearer")
+//                .bearerFormat("JWT")
+//                .in(SecurityScheme.In.HEADER)
+//                .name("Authorization");
+//        SecurityRequirement securityRequirement = new SecurityRequirement().addList("bearerAuth");
+//
+//        return new OpenAPI()
+//                .components(new Components().addSecuritySchemes("bearerAuth", securityScheme))
+//                .addSecurityItem(securityRequirement)
+//                .info(info);
+//    }
+//}

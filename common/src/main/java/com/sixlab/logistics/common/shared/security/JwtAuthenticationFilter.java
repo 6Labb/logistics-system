@@ -36,7 +36,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String requestURI = request.getRequestURI();
 
         // 로그인 & 회원가입 요청은 JWT 필터 적용 제외!
-        if (requestURI.equals("/auth/signIn") || requestURI.equals("/users/signUp")) {
+        if (requestURI.equals("/auth/signIn") || requestURI.equals("/users/signUp")
+                || requestURI.startsWith("/api-docs-user-service")
+                || requestURI.startsWith("/api-docs-hub-service")
+                || requestURI.startsWith("/api-docs-company-service")
+                || requestURI.startsWith("/api-docs-product-service")
+                || requestURI.startsWith("/api-docs-order-service")
+                || requestURI.startsWith("/api-docs-delivery-service")
+                || requestURI.startsWith("/api-docs-slack-ai-service")
+                || requestURI.startsWith("/swagger-ui")
+                || requestURI.startsWith("/v3/api-docs")
+                || requestURI.startsWith("/api-docs")
+                || requestURI.contains("swagger")
+                || requestURI.contains("api-docs")
+        ) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -57,7 +70,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            //SecurityContextHolder.getContext().setAuthentication(auth);
             System.out.println("✅ SecurityContext 저장된 사용자: " + auth.getName());
             System.out.println("✅ SecurityContext 저장된 권한: " + auth.getAuthorities());
         } else {
