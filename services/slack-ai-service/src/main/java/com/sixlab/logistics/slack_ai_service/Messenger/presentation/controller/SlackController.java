@@ -38,7 +38,7 @@ public class SlackController {
         return ResponseEntity.ok(slackHistory);
     }
 
-    @DeleteMapping("")
+    @DeleteMapping("/delete")
     public void deleteSlackMessage(@RequestParam("id") UUID id) {
         slackService.deletedMessage(id);
     }
