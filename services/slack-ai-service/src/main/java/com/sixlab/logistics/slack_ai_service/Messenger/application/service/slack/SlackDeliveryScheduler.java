@@ -24,13 +24,13 @@ public class SlackDeliveryScheduler {
         boolean isLocked = false;
         try {
             isLocked = lock.tryLock(5, 10, TimeUnit.SECONDS); //5초동안 락 r
+            slackDeliveryService.sendScheduledMessages();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
             if (isLocked && lock.isHeldByCurrentThread()) {
                 lock.unlock();
             }
-            slackDeliveryService.sendScheduledMessages();
         }
     /*
         redis RockUp

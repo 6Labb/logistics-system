@@ -7,7 +7,7 @@ import java.util.UUID;
 @Getter
 @Builder
 public class DeliveryClientResponseDto {
-    private String hudDeliveryAgentId;
+    private String hubDeliveryAgentId;
     private String slackId;
     private UUID fromHubId;
     private UUID toHubId;

@@ -1,9 +1,9 @@
 package com.sixlab.logistics.slack_ai_service.Messenger.presentation.controller;
+
 import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.slack.ResponseMessageListDto;
 import com.sixlab.logistics.slack_ai_service.Messenger.application.service.slack.SlackService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -19,16 +19,6 @@ import java.util.UUID;
 public class SlackController {
     private final SlackService slackService;
 
-    @Value("${server.port}")
-    private String serverPort;
-
-    @Value("${message}")
-    private String message;
-
-    @GetMapping("/port")
-    public String getSlack() {
-        return "info!!! From port : " + serverPort + "and message : " + message;
-    }
 
     @GetMapping("/getId")
     public ResponseEntity<String> getSlackIdByEmail(@RequestParam("email") String email) {

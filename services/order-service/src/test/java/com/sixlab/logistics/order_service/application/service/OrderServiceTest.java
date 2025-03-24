@@ -5,7 +5,7 @@
 //import com.sixlab.logistics.order_service.application.dto.response.OrderDeleteResponseDto;
 //import com.sixlab.logistics.order_service.application.dto.response.OrderFindOneResponseDto;
 //import com.sixlab.logistics.order_service.application.dto.response.OrderInfoUpdateResponseDto;
-//import com.sixlab.logistics.order_service.config.OrderApplicationQueueConfig;
+//import com.sixlab.logistics.order_service.infrastructure.config.OrderApplicationQueueConfig;
 //import org.assertj.core.api.Assertions;
 //import org.junit.jupiter.api.DisplayName;
 //import org.junit.jupiter.api.Test;

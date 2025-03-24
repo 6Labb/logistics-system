@@ -1,4 +1,4 @@
-package com.sixlab.logistics.order_service.config;
+package com.sixlab.logistics.order_service.infrastructure.config;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;

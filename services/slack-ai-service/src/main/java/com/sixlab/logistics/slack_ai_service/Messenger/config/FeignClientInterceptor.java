@@ -32,7 +32,6 @@ public class FeignClientInterceptor implements RequestInterceptor {
                 requestTemplate.header("Authorization", "Bearer " + token);
                 requestTemplate.header("X-Hub-User", userId);
                 requestTemplate.header("X-Hub-Role", role);
-                System.out.println("🚀 일반 FeignClientInterceptor 적용됨: " + clientName);
             }
         }
     }

@@ -1,12 +1,16 @@
 package com.sixlab.logistics.slack_ai_service.Messenger.application.service.ai;
 
 import com.rabbitmq.client.Channel;
+import com.sixlab.logistics.common.shared.exception.InternalServerException;
+import com.sixlab.logistics.common.shared.exception.InvalidParameterException;
+import com.sixlab.logistics.common.shared.exception.OperationNotAllowedException;
+import com.sixlab.logistics.common.shared.exception.ResourceNotFoundException;
 import com.sixlab.logistics.common.shared.response.ApiResponse;
+import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.ai.*;
+import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.slack.SlackMessageInfoDto;
 import com.sixlab.logistics.slack_ai_service.Messenger.application.service.cache.CacheService;
 import com.sixlab.logistics.slack_ai_service.Messenger.application.service.slack.SlackService;
 import com.sixlab.logistics.slack_ai_service.Messenger.exception.GeminiRetryException;
-import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.ai.*;
-import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.slack.SlackMessageInfoDto;
 import com.sixlab.logistics.slack_ai_service.Messenger.infrastructure.feign.DeliveryClient;
 import com.sixlab.logistics.slack_ai_service.Messenger.infrastructure.feign.GeminiApiClient;
 import com.sixlab.logistics.slack_ai_service.Messenger.infrastructure.feign.HubClient;
@@ -51,15 +55,28 @@ public class AiService{
 
         //발송허브담당자 - 출발허브-목적허브 배송 담당자?? 허브관리자면 현재 누가 해당 주문의 배송담당자인지 알수있는방법이 없음 허브 배송담당자로 진행
         ApiResponse<DeliveryClientResponseDto> deliveryResponse = deliveryClient.getDelivery(queue.getDeliveryId());
+        if (!deliveryResponse.getStatusCode().is2xxSuccessful()) {
+            throw new ResourceNotFoundException("배송 정보 조회 실패: " + queue.getDeliveryId());
+        }
         DeliveryClientResponseDto deliveryData = extractData(deliveryResponse, Function.identity());
 
-        ApiResponse<UserClientResponseDto> userResponse = userClient.getUser2(deliveryData.getHudDeliveryAgentId());
+        ApiResponse<UserClientResponseDto> userResponse = userClient.getUser2(deliveryData.getHubDeliveryAgentId());
+        if (!userResponse.getStatusCode().is2xxSuccessful()) {
+            throw new ResourceNotFoundException("사용자 정보 조회 실패: " + deliveryData.getHubDeliveryAgentId());
+        }
         UserClientResponseDto userData = extractData(userResponse, Function.identity());
         String userName = userData.getUserName();
         String slackId= userData.getSlackId();
 
         String fromHubName = cacheService.getHubName(deliveryData.getFromHubId());
+        if (fromHubName == null) {
+            throw new ResourceNotFoundException("출발 허브 이름 조회 실패: " + deliveryData.getFromHubId());
+        }
+
         String toHubName = cacheService.getHubName(deliveryData.getToHubId());
+        if (toHubName == null) {
+            throw new ResourceNotFoundException("도착 허브 이름 조회 실패: " + deliveryData.getToHubId());
+        }
 
         try {
             log.info("메시지 수신: " + queue);
@@ -82,17 +99,19 @@ public class AiService{
 
             slackService.sendSlackMessage(slackId,sendSlackMessage);
 
-            channel.basicAck(tag, false); //큐 삭제
+            channel.basicAck(tag, false); // 성공 시 큐에서 메시지 삭제
+        } catch (ResourceNotFoundException e) {
+            log.error("리소스 조회 실패: {}", e.getMessage(), e);
+            nackMessage(channel, tag);
+        } catch (GeminiRetryException e) {
+            log.error("Gemini 호출 실패: {}", e.getMessage(), e);
+            nackMessage(channel, tag);
         } catch (IOException e) {
             log.error("메시지 처리 중 IO 오류 발생: {}", e.getMessage(), e);
-            try {
-                channel.basicNack(tag, false, true);
-            } catch (IOException nackEx) {
-                log.error("basicNack 실패: {}", nackEx.getMessage(), nackEx);
-
-            } catch (Exception ioException) {
-                log.error("예상치 못한 오류 발생: {}", e.getMessage(), e);
-            }
+            nackMessage(channel, tag);
+        } catch (Exception e) {
+            log.error("예상치 못한 오류 발생: {}", e.getMessage(), e);
+            throw new InternalServerException("주문 처리 중 서버 오류 발생");
         }
     }
 
@@ -102,19 +121,35 @@ public class AiService{
         AiCreateRequestDto request = buildCallAiRequest(prompt);
         try {
             AiCreateResponseDto response = aiClient.callAi(request);
-            return extractResultFromResponse(response);
+            String result = extractResultFromResponse(response);
+            if ("gemini 응답실패".equals(result)) {
+                throw new OperationNotAllowedException("Gemini AI 응답 파싱 실패");
+            }
+            return result;
         } catch (Exception e) {
             throw new GeminiRetryException("Gemini 호출 실패", e);
         }
     }
 
+    public String fallbackAiCall(String prompt, Throwable t) {
+        log.warn("Gemini 호출 실패: {}", t.getMessage());
+        return "AI 응답을 가져오지 못했습니다.";
+    }
+
     public String generateContent(String text) {
-        AiCreateResponseDto response = aiClient.callAi(buildCallAiRequest(text));
-        return extractResultFromResponse(response);
+        try {
+            AiCreateResponseDto response = aiClient.callAi(buildCallAiRequest(text));
+            return extractResultFromResponse(response);
+        } catch (Exception e) {
+            throw new InternalServerException("서버 오류 발생");
+        }
     }
 
     //요청 변환
     private AiCreateRequestDto buildCallAiRequest(String text) {
+        if (text == null || text.isEmpty()) {
+            throw new InvalidParameterException("AI 요청 프롬프트가 비어있습니다.");
+        }
         AiCreateRequestDto.Part part = new AiCreateRequestDto.Part(text);
         AiCreateRequestDto.Content content = new AiCreateRequestDto.Content(List.of(part));
         return new AiCreateRequestDto(List.of(content));
@@ -122,13 +157,14 @@ public class AiService{
 
     //응답 파싱
     private String extractResultFromResponse(AiCreateResponseDto response) {
-        if (response.candidates() != null && !response.candidates().isEmpty()) {
-            AiCreateResponseDto.Candidate candidate = response.candidates().get(0);
-            if (candidate.content() != null && candidate.content().parts() != null && !candidate.content().parts().isEmpty()) {
-                return candidate.content().parts().get(0).text();
-            }
+        if (response == null || response.candidates() == null || response.candidates().isEmpty()) {
+            return "gemini 응답실패";
         }
-        return "gemini 응답실패";
+        AiCreateResponseDto.Candidate candidate = response.candidates().get(0);
+        if (candidate.content() == null || candidate.content().parts() == null || candidate.content().parts().isEmpty()) {
+            return "gemini 응답실패";
+        }
+        return candidate.content().parts().get(0).text();
     }
 
     private String buildPromptText(OrderInfoRequestDto infoDto) {
@@ -159,6 +195,14 @@ public class AiService{
                 .deliveryManagerName(userName)
                 .deadline(aiDeadline)
                 .build();
+    }
+
+    private void nackMessage(Channel channel, long tag) {
+        try {
+            channel.basicNack(tag, false, true); // 실패 시 큐에 메시지 재배치
+        } catch (IOException e) {
+            log.error("basicNack 실패: {}", e.getMessage(), e);
+        }
     }
 
 }

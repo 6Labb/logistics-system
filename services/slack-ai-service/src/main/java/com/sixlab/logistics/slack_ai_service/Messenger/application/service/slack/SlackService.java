@@ -1,14 +1,14 @@
 package com.sixlab.logistics.slack_ai_service.Messenger.application.service.slack;
 
-import com.sixlab.logistics.slack_ai_service.Messenger.exception.SlackCircuitException;
-import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.slack.SlackSendRequestDto;
-import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.slack.SlackSendResponseDto;
-import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.slack.SlackUserResponseDto;
-import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.slack.ResponseMessageListDto;
-import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.slack.SlackMessageInfoDto;
+import com.sixlab.logistics.common.shared.exception.InternalServerException;
+import com.sixlab.logistics.common.shared.exception.InvalidParameterException;
+import com.sixlab.logistics.common.shared.exception.OperationNotAllowedException;
+import com.sixlab.logistics.common.shared.exception.ResourceNotFoundException;
+import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.slack.*;
 import com.sixlab.logistics.slack_ai_service.Messenger.domain.entity.MessageType;
 import com.sixlab.logistics.slack_ai_service.Messenger.domain.entity.Slack;
 import com.sixlab.logistics.slack_ai_service.Messenger.domain.repository.SlackRepository;
+import com.sixlab.logistics.slack_ai_service.Messenger.exception.SlackCircuitException;
 import com.sixlab.logistics.slack_ai_service.Messenger.infrastructure.feign.SlackApiClient;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
@@ -33,36 +33,56 @@ public class SlackService {
     private final SlackRepository slackRepository;
 
     public String getSlackIdByEmail(String email) {
-        SlackUserResponseDto response = SlackClient.getUserByEmail(email);
-        if (response.ok() && response.user() != null) {
-            return response.user().id();
+        try {
+            SlackUserResponseDto response = SlackClient.getUserByEmail(email);
+            if (response.ok() && response.user() != null) {
+                return response.user().id();
+            }
+            throw new SlackCircuitException("조회 실패: " + response.error());
+        } catch (Exception e) {
+            throw new ResourceNotFoundException("Slack 사용자 조회 실패: " + email, e);
         }
-        throw new SlackCircuitException(" 조회실패 : " + response.error());
     }
 
     @Retry(name = "slackRetry")
     @CircuitBreaker(name = "slackCircuitBreaker", fallbackMethod = "slackSendFallback")
     @Transactional
     public void sendSlackMessage(String email, SlackMessageInfoDto messageInfo) {
-        String prompt = sendPromptMessage(messageInfo);
-
-        String slackId = getSlackIdByEmail(email);
-        if (slackId == null || slackId.contains("user_not_found")) {
-            log.warn(" 유저 없음: {}", email);
-            saveSlackHistory(null, prompt, MessageType.FAILED);
-            return;
+        if (email == null || email.isEmpty()) {
+            throw new InvalidParameterException("이메일이 비어있습니다.");
+        }
+        if (messageInfo == null) {
+            throw new InvalidParameterException("Slack 메시지 정보가 null입니다.");
         }
 
-        SlackSendRequestDto requestDto = new SlackSendRequestDto(slackId, prompt);
+        try {
+            String prompt = sendPromptMessage(messageInfo);
 
-        SlackSendResponseDto response = SlackClient.sendMessage(requestDto);
+            String slackId = getSlackIdByEmail(email);
+            if (slackId == null || slackId.contains("user_not_found")) {
+                log.warn("유저 없음: {}", email);
+                saveSlackHistory(null, prompt, MessageType.FAILED);
+                return;
+            }
 
-        MessageType type = response.ok() ? MessageType.SENT : MessageType.FAILED;
-        if (!response.ok()) {
-            log.warn(" 슬랙 오류: {}", response.error());
+            SlackSendRequestDto requestDto = new SlackSendRequestDto(slackId, prompt);
+
+            SlackSendResponseDto response = SlackClient.sendMessage(requestDto);
+
+            MessageType type = response.ok() ? MessageType.SENT : MessageType.FAILED;
+            if (!response.ok()) {
+                log.warn("슬랙 오류: {}", response.error());
+                throw new OperationNotAllowedException("Slack 메시지 전송 실패: " + response.error());
+            }
+
+            saveSlackHistory(response.channel(), prompt, type);
+        } catch (SlackCircuitException e) {
+            log.error("Slack 회로 차단 오류: {}", e.getMessage(), e);
+            saveSlackHistory(null, sendPromptMessage(messageInfo), MessageType.FAILED);
+        } catch (Exception e) {
+            log.error("Slack 메시지 전송 중 오류 발생: {}", e.getMessage(), e);
+            throw new InternalServerException("Slack 메시지 전송 중 서버 오류 발생");
         }
-
-        saveSlackHistory(response.channel(), prompt, type);
     }
     public void slackSendFallback(String email, SlackMessageInfoDto messageInfo, Throwable t) {
         log.error(" 전송실패 k email: {}, error: {}", email, t.getMessage());
@@ -70,10 +90,18 @@ public class SlackService {
         String prompt = sendPromptMessage(messageInfo);
         saveSlackHistory(null, prompt, MessageType.FAILED);
     }
-    
+
     private void saveSlackHistory(String channel, String content, MessageType type) {
-        Slack slack = new Slack(channel, content, type);
-        slackRepository.save(slack);
+        if (content == null) {
+            throw new InvalidParameterException("저장할 메시지 내용이 null 입니다.");
+        }
+        try {
+            Slack slack = new Slack(channel, content, type);
+            slackRepository.save(slack);
+        } catch (Exception e) {
+            log.error("Slack 히스토리 저장 실패: {}", e.getMessage(), e);
+            throw new InternalServerException("Slack 저장 중 서버 오류 발생");
+        }
     }
 
 

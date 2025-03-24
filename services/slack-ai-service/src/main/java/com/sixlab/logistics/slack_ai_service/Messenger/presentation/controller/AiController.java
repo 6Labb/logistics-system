@@ -1,4 +1,6 @@
 package com.sixlab.logistics.slack_ai_service.Messenger.presentation.controller;
+
+import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.ai.OrderInfoMessageResponseDto;
 import com.sixlab.logistics.slack_ai_service.Messenger.application.service.ai.AiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,11 +26,12 @@ public class AiController {
         return "info!!! From port : " + serverPort + "and message : " + message;
     }
 
-    //ai 응답호출
-//    @PostMapping("/callAi")
-//    public void getSlack_AiResponse() {
-//        aiService.processOrderAndNotifySlack();
-//    }
+//    ai 응답호출
+    @PostMapping("/call-test")
+    public ResponseEntity<String> callAiTest(@RequestBody OrderInfoMessageResponseDto message) {
+    aiService.processOrderAndNotifySlack(message, null, 0L);
+    return ResponseEntity.ok("AI 처리 및 슬랙 전송 시도 완료");
+}
 
     @PostMapping("/question")
     public ResponseEntity<String> geminiGetAnswer(@RequestParam String question) {
