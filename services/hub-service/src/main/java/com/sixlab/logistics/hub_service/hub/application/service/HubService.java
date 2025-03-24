@@ -84,6 +84,7 @@ public class HubService {
     }
 
 
+    @Transactional(readOnly = true)
     public Page<HubResponseDto> searchHubs(String keyword, String sort, String order, int page, int size) {
         if (size != 10 && size != 30 && size != 50) {
             size = 10;

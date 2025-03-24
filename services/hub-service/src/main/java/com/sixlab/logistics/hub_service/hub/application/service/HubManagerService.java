@@ -69,6 +69,7 @@ public class HubManagerService {
     }
 
 
+    @Transactional(readOnly = true)
     public HubManagerResponseDto getManagerById(UUID id) {
         HubManager hubManager = hubManagerRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 매니저 ID 입니다."));
@@ -76,6 +77,7 @@ public class HubManagerService {
         return HubManagerResponseDto.of(hubManager);
     }
 
+    @Transactional(readOnly = true)
     public HubManagerResponseDto getManagerByUserId(Long id) {
         HubManager hubManager = hubManagerRepository.findByUserId(id)
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 매니저 ID 입니다."));

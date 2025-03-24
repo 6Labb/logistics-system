@@ -25,6 +25,7 @@ public class HubManagerController {
 
     private final HubManagerService hubManagerService;
 
+    @PreAuthorize("hasRole('MASTER')")
     @PostMapping
     public ApiResponse<HubManagerCreateResponseDto> createHubManager(@Valid @RequestBody HubManagerCreateRequestDto request) {
 
