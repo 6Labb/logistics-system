@@ -58,14 +58,11 @@ public class HubManagerService {
         }
 
         // HubManager 생성
-        HubManager hubManager = HubManager.create(request.getUserId(), request.getHubId());
+        HubManager hubManager = HubManager.create(request.getUserId(), request.getSlackId(), request.getHubId());
+
         hubManagerRepository.save(hubManager);
 
-        return HubManagerCreateResponseDto.builder()
-                .id(hubManager.getId())
-                .userId(hubManager.getUserId())
-                .hubId(hubManager.getHubId())
-                .build();
+        return HubManagerCreateResponseDto.of(hubManager);
     }
 
 

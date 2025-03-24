@@ -33,7 +33,7 @@ public class Hub extends BasicEntity {
 
     private Long hubManagerUserId;
 
-    @Builder
+
     private Hub(String hubName, String hubAddress, double latitude, double longitude, Long hubManagerUserId) {
         this.hubName = hubName;
         this.hubAddress = hubAddress;
@@ -42,14 +42,9 @@ public class Hub extends BasicEntity {
         this.hubManagerUserId = hubManagerUserId;
     }
 
+    @Builder
     public static Hub create(String hubName, String hubAddress, double latitude, double longitude, Long hubManagerUserId) {
-        return Hub.builder()
-                .hubName(hubName)
-                .hubAddress(hubAddress)
-                .latitude(latitude)
-                .longitude(longitude)
-                .hubManagerUserId(hubManagerUserId)
-                .build();
+        return new Hub(hubName, hubAddress, latitude, longitude, hubManagerUserId);
     }
 
     public void update(String hubName, String hubAddress, double latitude, double longitude, Long hubManagerUserId) {

@@ -12,19 +12,22 @@ import java.util.UUID;
 public class HubManagerCreateResponseDto {
     private UUID id;
     private Long userId;
+    private String slackId;
     private UUID hubId;
 
     @Builder
-    private HubManagerCreateResponseDto(UUID id, Long userId, UUID hubId) {
+    private HubManagerCreateResponseDto(UUID id, Long userId, String slackId, UUID hubId) {
         this.id = id;
         this.userId = userId;
+        this.slackId = slackId;
         this.hubId = hubId;
     }
 
-    public HubManagerCreateResponseDto of(HubManager hubManager) {
+    public static HubManagerCreateResponseDto of(HubManager hubManager) {
         return HubManagerCreateResponseDto.builder()
                 .id(hubManager.getId())
                 .userId(hubManager.getUserId())
+                .slackId(hubManager.getSlackId())
                 .hubId(hubManager.getHubId())
                 .build();
     }

@@ -32,7 +32,6 @@ public class User extends BasicEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Builder
     private User(String username, String password, String slackId, Role role) {
         this.username = username;
         this.password = password;

@@ -9,6 +9,7 @@ import com.sixlab.logistics.hub_service.hub.domain.model.HubManager;
 import com.sixlab.logistics.hub_service.hub.domain.repository.HubManagerRepository;
 import com.sixlab.logistics.hub_service.hub.domain.repository.HubRepository;
 import com.sixlab.logistics.hub_service.hub.domain.repository.query.HubQueryRepository;
+import org.springframework.cache.annotation.Cacheable;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -40,10 +41,11 @@ public class HubService {
         return HubMapper.toDto(savedHub);
     }
 
+
     @Transactional(readOnly = true)
     public HubResponseDto getHubById(UUID id) {
         Hub hub = hubRepository.findById(id)
-                .filter(h -> h.getDeletedAt() == null) // 삭제된 데이터 제외
+                .filter(h -> h.getDeletedAt() == null)
                 .orElseThrow(() -> new EntityNotFoundException("허브를 찾을 수 없습니다."));
         return HubResponseDto.of(hub);
     }
@@ -51,7 +53,7 @@ public class HubService {
     @Transactional
     public HubResponseDto updateHub(UUID id, HubUpdateRequestDto requestDto) {
         Hub hub = hubRepository.findById(id)
-                .filter(h -> h.getDeletedAt() == null) // 삭제된 데이터 제외
+                .filter(h -> h.getDeletedAt() == null)
                 .orElseThrow(() -> new EntityNotFoundException("허브를 찾을 수 없습니다."));
 
         // 허브 정보 업데이트

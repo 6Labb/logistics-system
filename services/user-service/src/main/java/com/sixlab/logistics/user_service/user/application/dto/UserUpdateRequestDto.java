@@ -23,5 +23,14 @@ public class UserUpdateRequestDto {
         this.adminToken = adminToken;
     }
 
+    public static UserUpdateRequestDto of(User user) {
+        return UserUpdateRequestDto.builder()
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .slackId(user.getSlackId())
+                .role(user.getRole())
+                .build();
+    }
+
 
 }

@@ -6,7 +6,10 @@ import com.sixlab.logistics.hub_service.hub.application.dto.hub.HubCreateRequest
 import com.sixlab.logistics.hub_service.hub.application.dto.hub.HubCreateResponseDto;
 import com.sixlab.logistics.hub_service.hub.application.dto.hub.HubResponseDto;
 import com.sixlab.logistics.hub_service.hub.application.dto.hub.HubUpdateRequestDto;
+import com.sixlab.logistics.hub_service.hub.application.dto.hubmanager.HubManagerCreateRequestDto;
+import com.sixlab.logistics.hub_service.hub.application.dto.hubmanager.HubManagerCreateResponseDto;
 import com.sixlab.logistics.hub_service.hub.application.dto.hubmanager.HubManagerResponseDto;
+import com.sixlab.logistics.hub_service.hub.application.service.HubManagerService;
 import com.sixlab.logistics.hub_service.hub.application.service.HubService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +31,7 @@ import java.util.UUID;
 public class HubController {
 
     private final HubService hubService;
+    private final HubManagerService hubManagerService;
 
     @PreAuthorize("hasRole('MASTER')")
     @PostMapping
@@ -40,13 +44,6 @@ public class HubController {
     public ApiResponse<HubResponseDto> getHub(@PathVariable UUID id) {
         HubResponseDto response = hubService.getHubById(id);
         return ApiResponse.success(response, "허브를 조회하였습니다.");
-
-    }
-
-    @GetMapping("/managers/{userId}")
-    public ApiResponse<HubManagerResponseDto> getHubManagerByUserId(@PathVariable Long userId) {
-        HubManagerResponseDto response = hubService.getManagerByUserId(userId);
-        return ApiResponse.success(response, "허브매니저를 조회했습니다.");
     }
 
     @PreAuthorize("hasRole('MASTER')")
@@ -84,6 +81,20 @@ public class HubController {
         }
     }
 
+    @PreAuthorize("hasRole('MASTER')")
+    @PostMapping("/managers")
+    public ApiResponse<HubManagerCreateResponseDto> createHubManager(@Valid @RequestBody HubManagerCreateRequestDto request) {
+
+        HubManagerCreateResponseDto response = hubManagerService.createManager(request);
+
+        return ApiResponse.success(response, "HubManager created");
+    }
+
+    @GetMapping("/managers/{userId}")
+    public ApiResponse<HubManagerResponseDto> getHubManagerByUserId(@PathVariable Long userId) {
+        HubManagerResponseDto response = hubService.getManagerByUserId(userId);
+        return ApiResponse.success(response, "허브매니저를 조회했습니다.");
+    }
 
 
 
