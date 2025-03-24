@@ -80,8 +80,10 @@ public class OrderController {
         return ApiResponse.success(updateOrderInfo, "주문정보가 성공적으로 수정되었습니다.");
     }
 
+    // 접근 권한: MASTER, HUB_MANAGER (담당)
     @Operation(summary = "주문 삭제")
     @DeleteMapping("/{orderId}")
+    @PreAuthorize("hasAnyRole('MASTER', 'HUB_MANAGER')")
     public ApiResponse<OrderDeleteResponseDto> deleteOrder(@PathVariable UUID orderId,
                                                            @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
         OrderDeleteResponseDto dto = orderService.deleteOrder(orderId, userDetails);
