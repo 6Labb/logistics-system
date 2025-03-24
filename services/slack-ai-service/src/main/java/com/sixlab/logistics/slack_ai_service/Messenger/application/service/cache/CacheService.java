@@ -1,12 +1,13 @@
 package com.sixlab.logistics.slack_ai_service.Messenger.application.service.cache;
 
-import com.sixlab.logistics.common.shared.response.ApiResponse;
+import com.sixlab.logistics.common.shared.response.ApiResponseDto;
 import com.sixlab.logistics.common.shared.response.ApiResponseHelper;
 import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.ai.HubClientResponseDto;
 import com.sixlab.logistics.slack_ai_service.Messenger.infrastructure.feign.HubClient;
 import com.sixlab.logistics.slack_ai_service.Messenger.infrastructure.feign.UserClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -20,7 +21,7 @@ public class CacheService {
 
     @Cacheable(value = "hubName", key = "#hubId")
     public String getHubName(UUID hubId) {
-        ApiResponse<HubClientResponseDto> hubResponse = hubClient.getHub(hubId);
+        ResponseEntity<ApiResponseDto<HubClientResponseDto>> hubResponse = hubClient.getHub(hubId);
         HubClientResponseDto hubData = ApiResponseHelper.extractData(hubResponse, Function.identity());
         return hubData.getHubName();
     }

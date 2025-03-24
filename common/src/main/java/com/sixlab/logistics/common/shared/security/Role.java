@@ -31,4 +31,13 @@ public enum Role {
         public static final String HUB_MANAGER = "ROLE_HUB_MANAGER";
         public static final String MASTER = "ROLE_MASTER";
     }
+
+    public static Role fromAuthority(String authority) {
+        for (Role role : Role.values()) {
+            if (role.getAuthority().equals(authority)) {
+                return role;
+            }
+        }
+        throw new IllegalArgumentException("Unknown authority: " + authority);
+    }
 }

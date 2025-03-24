@@ -5,7 +5,10 @@ import com.sixlab.logistics.common.shared.exception.InternalServerException;
 import com.sixlab.logistics.common.shared.exception.InvalidParameterException;
 import com.sixlab.logistics.common.shared.exception.OperationNotAllowedException;
 import com.sixlab.logistics.common.shared.exception.ResourceNotFoundException;
-import com.sixlab.logistics.common.shared.response.ApiResponse;
+import com.sixlab.logistics.common.shared.response.ApiResponseDto;
+import com.sixlab.logistics.common.shared.security.Role;
+import com.sixlab.logistics.common.shared.security.UserDetailsImpl;
+import com.sixlab.logistics.common.shared.security.UserInfo;
 import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.ai.*;
 import com.sixlab.logistics.slack_ai_service.Messenger.application.dto.slack.SlackMessageInfoDto;
 import com.sixlab.logistics.slack_ai_service.Messenger.application.service.cache.CacheService;
@@ -21,7 +24,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -33,11 +40,11 @@ import static com.sixlab.logistics.common.shared.response.ApiResponseHelper.extr
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AiService{
+public class AiService {
 
-    private static final String workingHour="09:00~18:00";
+    private static final String workingHour = "09:00~18:00";
     private static final String PROMPT_MESSAGE =
-                    "추가 고려 사항: 발송지 기준으로 넉넉하게 고려. 배송 담당자의 근무 시간을 벗어나지 않도록 해야 함. " +
+            "추가 고려 사항: 발송지 기준으로 넉넉하게 고려. 배송 담당자의 근무 시간을 벗어나지 않도록 해야 함. " +
                     "경유지에서 평균 처리 시간이 걸릴 수 있음 " +
                     "답변 형식: 위 내용을 기반으로 도출된 최종 발송 시한은 XX월 XX일 오전/오후 X시 입니다. 추가적인 설명 없이 이 형식으로만 답변해줘.";
 
@@ -51,22 +58,52 @@ public class AiService{
     @RabbitListener(queues = "orderInfo-queue")
     public void processOrderAndNotifySlack(OrderInfoMessageResponseDto queue,
                                            Channel channel,
-                                           @Header(AmqpHeaders.DELIVERY_TAG) long tag) {
+                                           @Header(AmqpHeaders.DELIVERY_TAG) long tag,
+                                           @Header("Authorization") String authHeader,
+                                           @Header("X-Hub-User") String username,
+                                           @Header("X-Hub-Role") String role) {
+        log.info("큐" + queue + "채널" + channel);
+        System.out.println("큐" + queue + "채널" + channel);
+        //큐 헤더 확인
+        System.out.println("jwt 확인 " + authHeader);
+        System.out.println("user" + username);
+        System.out.println("role" + role);
+
+        //헤더 다시 등록
+        String token = authHeader.startsWith("Bearer ") ? authHeader.substring(7).trim() : authHeader;
+        System.out.println("등록 토큰");
+        UserInfo userInfo = new UserInfo(username, "UNUSED", null, Role.fromAuthority(role));
+        UserDetailsImpl userDetails = new UserDetailsImpl(userInfo);
+
+        Authentication authentication =
+                new UsernamePasswordAuthenticationToken(userDetails, token, userDetails.getAuthorities());
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
 
         //발송허브담당자 - 출발허브-목적허브 배송 담당자?? 허브관리자면 현재 누가 해당 주문의 배송담당자인지 알수있는방법이 없음 허브 배송담당자로 진행
-        ApiResponse<DeliveryClientResponseDto> deliveryResponse = deliveryClient.getDelivery(queue.getDeliveryId());
+        ResponseEntity<ApiResponseDto<DeliveryClientResponseDto>> deliveryResponse = deliveryClient.getDelivery(queue.getDeliveryId());
         if (!deliveryResponse.getStatusCode().is2xxSuccessful()) {
             throw new ResourceNotFoundException("배송 정보 조회 실패: " + queue.getDeliveryId());
         }
         DeliveryClientResponseDto deliveryData = extractData(deliveryResponse, Function.identity());
+        System.out.println("1차통과");
+        System.out.println(deliveryData.getToHubId());
+        System.out.println(deliveryData.getFromHubId());
+        System.out.println(deliveryData.getSlackId());
+        System.out.println(deliveryData.getHubDeliveryAgentId());
 
-        ApiResponse<UserClientResponseDto> userResponse = userClient.getUser2(deliveryData.getHubDeliveryAgentId());
-        if (!userResponse.getStatusCode().is2xxSuccessful()) {
-            throw new ResourceNotFoundException("사용자 정보 조회 실패: " + deliveryData.getHubDeliveryAgentId());
-        }
-        UserClientResponseDto userData = extractData(userResponse, Function.identity());
-        String userName = userData.getUserName();
-        String slackId= userData.getSlackId();
+//        ResponseEntity<ApiResponseDto<UserClientResponseDto>> userResponse = userClient.getUser2(deliveryData.getHubDeliveryAgentId());
+//        ResponseEntity<ApiResponseDto<UserClientResponseDto>> userResponse = userClient.getUser(deliveryData.getHubDeliveryAgentId(),username,role);
+//        if (!userResponse.getStatusCode().is2xxSuccessful()) {
+//            throw new ResourceNotFoundException("사용자 정보 조회 실패: " + deliveryData.getHubDeliveryAgentId());
+//        }
+//        UserClientResponseDto userData = extractData(userResponse, Function.identity());
+        String userName = "테스트";
+//                userData.getUserName();
+        String slackId = "hu185@naver.com";
+//                userData.getSlackId();
+        System.out.println("2차통과");
 
         String fromHubName = cacheService.getHubName(deliveryData.getFromHubId());
         if (fromHubName == null) {
@@ -78,6 +115,8 @@ public class AiService{
             throw new ResourceNotFoundException("도착 허브 이름 조회 실패: " + deliveryData.getToHubId());
         }
 
+        System.out.println("3차 통과");
+        System.out.println("큐 소비 시작");
         try {
             log.info("메시지 수신: " + queue);
             OrderInfoRequestDto infoDto = OrderInfoRequestDto.builder()
@@ -93,11 +132,11 @@ public class AiService{
             String prompt = buildPromptText(infoDto);
 
             String aiDeadline = getAiResponse(prompt);
-            log.info("AI 호출 확인"+aiDeadline);
+            log.info("AI 호출 확인" + aiDeadline);
 
-            SlackMessageInfoDto sendSlackMessage = buildSlackMessage(queue,infoDto,userName,aiDeadline);
+            SlackMessageInfoDto sendSlackMessage = buildSlackMessage(queue, infoDto, userName, aiDeadline);
 
-            slackService.sendSlackMessage(slackId,sendSlackMessage);
+            slackService.sendSlackMessage(slackId, sendSlackMessage);
 
             channel.basicAck(tag, false); // 성공 시 큐에서 메시지 삭제
         } catch (ResourceNotFoundException e) {
@@ -182,7 +221,7 @@ public class AiService{
         );
     }
 
-    private SlackMessageInfoDto buildSlackMessage(OrderInfoMessageResponseDto message, OrderInfoRequestDto infoDto,String userName ,String aiDeadline) {
+    private SlackMessageInfoDto buildSlackMessage(OrderInfoMessageResponseDto message, OrderInfoRequestDto infoDto, String userName, String aiDeadline) {
         return SlackMessageInfoDto.builder()
                 .orderId(message.getOrderId())
                 .customerName(message.getReceiverName())

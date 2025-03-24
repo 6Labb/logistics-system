@@ -6,6 +6,7 @@ import com.sixlab.logistics.common.shared.exception.ResourceNotFoundException;
 import com.sixlab.logistics.common.shared.exception.UnauthorizedAccessException;
 import com.sixlab.logistics.common.shared.response.ApiResponse;
 import com.sixlab.logistics.common.shared.response.ApiResponseDto;
+import com.sixlab.logistics.order_service.infrastructure.config.AuthHeaderMessagePostProcessor;
 import com.sixlab.logistics.common.shared.security.Role;
 import com.sixlab.logistics.common.shared.security.UserDetailsImpl;
 import com.sixlab.logistics.common.shared.security.UserInfo;
@@ -21,7 +22,6 @@ import com.sixlab.logistics.order_service.application.dto.response.*;
 import com.sixlab.logistics.order_service.domain.model.Order;
 import com.sixlab.logistics.order_service.domain.model.Status;
 import com.sixlab.logistics.order_service.infrastructure.persistence.OrderJpaRepository;
-import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -176,9 +176,8 @@ public class OrderService {
 
         //AI 호출용 RabbitMQ
         OrderInfoMessageRequestDto message = createOrderMessage(savedOrder.getOrderId(),getProduct, dto, getDelivery);
-        rabbitTemplate.convertAndSend(exchange, "order.created", message);
-        System.out.println("📤 주문 메시지 전송됨: " +exchange+" : "+ queueOrder+" : "+message); //테스트후  삭제
 
+        rabbitTemplate.convertAndSend(exchange, "order.created", message,new AuthHeaderMessagePostProcessor());
         return new OrderCreateResponseDto(savedOrder);
     }
 
