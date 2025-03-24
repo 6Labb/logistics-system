@@ -39,3 +39,14 @@ service:
 admin:
   # token: ${ADMIN_TOKEN}
   token: "AcwNIiPfouAQU0TgGRwDC0a7UUtbu8nvUhIh3M+xf+I="
+
+
+#springdoc:
+#  swagger-ui:
+#    enabled: true
+#    path: /docs
+#    operations-sorter: alpha
+#    tags-sorter: alpha
+#  api-docs:
+#    enabled: true
+#    path: /api-docs-user-service
