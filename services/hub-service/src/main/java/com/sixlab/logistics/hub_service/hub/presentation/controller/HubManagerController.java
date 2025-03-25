@@ -25,14 +25,6 @@ public class HubManagerController {
 
     private final HubManagerService hubManagerService;
 
-//    @PreAuthorize("hasRole('MASTER')")
-//    @PostMapping
-//    public ApiResponse<HubManagerCreateResponseDto> createHubManager(@Valid @RequestBody HubManagerCreateRequestDto request) {
-//
-//        HubManagerCreateResponseDto response = hubManagerService.createManager(request);
-//
-//        return ApiResponse.success(response, "HubManager created");
-//    }
 
     @GetMapping("/by-id/{managerId}")
     public ApiResponse<HubManagerResponseDto> getHubManager(@PathVariable UUID managerId) {
