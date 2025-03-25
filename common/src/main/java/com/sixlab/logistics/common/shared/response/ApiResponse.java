@@ -1,5 +1,7 @@
 package com.sixlab.logistics.common.shared.response;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
