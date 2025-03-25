@@ -31,5 +31,7 @@ public class FeignClientInterceptor implements RequestInterceptor {
         } else {
             System.out.println("🚨 FeignClientInterceptor 적용 실패 - SecurityContext에서 토큰을 찾을 수 없음");
         }
+
+        log.info("Feign 요청 헤더: {}", requestTemplate.headers());
     }
 }
