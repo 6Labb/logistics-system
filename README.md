@@ -1,5 +1,29 @@
 # 대규모 AI 시스템 프로젝트 - 6Lab
 
+## 📋 목차
+1. [기술 스택](#기술-스택)
+2. [주요 라이브러리](#주요-라이브러리)
+3. [아키텍처](#아키텍처)
+4. [API Docs](#API-Docs)
+5. [ERD](#ERD)
+
+---
+
+### 👥 팀원
+
+|                                                                                          |                                                                                          |                                                                                          |                                                                                          |                                                                                                |
+|:----------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------:|
+| <img src="https://avatars.githubusercontent.com/u/197976648?v=4" width="120px;" alt=""/> | <img src="https://avatars.githubusercontent.com/u/189347549?v=4" width="120px;" alt=""/> | <img src="https://avatars.githubusercontent.com/u/158035502?v=4" width="120px;" alt=""/> | <img src="https://avatars.githubusercontent.com/u/142812547?v=4" width="120px;" alt=""/> | <img src="https://avatars.githubusercontent.com/u/123526228?s=400&v=4" width="120px;" alt=""/> |
+|                            [김 훈](https://github.com/Hooni-i)                             |                         [김민주](https://github.com/mjjmjmjmj)                          |                         [정은선](https://https://github.com/jeongeunsun)                         |                            [박성주](https://github.com/goodperiodt)                            |                              [엄은진](https://github.com/mummumm)                               |
+|                                       **공통 모듈, 추천 알고리즘 연동 및 AI 응답 처리, 슬랙 알림 기능 및 Webhook 연동**                                       |                                    **Gateway, Config Server, Eureka, 인증/인가(JWT+Security), 사용자, 허브 도메인 개발**                                  |                                  **협력 업체 관리를 위한 업체 도메인의 기획 및 개발, 입출고 관리의 기반이 되는 상품 도메인 개발**                                   |                             **물류 시스템 내에서 주문의 생성부터 상태 전이까지 전반적인 흐름을 관리하는 주문 도메인의 설계 및 구현**                             |                               **상품의 출고 및 배송 프로세스를 담당하는 배송 도메인을 설계하고 구현**                               |
+
+---
+
+### ⏰ 프로젝트 기간
+📅 **2025-03-11 ~ 2025-03-25**
+
+---
+
 ## 📌 프로젝트 목적
 
 본 프로젝트는 B2B 기반의 물류관리 및 배송 시스템을 구축하여,  
@@ -7,7 +31,6 @@
 허브(물류센터)를 중심으로 한 효율적인 재고 관리, 허브 간 배송 추적,  
 예측 기반 출고 시점 안내, 실시간 알림 기능 등을 통해  
 **현실적인 물류 환경에 적용 가능한 시스템을 설계**하였습니다.
-
 
 ## 📦 프로젝트 상세
 
@@ -43,23 +66,124 @@
 도메인별로 독립적인 서비스를 구성하였으며  
 Eureka, Config Server, Gateway, JWT 인증 시스템을 통해 전체 서비스를 유기적으로 연결하였습니다.
 
+---
+<details>
+  <summary><strong>🛠 서비스 구성 및 실행 방법</strong></summary><br>
 
-### ⏰ 프로젝트 기간
+### 1. 프로젝트 클론
+
+```bash
+git clone https://github.com/6Labb/logistics-system.git
+cd logistics-system
+```
+
 ---
-📅**2025-03-11 ~ 2025-03-25**
-### 👥 참여인원
-|                                                                                          |                                                                                          |                                                                                          |                                                                                          |                                                                                                |
-|:----------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------:|
-| <img src="https://avatars.githubusercontent.com/u/197976648?v=4" width="120px;" alt=""/> | <img src="https://avatars.githubusercontent.com/u/189347549?v=4" width="120px;" alt=""/> | <img src="https://avatars.githubusercontent.com/u/158035502?v=4" width="120px;" alt=""/> | <img src="https://avatars.githubusercontent.com/u/142812547?v=4" width="120px;" alt=""/> | <img src="https://avatars.githubusercontent.com/u/123526228?s=400&v=4" width="120px;" alt=""/> |
-|                            [김 훈](https://github.com/Hooni-i)                             |                         [김민주](https://github.com/mjjmjmjmj)                          |                         [정은선](https://https://github.com/jeongeunsun)                         |                            [박성주](https://github.com/goodperiodt)                            |                              [엄은진](https://github.com/mummumm)                               |
-|                                       **공통 모듈, 추천 알고리즘 연동 및 AI 응답 처리, 슬랙 알림 기능 및 Webhook 연동**                                       |                                    **Gateway, Config Server, Eureka, 인증/인가(JWT+Security), 사용자,허브 도메인 개발**                                  |                                  **협력 업체 관리를 위한 업체 도메인의 기획 및 개발, 입출고 관리의 기반이 되는 상품 도메인 개발**                                   |                             **물류 시스템 내에서 주문의 생성부터 상태 전이까지 전반적인 흐름을 관리하는 주문 도메인의 설계 및 구현**                             |                               **상품의 출고 및 배송 프로세스를 담당하는 배송 도메인을 설계하고 구현**                               |
+
+### 2. Docker 인프라 실행
+
+본 프로젝트는 `docker-compose`를 통해 공통 인프라 환경을 구성합니다.
+
+**구성 요소:**
+- **PostgreSQL**
+- **Redis**
+- **Zipkin**
+
+```bash
+docker-compose up -d
+```
+
 ---
-## 📋 목차
-1. [기술 스택](#기술-스택)
-2. [주요 라이브러리](#주요-라이브러리)
-3. [아키텍처](#아키텍처)
-4. [API Docs](#API-Docs)
-5. [ERD](#ERD)
+
+### 3. 필수 인프라 서비스 실행
+
+> 실행 순서에는 상관 없지만, 두 서버 모두 반드시 먼저 실행되어 있어야 합니다.
+
+```bash
+# Config Server
+cd infra/config-server
+./gradlew bootRun
+```
+
+```bash
+# Eureka Server
+cd infra/eureka-server
+./gradlew bootRun
+```
+
+---
+
+### 4. 마이크로서비스 실행
+
+Config Server와 Eureka Server가 실행된 상태에서,  
+각 도메인 서비스들을 실행합니다.
+
+```bash
+# User Service
+cd services/user-service
+./gradlew bootRun
+```
+
+```bash
+# Hub Service
+cd services/hub-service
+./gradlew bootRun
+```
+
+```bash
+# Order Service
+cd services/order-service
+./gradlew bootRun
+```
+
+```bash
+# Product Service
+cd services/product-service
+./gradlew bootRun
+```
+
+```bash
+# Company Service
+cd services/company-service
+./gradlew bootRun
+```
+
+```bash
+# Delivery Service
+cd services/delivery-service
+./gradlew bootRun
+```
+
+```bash
+# Slack&AI Service
+cd services/slack-ai-service
+./gradlew bootRun
+```
+
+---
+
+### 5. Gateway 실행
+
+```bash
+cd infra/gateway-server
+./gradlew bootRun
+```
+
+---
+
+### 6. 접속 경로 안내
+
+| 기능 | 주소 |
+|------|------|
+| **Gateway 통합 진입점** | `http://localhost:19091` |
+| **Swagger API 문서 (통합)** | `http://localhost:19091/swagger-ui` |
+| **Zipkin 트레이싱** | `http://localhost:9411` |
+| **Eureka 대시보드** | `http://localhost:19090` |
+
+</details>
+
+---
+
+
 ### ⚒️ 기술 스택
 - **Language:** Java 17
 - **Framework:** Spring Boot 3.4.2
