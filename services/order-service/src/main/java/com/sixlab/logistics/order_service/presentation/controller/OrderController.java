@@ -33,7 +33,7 @@ public class OrderController {
     @Operation(summary = "주문 등록")
     @PostMapping
     // 모든 권한 접근 허용
-    // @PreAuthorize()
+    @PreAuthorize("hasAnyRole('MASTER', 'HUB_MANAGER', 'DELIVERY_AGENT', 'TRADE_PARTNER')")
     public ApiResponse<OrderCreateResponseDto> createOrder(
             @RequestBody @Valid OrderCreateRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
@@ -49,8 +49,9 @@ public class OrderController {
 
     @GetMapping
     @Operation(summary = "주문 전체 조회")
-    public ApiResponse<?> findAllOrders(UserInfo user) {
-        List<OrderFindOneResponseDto> dtoList = orderService.getOrderListByRole(user);
+    @PreAuthorize("hasAnyRole('MASTER', 'HUB_MANAGER', 'DELIVERY_AGENT', 'TRADE_PARTNER')")
+    public ApiResponse<List<OrderFindOneResponseDto>> findAllOrders(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        List<OrderFindOneResponseDto> dtoList = orderService.getOrderListByRole(userDetails);
         if(dtoList.isEmpty()) return ApiResponse.success(null, "주문내역이 존재하지 않습니다.");
         return ApiResponse.success(dtoList, dtoList.size()+" 건의 주문내역이 조회되었습니다.");
     }
