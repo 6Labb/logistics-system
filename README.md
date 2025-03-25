@@ -178,7 +178,14 @@ cd infra/gateway-server
 ### ERD
 ![logistics_system (4)](https://github.com/user-attachments/assets/cbdfc867-4b40-45c2-992e-5cd0b42dca13)
 
+---
+### 트러블 슈팅
+- [트러블슈팅: FeignClient 응답 DTO와 내부 도메인 객체의 분리 필요성](https://github.com/6Labb/logistics-system/wiki/%5B%ED%8A%B8%EB%9F%AC%EB%B8%94%EC%8A%88%ED%8C%85%5D-FeignClient-%EC%9D%91%EB%8B%B5-DTO%EC%99%80-%EB%82%B4%EB%B6%80-%EB%8F%84%EB%A9%94%EC%9D%B8-%EA%B0%9D%EC%B2%B4%EC%9D%98-%EB%B6%84%EB%A6%AC-%ED%95%84%EC%9A%94%EC%84%B1)
 
+- [트러블슈팅: Zipkin Docker 이미지 실행 실패 (Apple M4 칩 + Java 21 이슈)](https://github.com/6Labb/logistics-system/wiki/%5B%ED%8A%B8%EB%9F%AC%EB%B8%94%EC%8A%88%ED%8C%85%5D-Zipkin-Docker-%EC%9D%B4%EB%AF%B8%EC%A7%80-%EC%8B%A4%ED%96%89-%EC%8B%A4%ED%8C%A8-(Apple-M4-%EC%B9%A9---Java-21-%EC%9D%B4%EC%8A%88))
+
+### 잘한 점
+- [잘한 점: common 공통모듈 개발](https://github.com/6Labb/logistics-system/wiki/%5B%EC%9E%98%ED%95%9C%EC%A0%90%5D-common-%EA%B3%B5%ED%86%B5%EB%AA%A8%EB%93%88-%EA%B0%9C%EB%B0%9C)
 
 
 --- 
