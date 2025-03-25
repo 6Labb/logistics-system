@@ -53,11 +53,12 @@ INSERT INTO p_delivery_agent (user_id, type, delivery_sequence, hub_id, slack_id
 (6, 'HUB', 0, '11e98756-d7a2-f948-b1b1-0242ac141002', 'hu185@naver.com');
 
 SET search_path TO users;
+ALTER SEQUENCE users.p_users_id_seq RESTART WITH 7;
 -- 회원 데이터 삽입
 INSERT INTO p_users (id, username, password, role, slack_id) VALUES
 (1, 'hub1', '$2a$10$dGq8O5RmfBcxTT2KwcTJ3.aXSRz0TW6KxsMIINxdPTn5ux9hBX4Ke', 'HUB_MANAGER', 'hu185@naver.com'),
-(2, 'hub2', '$2a$10$dGq8O5RmfBcxTT2KwcTJ3.aXSRz0TW6KxsMIINxdPTn5ux9hBX4Ke', 'HUB_MANAGER', 'hu185@naver.com'),
-(3, 'deliver1', '$2a$10$dGq8O5RmfBcxTT2KwcTJ3.aXSRz0TW6KxsMIINxdPTn5ux9hBX4Ke', 'DELIVERY_AGENT', 'hu185@naver.com'),
-(4, 'deliver2', '$2a$10$dGq8O5RmfBcxTT2KwcTJ3.aXSRz0TW6KxsMIINxdPTn5ux9hBX4Ke', 'DELIVERY_AGENT', 'hu185@naver.com'),
-(5, 'deliver3', '$2a$10$dGq8O5RmfBcxTT2KwcTJ3.aXSRz0TW6KxsMIINxdPTn5ux9hBX4Ke', 'DELIVERY_AGENT', 'hu185@naver.com'),
-(6, 'deliver4', '$2a$10$dGq8O5RmfBcxTT2KwcTJ3.aXSRz0TW6KxsMIINxdPTn5ux9hBX4Ke', 'DELIVERY_AGENT', 'hu185@naver.com');
+(2, 'hub2', '$2a$10$dGq8O5RmfBcxTT2KwcTJ3.aXSRz0TW6KxsMIINxdPTn5ux9hBX4Ke', 'HUB_MANAGER', 'hu1851@naver.com'),
+(3, 'deliver1', '$2a$10$dGq8O5RmfBcxTT2KwcTJ3.aXSRz0TW6KxsMIINxdPTn5ux9hBX4Ke', 'DELIVERY_AGENT', 'hu1852@naver.com'),
+(4, 'deliver2', '$2a$10$dGq8O5RmfBcxTT2KwcTJ3.aXSRz0TW6KxsMIINxdPTn5ux9hBX4Ke', 'DELIVERY_AGENT', 'hu1853@naver.com'),
+(5, 'deliver3', '$2a$10$dGq8O5RmfBcxTT2KwcTJ3.aXSRz0TW6KxsMIINxdPTn5ux9hBX4Ke', 'DELIVERY_AGENT', 'hu1854@naver.com'),
+(6, 'deliver4', '$2a$10$dGq8O5RmfBcxTT2KwcTJ3.aXSRz0TW6KxsMIINxdPTn5ux9hBX4Ke', 'DELIVERY_AGENT', 'hu1855@naver.com');
