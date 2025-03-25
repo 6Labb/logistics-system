@@ -6,14 +6,14 @@
 3. [아키텍처](#아키텍처)
 4. [API Docs](#API-Docs)
 5. [ERD](#ERD)
-
+ 
 ---
 
 ### 👥 팀원
 
 |                                                                                          |                                                                                          |                                                                                          |                                                                                          |                                                                                                |
 |:----------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------:|
-| <img src="https://avatars.githubusercontent.com/u/197976648?v=4" width="120px;" alt=""/> | <img src="https://avatars.githubusercontent.com/u/189347549?v=4" width="120px;" alt=""/> | <img src="https://avatars.githubusercontent.com/u/158035502?v=4" width="120px;" alt=""/> | <img src="https://avatars.githubusercontent.com/u/142812547?v=4" width="120px;" alt=""/> | <img src="https://avatars.githubusercontent.com/u/123526228?s=400&v=4" width="120px;" alt=""/> |
+| <img src="https://avatars.githubusercontent.com/u/197976648?v=4" width="120px;" alt=""/> | <img src="https://avatars.githubusercontent.com/u/76428635?v=4" width="120px;" alt=""/> | <img src="https://avatars.githubusercontent.com/u/163955181?v=4" width="120px;" alt=""/> | <img src="https://avatars.githubusercontent.com/u/125863849?v=4" width="120px;" alt=""/> | <img src="https://avatars.githubusercontent.com/u/85439982?s=400&v=4" width="120px;" alt=""/> |
 |                            [김 훈](https://github.com/Hooni-i)                             |                         [김민주](https://github.com/mjjmjmjmj)                          |                         [정은선](https://https://github.com/jeongeunsun)                         |                            [박성주](https://github.com/goodperiodt)                            |                              [엄은진](https://github.com/mummumm)                               |
 |                                       **공통 모듈, 추천 알고리즘 연동 및 AI 응답 처리, 슬랙 알림 기능 및 Webhook 연동**                                       |                                    **Gateway, Config Server, Eureka, 인증/인가(JWT+Security), 사용자, 허브 도메인 개발**                                  |                                  **협력 업체 관리를 위한 업체 도메인의 기획 및 개발, 입출고 관리의 기반이 되는 상품 도메인 개발**                                   |                             **물류 시스템 내에서 주문의 생성부터 상태 전이까지 전반적인 흐름을 관리하는 주문 도메인의 설계 및 구현**                             |                               **상품의 출고 및 배송 프로세스를 담당하는 배송 도메인을 설계하고 구현**                               |
 
@@ -182,7 +182,13 @@ cd infra/gateway-server
 </details>
 
 ---
+### ERD
+![logistics_system (4)](https://github.com/user-attachments/assets/cbdfc867-4b40-45c2-992e-5cd0b42dca13)
 
+
+
+
+--- 
 
 ### ⚒️ 기술 스택
 - **Language:** Java 17
