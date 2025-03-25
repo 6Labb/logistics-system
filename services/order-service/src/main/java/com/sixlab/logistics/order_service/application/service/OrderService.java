@@ -20,6 +20,7 @@ import com.sixlab.logistics.order_service.application.dto.request.RequestDeliver
 import com.sixlab.logistics.order_service.application.dto.response.*;
 import com.sixlab.logistics.order_service.domain.model.Order;
 import com.sixlab.logistics.order_service.domain.model.Status;
+import com.sixlab.logistics.order_service.infrastructure.config.AuthHeaderMessagePostProcessor;
 import com.sixlab.logistics.order_service.infrastructure.persistence.OrderJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
