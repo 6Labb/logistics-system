@@ -31,13 +31,6 @@ public class DeliveryController {
 
     private final DeliveryService deliveryService;
 
-    /*
-    @GetMapping("/deliveries")
-    public String getDelivery() {
-        return "info!!! From port : " + serverPort + "and message : " + message;
-    }
-    */
-
     // 배송 리스트 조회
     @GetMapping("/deliveries")
     public ApiResponse<Page<DeliveryResponseDto>> getAllDeliveries(
