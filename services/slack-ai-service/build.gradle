@@ -67,6 +67,12 @@ dependencies {
 	implementation 'com.fasterxml.jackson.core:jackson-annotations'
 	implementation 'com.fasterxml.jackson.core:jackson-core'
 
+	// swagger
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
+	implementation 'com.fasterxml.jackson.module:jackson-module-parameter-names:2.15.0'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.0'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.15.0'
+
 
 }
 

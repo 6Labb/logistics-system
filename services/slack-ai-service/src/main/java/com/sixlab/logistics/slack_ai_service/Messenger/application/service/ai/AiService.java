@@ -91,8 +91,8 @@ public class AiService {
         }
         UserClientResponseDto userData = extractData(userResponse, Function.identity());
         String userName =userData.getUserName();
-        String slackId = "hu185@naver.com"; //테스트용 하드코딩
-//                userData.getSlackId();
+        String slackId =userData.getSlackId();
+//                "hu185@naver.com"; //테스트용 하드코딩
         System.out.println("2차통과");
 
         String fromHubName = cacheService.getHubName(deliveryData.getFromHubId());

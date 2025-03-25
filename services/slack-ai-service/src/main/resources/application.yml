@@ -37,3 +37,13 @@ logging:
     root: INFO
     feign: DEBUG
     feign.client: DEBUG
+
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /docs
+    operations-sorter: alpha
+    tags-sorter: alpha
+  api-docs:
+    enabled: true
+    path: /api-docs-slack-ai-service
