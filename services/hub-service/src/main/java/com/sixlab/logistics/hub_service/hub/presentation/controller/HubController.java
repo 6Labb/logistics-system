@@ -85,9 +85,18 @@ public class HubController {
     @PostMapping("/managers")
     public ApiResponse<HubManagerCreateResponseDto> createHubManager(@Valid @RequestBody HubManagerCreateRequestDto request) {
 
-        HubManagerCreateResponseDto response = hubManagerService.createManager(request);
+        try {
+            HubManagerCreateResponseDto response = hubManagerService.createManager(request);
+            return ApiResponse.success(response, "HubManager created");
+        } catch (IllegalArgumentException e) {
+            return ApiResponse.fail(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (IllegalStateException e) {
+            return ApiResponse.fail(HttpStatus.UNAUTHORIZED, e.getMessage());
+        } catch (Exception e) {
+            return ApiResponse.fail(HttpStatus.INTERNAL_SERVER_ERROR, "허브매니저 생성 중 오류 발생");
+        }
 
-        return ApiResponse.success(response, "HubManager created");
+
     }
 
     @GetMapping("/managers/{userId}")
