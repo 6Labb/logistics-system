@@ -1,6 +1,7 @@
 package com.sixlab.logistics.order_service.application.client;
 
 import com.sixlab.logistics.common.shared.response.ApiResponseDto;
+import com.sixlab.logistics.common.shared.response.ApiResponseDto;
 import com.sixlab.logistics.order_service.application.dto.response.HubResponseDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
