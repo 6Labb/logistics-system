@@ -2,6 +2,7 @@ package com.sixlab.logistics.common.shared.exception;
 
 import com.sixlab.logistics.common.shared.response.ApiResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -54,6 +55,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InternalServerException.class)
     public ApiResponse<String> handleInternalServerError(InternalServerException ex) {
         return ApiResponse.fail(HttpStatus.INTERNAL_SERVER_ERROR,ex.getMessage());
+    }
+
+    // ❌ 인증은 되었지만, 권한이 부족한 경우 (403)
+    @ExceptionHandler(AccessDeniedException.class)
+    public ApiResponse<String> handleAccessDenied(AccessDeniedException ex) {
+        return ApiResponse.fail(HttpStatus.FORBIDDEN, "접근 권한이 없습니다.");
     }
 }
 

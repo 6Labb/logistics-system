@@ -1,13 +1,23 @@
 package com.sixlab.logistics.delivery_service;
 
+import com.sixlab.logistics.common.infrastructure.config.JpaConfig;
+import com.sixlab.logistics.common.infrastructure.config.QueryDslConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
 
 @SpringBootApplication
+@EnableFeignClients
+@Import({
+		JpaConfig.class,
+		QueryDslConfig.class
+})
+@ComponentScan(basePackages = {"com.sixlab.logistics.delivery_service","com.sixlab.logistics.common"})
 public class DeliveryServiceApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(DeliveryServiceApplication.class, args);
 	}
-
 }

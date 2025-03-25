@@ -1,9 +1,18 @@
 server:
   port: 19098
 
-message: "slack-ai-service dev message updated 1:35"
+message:
+  queue:
+    order: orderInfo-queue
 
 spring:
+  config:
+    import: optional:file:.env[.properties]
+  cache:
+    type: redis
+    redis:
+      host: redis
+      port: 6379
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -13,9 +22,81 @@ spring:
         show_sql: true
         format_sql: true
         use_sql_comments: true
-        default_schema: orders
+        default_schema: ai_core
   datasource:
     url: jdbc:postgresql://localhost:5432/logistics
     username: postgres
-    password: 0000
+    password: lab6
     driver-class-name: org.postgresql.Driver
+  application:
+    name: slack-ai-service
+  rabbitmq.host: localhost
+  rabbitmq.port: 5672
+  rabbitmq.username: guest
+  rabbitmq.password: guest
+  rabbitmq:
+    listener:
+      simple:
+        acknowledge-mode : manual
+  resilience4j:
+    retry:
+      instances:
+        externalApi:
+          maxRetryAttempts: 2 # 빠른 응답 예상
+          waitDuration: 300ms # 짧게
+          retryExceptions:
+            - com.sixlab.logistics.slack_ai_service.Messenger.application.exception.SlackRetryException
+            - java.net.ConnectException
+        geminiRetry: # Gemini
+          maxRetryAttempts: 4 # 불안정 예상
+          waitDuration: 1000ms # 길게
+          enableExponentialBackoff: true
+          exponentialBackoffMultiplier: 2
+          retryExceptions:
+            - com.sixlab.logistics.slack_ai_service.Messenger.application.exception.GeminiRetryException
+            - java.net.ConnectException
+    circuitbreaker:
+      instances:
+        slackCircuitBreaker:
+          slidingWindowSize: 20s # 짧게
+          failureRateThreshold: 30 # 덜 민감
+          waitDurationInOpenState: 10s
+          recordExceptions:
+            - com.sixlab.logistics.slack_ai_service.Messenger.application.exception.SlackCircuitException
+        geminiCircuitBreaker:
+          slidingWindowSize: 60s # 길게
+          failureRateThreshold: 15 # 더 민감
+          waitDurationInOpenState: 20s
+          recordExceptions:
+            - com.sixlab.logistics.slack_ai_service.Messenger.application.exception.GeminiRetryException
+redisson:
+  config: |
+    singleServerConfig:
+      address: "redis://redis:6379"
+slack:
+  token: ${slack.token}
+  uri: ${slack.uri}
+gemini:
+  key: ${gemini.key}
+  uri: ${gemini.uri}
+
+logging:
+  level:
+    root: INFO
+    feign: DEBUG
+    feign.client: DEBUG
+
+management:
+  zipkin:
+    tracking:
+    endpoint: "http://localhost:9411/api/v2/spans"
+  tracing:
+    sampling:
+      probability: 1.0
+
+service:
+  jwt:
+    access-expiration: 3600000
+    # secret-key: ${SECRET_KEY}
+    secret-key: "401b09eab3c013d4ca54922bb802bec8fd5318192b0a75f201d8b3727429080fb337591abd3e44453b954555b7a0812e1081c39b740293f765eae731f5a65ed1"
+

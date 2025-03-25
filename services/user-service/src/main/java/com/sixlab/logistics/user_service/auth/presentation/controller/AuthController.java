@@ -1,40 +1,35 @@
 package com.sixlab.logistics.user_service.auth.presentation.controller;
 
+import com.sixlab.logistics.common.shared.response.ApiResponse;
+import com.sixlab.logistics.user_service.auth.application.dto.LoginRequestDto;
 import com.sixlab.logistics.user_service.auth.application.service.AuthService;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/auth")
 public class AuthController {
 
     private final AuthService authService;
 
+
     /**
-     * 사용자 ID를 받아 JWT 액세스 토큰을 생성하여 응답합니다.
+     * 사용자 ID(username)와 password 를 받아 JWT 액세스 토큰을 생성하여 응답합니다.
      *
-     * @param username 사용자 ID
      * @return JWT 액세스 토큰을 포함한 AuthResponse 객체를 반환합니다.
      */
-    @GetMapping("/auth/signIn")
-    public ResponseEntity<?> createAuthenticationToken(@RequestParam String username){
-        return ResponseEntity.ok(new AuthResponse(authService.createAccessToken(username)));
+    @PostMapping("/signIn")
+    public ApiResponse<?> login(@RequestBody LoginRequestDto request) {
+        String token = authService.authenticate(request);
+
+        if (token == null) {
+            return ApiResponse.fail(HttpStatus.UNAUTHORIZED,"아이디와 비밀번호를 확인해주세요");
+        }
+
+        return ApiResponse.success(token, "로그인 성공");
     }
 
-    /**
-     * JWT 액세스 토큰을 포함하는 응답 객체입니다.
-     */
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    static class AuthResponse {
-        private String access_token;
 
-    }
 }

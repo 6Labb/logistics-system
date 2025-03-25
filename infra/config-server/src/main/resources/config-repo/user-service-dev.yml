@@ -1,9 +1,11 @@
 server:
   port: 19092
 
-message: "user-service dev message updated 1:23"
+message: "user-service dev message"
 
 spring:
+  config:
+    import: optional:file:.env[.properties]
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -17,10 +19,34 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/logistics
     username: postgres
-    password: 0000
+    password: lab6
     driver-class-name: org.postgresql.Driver
+
+management:
+  zipkin:
+    tracking:
+    endpoint: "http://localhost:9411/api/v2/spans"
+  tracing:
+    sampling:
+      probability: 1.0
 
 service:
   jwt:
-    access-expiration: 3600000
+    access-expiration: 21600000
+    # secret-key: ${SECRET_KEY}
     secret-key: "401b09eab3c013d4ca54922bb802bec8fd5318192b0a75f201d8b3727429080fb337591abd3e44453b954555b7a0812e1081c39b740293f765eae731f5a65ed1"
+
+admin:
+  # token: ${ADMIN_TOKEN}
+  token: "AcwNIiPfouAQU0TgGRwDC0a7UUtbu8nvUhIh3M+xf+I="
+
+
+#springdoc:
+#  swagger-ui:
+#    enabled: true
+#    path: /docs
+#    operations-sorter: alpha
+#    tags-sorter: alpha
+#  api-docs:
+#    enabled: true
+#    path: /api-docs-user-service

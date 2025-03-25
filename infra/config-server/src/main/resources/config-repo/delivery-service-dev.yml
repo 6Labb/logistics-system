@@ -6,6 +6,8 @@ message: "service dev message updated 1:19"
 spring:
   application:
     name: delivery-service
+  config:
+    import: optional:file:.env[.properties]
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -19,5 +21,21 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/logistics
     username: postgres
-    password: 0000
+    password: lab6
     driver-class-name: org.postgresql.Driver
+
+management:
+  zipkin:
+    tracking:
+    endpoint: "http://localhost:9411/api/v2/spans"
+  tracing:
+    sampling:
+      probability: 1.0
+
+service:
+  jwt:
+    access-expiration: 3600000
+    secret-key: ${SECRET_KEY}
+
+admin:
+  token: ${ADMIN_TOKEN}

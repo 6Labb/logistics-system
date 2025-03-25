@@ -1,0 +1,77 @@
+package com.sixlab.logistics.common.shared.security;
+
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+
+import javax.crypto.SecretKey;
+
+/**
+ *  JWT가 유효한지 검증
+ *  토큰에서 사용자 정보 추출
+ */
+
+public class JwtTokenProvider {
+
+    //@Value("${service.jwt.secret-key}") // 🔥 Auth 서비스와 동일한 환경변수 사용
+    private String SECRET_KEY = "401b09eab3c013d4ca54922bb802bec8fd5318192b0a75f201d8b3727429080fb337591abd3e44453b954555b7a0812e1081c39b740293f765eae731f5a65ed1";
+
+    private SecretKey key;
+
+    @PostConstruct
+    public void init() {
+        this.key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(SECRET_KEY)); // Auth 서비스와 동일한 방식으로 변경
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            System.out.println("🚀 JWT 검증 시작: " + token);
+
+            Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
+
+            System.out.println("✅ JWT 검증 성공!");
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            System.out.println("🚨 JWT 검증 실패: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public Authentication getAuthentication(String token) {
+        // 토큰 파싱
+        Claims claims = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        try {
+
+            Long userId = Long.parseLong(claims.get("userId", String.class));
+            String roleStr = claims.get("role", String.class);
+            Role role = Role.valueOf(roleStr);
+
+            UserInfo userInfo = new UserInfo("UNUSED", "UNUSED", userId ,role);
+            UserDetails userDetails = new UserDetailsImpl(userInfo);
+            System.out.println("✅ getAuthentication - userId: " + userId + ", role: " + role);
+
+            return new UsernamePasswordAuthenticationToken(userDetails, token, userDetails.getAuthorities());
+
+        } catch (Exception e) {
+
+            System.out.println("JWT 파싱 실패: " + e.getMessage());
+            throw new RuntimeException("Invalid JWT: userId 또는 role 파싱 실패", e);
+
+        }
+
+    }
+
+}

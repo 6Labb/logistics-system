@@ -4,6 +4,8 @@ server:
 message: "company-service dev message updated 12:59"
 
 spring:
+  application:
+    name: company-service
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -17,5 +19,5 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/logistics
     username: postgres
-    password: 0000
+    password: lab6
     driver-class-name: org.postgresql.Driver
