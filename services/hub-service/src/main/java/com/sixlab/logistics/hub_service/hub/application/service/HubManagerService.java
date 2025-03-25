@@ -1,16 +1,16 @@
 package com.sixlab.logistics.hub_service.hub.application.service;
 
+import com.sixlab.logistics.common.shared.response.ApiResponseDto;
 import com.sixlab.logistics.hub_service.hub.application.dto.hubmanager.*;
+import com.sixlab.logistics.hub_service.hub.domain.model.Hub;
+import com.sixlab.logistics.hub_service.hub.domain.repository.HubRepository;
 import com.sixlab.logistics.hub_service.hub.infrastructure.feign.UserClient;
-import com.sixlab.logistics.hub_service.hub.infrastructure.feign.UserResponseDto;
+import com.sixlab.logistics.hub_service.hub.infrastructure.feign.ExternalUserResponseDto;
 import com.sixlab.logistics.hub_service.hub.domain.model.HubManager;
 import com.sixlab.logistics.hub_service.hub.domain.repository.HubManagerRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,9 +19,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class HubManagerService {
+
+    private final HubRepository hubRepository;
 
     private final HubManagerRepository hubManagerRepository;
 
@@ -49,7 +52,11 @@ public class HubManagerService {
 
         // FeignClient 호출 (JWT 자동 포함됨)
         //UserResponseDto userResponse = userClient.getUser(request.getUserId(), "Bearer " + token);
-        UserResponseDto userResponse = userClient.getUser(request.getUserId());
+        ApiResponseDto<ExternalUserResponseDto> userResponse = userClient.getUser(request.getUserId());
+
+        log.info("Feign 응답 전체: {}", userResponse);
+        log.info("data: {}", userResponse.getData());
+        log.info("slackId: {}", userResponse.getData().getSlackId());
 
         System.out.println("FeignClient 응답 수신: " + userResponse);
 
@@ -57,10 +64,17 @@ public class HubManagerService {
             throw new IllegalArgumentException("유효하지 않은 사용자 ID입니다: " + request.getUserId());
         }
 
+        //ExternalUserResponseDto userData = userResponse.getData();
+
+        Hub hub = hubRepository.findById(request.getHubId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 허브가 존재하지 않습니다."));
+
         // HubManager 생성
-        HubManager hubManager = HubManager.create(request.getUserId(), request.getSlackId(), request.getHubId());
+        HubManager hubManager = HubManager.create(request.getUserId(), userResponse.getData().getSlackId(), request.getHubId());
 
         hubManagerRepository.save(hubManager);
+
+        hub.updateManagerUserId(request.getUserId());
 
         return HubManagerCreateResponseDto.of(hubManager);
     }

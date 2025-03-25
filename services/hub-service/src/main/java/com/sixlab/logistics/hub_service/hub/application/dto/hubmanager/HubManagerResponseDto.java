@@ -24,12 +24,10 @@ public class HubManagerResponseDto {
     private LocalDateTime modifiedAt;
 
     @Builder
-    private HubManagerResponseDto(UUID id, Long userId, UUID hubId, LocalDateTime createdAt, LocalDateTime modifiedAt) {
+    private HubManagerResponseDto(UUID id, Long userId, UUID hubId) {
         this.id = id;
         this.userId = userId;
         this.hubId = hubId;
-        this.createdAt = createdAt;
-        this.modifiedAt = modifiedAt;
     }
 
     public static HubManagerResponseDto of(HubManager hubManager) {
@@ -37,9 +35,7 @@ public class HubManagerResponseDto {
                 .id(hubManager.getId())
                 .userId(hubManager.getUserId())
                 .hubId(hubManager.getHubId())
-                .createdAt(hubManager.getCreatedAt())
-                .modifiedAt(LocalDateTime.now())
                 .build();
     }
 
-} // GET /hubs/{hubId}/manager
+}

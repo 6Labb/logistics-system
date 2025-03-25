@@ -55,6 +55,11 @@ public class Hub extends BasicEntity {
         this.hubManagerUserId = hubManagerUserId;
     }
 
+    public void updateManagerUserId(Long userId) {
+        this.hubManagerUserId = userId;
+    }
+
+
 
 
 }
