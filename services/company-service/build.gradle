@@ -26,10 +26,17 @@ repositories {
 
 tasks.register("prepareKotlinBuildScriptModel")
 dependencies {
+
+	// swagger
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
+	implementation 'com.fasterxml.jackson.module:jackson-module-parameter-names:2.15.0'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.0'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.15.0'
+
 	// zipkin
-//	implementation 'io.micrometer:micrometer-tracing-bridge-brave'
-//	implementation 'io.github.openfeign:feign-micrometer'
-//	implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
+	implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+	implementation 'io.github.openfeign:feign-micrometer'
+	implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
 
 	// redis
 	implementation 'org.springframework.session:spring-session-data-redis'
