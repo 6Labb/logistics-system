@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static com.sixlab.logistics.common.shared.security.Role.HUB_MANAGER;
+import static com.sixlab.logistics.common.shared.security.Role.*;
 
 @Service
 @Slf4j
@@ -237,15 +237,15 @@ public class OrderService {
             // hubId 를 통해 hub 객체를 얻고, hub 객체에서 userId 꺼내 비교하기
             // (현재 유저가 허브 담당자인지 확인하기)
 
-            ResponseEntity<ApiResponse<HubResponseDto>> hubById = hubClient.getHubById(hubId);
+            ResponseEntity<ApiResponseDto<HubResponseDto>> hubById = hubClient.getHubById(hubId);
 
             // checkFeignClientResponse() 메서드는 ApiResponseDto 타입을 받는다.
             if(!hubById.getStatusCode().is2xxSuccessful() ||
-                    hubById.getBody() == null || !hubById.getBody().getStatusCode().is2xxSuccessful()) {
+                    hubById.getBody() == null) {
                 throw new RuntimeException("FeignClient 호출 문제 발생 - http 상태 코드: "+ hubById.getStatusCode()); }
 
             // 허브 객체에 저장되어 있는 허브 담당자의 userId
-            Long hubManagerUserId = hubById.getBody().getBody().getData().getHubManagerUserId();
+            Long hubManagerUserId = hubById.getBody().getData().getHubManagerUserId();
 
             if(!userId.equals(hubManagerUserId)) {
                 log.info("해당 허브의 담당자가 아님");
@@ -338,15 +338,15 @@ public class OrderService {
                 // hubId 를 통해 hub 객체를 얻고, hub 객체에서 userId 꺼내 비교하기
                 // (현재 유저가 허브 담당자인지 확인하기)
 
-                ResponseEntity<ApiResponse<HubResponseDto>> hubById = hubClient.getHubById(hubId);
-                
+                ResponseEntity<ApiResponseDto<HubResponseDto>> hubById = hubClient.getHubById(hubId);
+
                 // checkFeignClientResponse() 메서드는 ApiResponseDto 타입을 받는다.
                 if(!hubById.getStatusCode().is2xxSuccessful() ||
-                        hubById.getBody() == null || !hubById.getBody().getStatusCode().is2xxSuccessful()) {
+                        hubById.getBody() == null) {
                     throw new RuntimeException("FeignClient 호출 문제 발생 - http 상태 코드: "+ hubById.getStatusCode()); }
 
                 // 허브 객체에 저장되어 있는 허브 담당자의 userId
-                Long hubManagerUserId = hubById.getBody().getBody().getData().getHubManagerUserId();
+                Long hubManagerUserId = hubById.getBody().getData().getHubManagerUserId();
 
                 if(!userId.equals(hubManagerUserId)) {
                     log.info("해당 허브의 담당자가 아님");
@@ -401,15 +401,15 @@ public class OrderService {
         // hubId 를 통해 hub 객체를 얻고, hub 객체에서 userId 꺼내 비교하기
         // (현재 유저가 허브 담당자인지 확인하기)
 
-        ResponseEntity<ApiResponse<HubResponseDto>> hubById = hubClient.getHubById(hubId);
+        ResponseEntity<ApiResponseDto<HubResponseDto>> hubById = hubClient.getHubById(hubId);
 
         // checkFeignClientResponse() 메서드는 ApiResponseDto 타입을 받는다.
         if(!hubById.getStatusCode().is2xxSuccessful() ||
-                hubById.getBody() == null || !hubById.getBody().getStatusCode().is2xxSuccessful()) {
+                hubById.getBody() == null) {
             throw new RuntimeException("FeignClient 호출 문제 발생 - http 상태 코드: "+ hubById.getStatusCode()); }
 
         // 허브 객체에 저장되어 있는 허브 담당자의 userId
-        Long hubManagerUserId = hubById.getBody().getBody().getData().getHubManagerUserId();
+        Long hubManagerUserId = hubById.getBody().getData().getHubManagerUserId();
 
         if(!userId.equals(hubManagerUserId)) {
             log.info("해당 허브의 담당자가 아님");
@@ -456,16 +456,18 @@ public class OrderService {
     }
 
     // --------------------------------------------------------------
-    public List<OrderFindOneResponseDto> getOrderListByRole(UserInfo user) {
-            switch(user.getRole()) {
+    public List<OrderFindOneResponseDto> getOrderListByRole(UserDetailsImpl userDetails) {
+        UserInfo userInfo = userDetails.getUserInfo();
+        Role role = userInfo.getRole();
+
+        switch(role) {
                 case MASTER:
                     return transDtoList(orderJpaRepository.findAll());
-                // 1. 허브 관리자는 담당 허브 조회만 가능하다는데 이걸 어떤 로직으로 풀어나가야할지...?
                 // case HUB_MANAGER:
                 case DELIVERY_AGENT:
                 case TRADE_PARTNER:
             }    // 허브 매니저 로직을 추가하기 전이라 허브 매니저도 하기와 같은 코드가 작동됨.
-        return transDtoList(orderJpaRepository.findAllByUserId(user.getUserId())
+        return transDtoList(orderJpaRepository.findAllByUserId(userInfo.getUserId())
         );
     }
 
