@@ -1,16 +1,17 @@
 package com.sixlab.logistics.user_service.auth.application.service;
 
+
+import com.sixlab.logistics.common.shared.exception.ResourceNotFoundException;
+import com.sixlab.logistics.common.shared.exception.UnauthorizedAccessException;
 import com.sixlab.logistics.user_service.auth.application.dto.LoginRequestDto;
 import com.sixlab.logistics.user_service.user.domain.model.User;
 import com.sixlab.logistics.user_service.user.domain.repository.UserRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,6 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    //private final JwtTokenProvider jwtTokenProvider;
 
     @Value("${spring.application.name}")
     private String issuer;
@@ -70,11 +70,11 @@ public class AuthService {
 
     public String authenticate(LoginRequestDto request) {
         // 사용자 조회
-        User user = userRepository.findByUsername(request.getUsername()).orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+        User user = userRepository.findByUsername(request.getUsername()).orElse(null);
 
         // 비밀번호 검증
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new BadCredentialsException("비밀번호를 다시 확인해 주세요.");
+        if ( user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            return null;
         }
 
         // JWT 생성 (userID + role)

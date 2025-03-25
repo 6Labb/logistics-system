@@ -40,18 +40,6 @@ import static com.sixlab.logistics.common.shared.security.Role.*;
 @Slf4j
 @RequiredArgsConstructor
 public class OrderService {
-    private final ObjectMapper objectMapper;
-
-    private final UUID productId = UUID.fromString("50c3068a-6b09-4f45-a3af-c119168a7676");
-    private final UUID companyId = UUID.fromString("edb45825-cafb-457f-9179-7d544b1ec78a"); // 공급업체 id
-    private final UUID receiverCompanyId = UUID.fromString("c0502b76-1beb-4d6d-a2d3-3f61ca1b7574"); // 수령업체 id
-    // 허브 id: GetProductResponseDto 에 상품 id, 공급업체 id, 수량 등의 필드 정보가 존재하고,
-    // 해당 허브 id 는 상품 id 를 관리하고 있으며 해당 상품의 수량은 quantity 필드를 참고하면 된다.
-    private final UUID hubId = UUID.fromString("69199641-5072-4036-a899-af524390fb93");
-    private final Long mockUserId = 1L;
-    private final UUID deliveryId = UUID.fromString("50c6789a-6b09-4f45-a3af-c119168a7676");
-    private final UUID deliveryAgentId = UUID.fromString("50c7777a-6b09-4f45-a3af-c119168a7676");
-
     private final DeliveryClient deliveryClient;
     private final ProductClient productClient;
     private final CompanyClient companyClient;
@@ -122,7 +110,6 @@ public class OrderService {
         UUID receiverCompanyId = receiverCompanyInfo.getId();
 
         // 4. 배송등록 마이크로 서비스 호출에 전달할 데이터 생성
-        /* *** 배송 서비스 호출 오류로 잠정 주석 처리 -------------------------------------------------------
         RequestDeliveryRegisterDto requestDeliveryRegisterDto = RequestDeliveryRegisterDto.builder()
                 .supplierCompanyId(supplierCompanyId) // 공급업체 id
                 .receiverCompanyId(receiverCompanyId) // 수령업체 id
@@ -141,21 +128,13 @@ public class OrderService {
         // ResponseDeliveryRegisterDto
         ResponseDeliveryRegisterDto getDelivery = deliveryBody.getData();
 
-        // *** deliveryInfo 가 null 일 수 있나?
-         ------------------------------------------------------------------------------*/
-
         // 5. Order 엔터티 객체 만들어서 저장하기
-        // *** 배송 서비스 호출 완료시 복원해야할 코드: Order order = dto.toEntity(supplierCompanyId, userId, getDelivery.getId());
-        UUID mockDeliveryId = UUID.randomUUID(); // 배송 서비스 호출 되면 주석처리 예정 코드
-        Order order = dto.toEntity(supplierCompanyId, userId, mockDeliveryId); // 배송 서비스 호출 되면 주석처리 예정 코드
+        Order order = dto.toEntity(supplierCompanyId, userId, getDelivery.getId());
         Order savedOrder = orderJpaRepository.save(order);
 
-        //AI 호출용 RabbitMQ: 배송 서비스 호출 완료하면 복원해놓겠어 --------------------------------------------------------------
-        /*OrderInfoMessageRequestDto message = createOrderMessage(savedOrder.getOrderId(),getProduct, dto, getDelivery);
-        rabbitTemplate.convertAndSend(exchange, "order.created", message);
-        System.out.println("📤 주문 메시지 전송됨: " +exchange+" : "+ queueOrder+" : "+message); //테스트후  삭제
-        --------------------------------------------------------------------------------------------------*/
-        log.info("saved orderId: {}", savedOrder.getOrderId());
+        //AI 호출용 RabbitMQ
+        OrderInfoMessageRequestDto message = createOrderMessage(savedOrder.getOrderId(),getProduct, dto, getDelivery);
+        rabbitTemplate.convertAndSend(exchange, "order.created", message,new AuthHeaderMessagePostProcessor());
         return new OrderCreateResponseDto(savedOrder);
     }
 

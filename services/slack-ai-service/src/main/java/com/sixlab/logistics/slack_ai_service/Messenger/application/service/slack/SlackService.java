@@ -85,7 +85,7 @@ public class SlackService {
         }
     }
     public void slackSendFallback(String email, SlackMessageInfoDto messageInfo, Throwable t) {
-        log.error(" 전송실패 k email: {}, error: {}", email, t.getMessage());
+        log.error(" 전송실패 email: {}, error: {}", email, t.getMessage());
 
         String prompt = sendPromptMessage(messageInfo);
         saveSlackHistory(null, prompt, MessageType.FAILED);

@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -19,7 +20,7 @@ import java.util.UUID;
 public class SlackController {
     private final SlackService slackService;
 
-
+    @PreAuthorize("hasRole('MASTER')")
     @GetMapping("/getId")
     public ResponseEntity<String> getSlackIdByEmail(@RequestParam("email") String email) {
         log.info("getSlackIdByEmail email : " + email);
@@ -38,6 +39,7 @@ public class SlackController {
         return ResponseEntity.ok(slackHistory);
     }
 
+    @PreAuthorize("hasRole('MASTER')")
     @DeleteMapping("/delete")
     public void deleteSlackMessage(@RequestParam("id") UUID id) {
         slackService.deletedMessage(id);
