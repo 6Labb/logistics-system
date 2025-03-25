@@ -1,6 +1,7 @@
 package com.sixlab.logistics.order_service.application.client;
 
-import com.sixlab.logistics.common.shared.response.ApiResponse;
+import com.sixlab.logistics.common.shared.response.ApiResponseDto;
+import com.sixlab.logistics.common.shared.response.ApiResponseDto;
 import com.sixlab.logistics.order_service.application.dto.response.HubResponseDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -13,5 +14,6 @@ import java.util.UUID;
 public interface HubClient {
     // hubManager 조회 (param 은 userId)
     @GetMapping("/hubs/{id}")
-    ResponseEntity<ApiResponse<HubResponseDto>> getHubById(@PathVariable UUID id);
+    ResponseEntity<ApiResponseDto<HubResponseDto>> getHubById(@PathVariable UUID id);
+    // ResponseEntity<TempDto> getHubById(@PathVariable UUID id);
 }
