@@ -23,19 +23,19 @@ public class HubManager extends BasicEntity {
     @Column(nullable = false, unique = true)
     private Long userId;
 
+    private String slackId;
+
     private UUID hubId;
 
-    @Builder
-    private HubManager(Long userId, UUID hubId) {
+
+    private HubManager(Long userId, String slackId, UUID hubId) {
         this.userId = userId;
+        this.slackId = slackId;
         this.hubId = hubId;
     }
 
-    public static HubManager create(Long userId, UUID hubId) {
-        return HubManager.builder()
-                .userId(userId)
-                .hubId(hubId)
-                .build();
+    public static HubManager create(Long userId, String slackId, UUID hubId) {
+        return new HubManager(userId, slackId, hubId);
     }
 
     public void update(UUID hubId) {

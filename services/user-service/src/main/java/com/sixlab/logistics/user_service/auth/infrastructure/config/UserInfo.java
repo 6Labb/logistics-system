@@ -1,17 +1,16 @@
 package com.sixlab.logistics.user_service.auth.infrastructure.config;
 
 
-import lombok.RequiredArgsConstructor;
-
+import com.sixlab.logistics.user_service.user.application.dto.Role;
 
 public class UserInfo {
 
     private final String username;
     private final String password;
     private final Long userId;
-    private final String role;
+    private final Role role;
 
-    public UserInfo(String username,  String password, Long userId, String role) {
+    public UserInfo(String username,  String password, Long userId, Role role) {
         this.username = "UNUSED";
         this.password = "UNUSED";
         this.userId = userId;
@@ -21,7 +20,7 @@ public class UserInfo {
     public String getUsername() { return username; }
     public String getPassword() { return password; }
     public Long getUserId() { return userId; }
-    public String getRole() { return role; }
+    public Role getRole() { return role; }
 
 
 }
