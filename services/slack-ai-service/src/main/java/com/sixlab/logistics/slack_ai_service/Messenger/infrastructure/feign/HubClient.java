@@ -12,6 +12,6 @@ import java.util.UUID;
 
 @FeignClient(name = "hub-service",configuration = FeignClientInterceptor.class)
 public interface HubClient {
-     @GetMapping("/{id}")
+     @GetMapping("/hubs/{id}")
      ResponseEntity<ApiResponseDto<HubClientResponseDto>> getHub(@PathVariable UUID id);
 }

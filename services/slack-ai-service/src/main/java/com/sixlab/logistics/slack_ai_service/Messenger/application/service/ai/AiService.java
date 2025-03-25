@@ -60,19 +60,13 @@ public class AiService {
                                            Channel channel,
                                            @Header(AmqpHeaders.DELIVERY_TAG) long tag,
                                            @Header("Authorization") String authHeader,
-                                           @Header("X-Hub-User") String username,
-                                           @Header("X-Hub-Role") String role) {
+                                           @Header("X-Hub-User") Long userId,
+                                           @Header("X-Hub-Role") String role) throws IOException {
         log.info("큐" + queue + "채널" + channel);
-        System.out.println("큐" + queue + "채널" + channel);
-        //큐 헤더 확인
-        System.out.println("jwt 확인 " + authHeader);
-        System.out.println("user" + username);
-        System.out.println("role" + role);
 
         //헤더 다시 등록
         String token = authHeader.startsWith("Bearer ") ? authHeader.substring(7).trim() : authHeader;
-        System.out.println("등록 토큰");
-        UserInfo userInfo = new UserInfo(username, "UNUSED", null, Role.fromAuthority(role));
+        UserInfo userInfo = new UserInfo("UNUSED", "UNUSED", userId, Role.fromAuthority(role));
         UserDetailsImpl userDetails = new UserDetailsImpl(userInfo);
 
         Authentication authentication =
@@ -88,20 +82,16 @@ public class AiService {
         }
         DeliveryClientResponseDto deliveryData = extractData(deliveryResponse, Function.identity());
         System.out.println("1차통과");
-        System.out.println(deliveryData.getToHubId());
-        System.out.println(deliveryData.getFromHubId());
-        System.out.println(deliveryData.getSlackId());
-        System.out.println(deliveryData.getHubDeliveryAgentId());
 
-//        ResponseEntity<ApiResponseDto<UserClientResponseDto>> userResponse = userClient.getUser2(deliveryData.getHubDeliveryAgentId());
+
+        ResponseEntity<ApiResponseDto<UserClientResponseDto>> userResponse = userClient.getUser2(deliveryData.getHubDeliveryAgentId());
 //        ResponseEntity<ApiResponseDto<UserClientResponseDto>> userResponse = userClient.getUser(deliveryData.getHubDeliveryAgentId(),username,role);
-//        if (!userResponse.getStatusCode().is2xxSuccessful()) {
-//            throw new ResourceNotFoundException("사용자 정보 조회 실패: " + deliveryData.getHubDeliveryAgentId());
-//        }
-//        UserClientResponseDto userData = extractData(userResponse, Function.identity());
-        String userName = "테스트";
-//                userData.getUserName();
-        String slackId = "hu185@naver.com";
+        if (!userResponse.getStatusCode().is2xxSuccessful()) {
+            throw new ResourceNotFoundException("사용자 정보 조회 실패: " + deliveryData.getHubDeliveryAgentId());
+        }
+        UserClientResponseDto userData = extractData(userResponse, Function.identity());
+        String userName =userData.getUserName();
+        String slackId = "hu185@naver.com"; //테스트용 하드코딩
 //                userData.getSlackId();
         System.out.println("2차통과");
 
@@ -117,7 +107,7 @@ public class AiService {
 
         System.out.println("3차 통과");
         System.out.println("큐 소비 시작");
-        try {
+
             log.info("메시지 수신: " + queue);
             OrderInfoRequestDto infoDto = OrderInfoRequestDto.builder()
                     .productName(queue.getProductName())
@@ -135,21 +125,22 @@ public class AiService {
             log.info("AI 호출 확인" + aiDeadline);
 
             SlackMessageInfoDto sendSlackMessage = buildSlackMessage(queue, infoDto, userName, aiDeadline);
-
+        try {
             slackService.sendSlackMessage(slackId, sendSlackMessage);
 
             channel.basicAck(tag, false); // 성공 시 큐에서 메시지 삭제
         } catch (ResourceNotFoundException e) {
+            channel.basicNack(tag, false, false);
             log.error("리소스 조회 실패: {}", e.getMessage(), e);
-            nackMessage(channel, tag);
         } catch (GeminiRetryException e) {
             log.error("Gemini 호출 실패: {}", e.getMessage(), e);
-            nackMessage(channel, tag);
+            channel.basicNack(tag, false, false);
         } catch (IOException e) {
             log.error("메시지 처리 중 IO 오류 발생: {}", e.getMessage(), e);
             nackMessage(channel, tag);
         } catch (Exception e) {
             log.error("예상치 못한 오류 발생: {}", e.getMessage(), e);
+            channel.basicNack(tag, false, false);
             throw new InternalServerException("주문 처리 중 서버 오류 발생");
         }
     }
