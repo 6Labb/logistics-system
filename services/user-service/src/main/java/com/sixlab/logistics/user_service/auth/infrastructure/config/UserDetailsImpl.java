@@ -1,12 +1,10 @@
 package com.sixlab.logistics.user_service.auth.infrastructure.config;
 
-import com.sixlab.logistics.user_service.user.application.dto.Role;
-import com.sixlab.logistics.user_service.user.domain.model.User;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -28,7 +26,8 @@ public class UserDetailsImpl implements UserDetails {
     // return authority information
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(userInfo.getRole());
+
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + userInfo.getRole());
 
         return Collections.singletonList(authority);
     }

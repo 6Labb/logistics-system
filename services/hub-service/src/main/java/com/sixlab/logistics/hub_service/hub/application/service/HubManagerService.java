@@ -27,17 +27,6 @@ public class HubManagerService {
 
     private final UserClient userClient;
 
-//    @Transactional
-//    public HubManagerCreateResponseDto createManager(HubManagerCreateRequestDto request) {
-//
-//        HubManager hubManager = HubManager.create(request.getUserId(), request.getHubId());
-//        hubManagerRepository.save(hubManager);
-//
-//        return HubManagerCreateResponseDto.builder()
-//                .id(hubManager.getId())
-//                .build();
-//    }
-
     @Transactional
     public HubManagerCreateResponseDto createManager(HubManagerCreateRequestDto request) {
 
@@ -60,26 +49,24 @@ public class HubManagerService {
 
         // FeignClient 호출 (JWT 자동 포함됨)
         //UserResponseDto userResponse = userClient.getUser(request.getUserId(), "Bearer " + token);
-        UserResponseDto userResponse = userClient.getUser(request.getUserId(), currentUserId, currentUserRole);
+        UserResponseDto userResponse = userClient.getUser(request.getUserId());
 
-        System.out.println("✅ FeignClient 응답 수신: " + userResponse);
+        System.out.println("FeignClient 응답 수신: " + userResponse);
 
         if (userResponse == null) {
-            throw new IllegalArgumentException("🚨 유효하지 않은 사용자 ID입니다: " + request.getUserId());
+            throw new IllegalArgumentException("유효하지 않은 사용자 ID입니다: " + request.getUserId());
         }
 
         // HubManager 생성
-        HubManager hubManager = HubManager.create(request.getUserId(), request.getHubId());
+        HubManager hubManager = HubManager.create(request.getUserId(), request.getSlackId(), request.getHubId());
+
         hubManagerRepository.save(hubManager);
 
-        return HubManagerCreateResponseDto.builder()
-                .id(hubManager.getId())
-                .userId(hubManager.getUserId())
-                .hubId(hubManager.getHubId())
-                .build();
+        return HubManagerCreateResponseDto.of(hubManager);
     }
 
 
+    @Transactional(readOnly = true)
     public HubManagerResponseDto getManagerById(UUID id) {
         HubManager hubManager = hubManagerRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 매니저 ID 입니다."));
@@ -87,6 +74,7 @@ public class HubManagerService {
         return HubManagerResponseDto.of(hubManager);
     }
 
+    @Transactional(readOnly = true)
     public HubManagerResponseDto getManagerByUserId(Long id) {
         HubManager hubManager = hubManagerRepository.findByUserId(id)
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 매니저 ID 입니다."));
@@ -112,19 +100,5 @@ public class HubManagerService {
 
         hubManager.delete(3L); // BasicEntity의 softDelete() 호출
     }
-
-    @Transactional(readOnly = true)
-    public Page<HubManagerResponseDto> search(HubManagerSearchCondition condition, Pageable pageable) {
-        Specification<HubManager> spec = Specification
-                .where(HubManagerSpecification.userIdEq(condition.getUserId()))
-                .and(HubManagerSpecification.hubIdEq(condition.getHubId()));
-
-        return hubManagerRepository.findAll(spec, pageable)
-                .map(HubManagerResponseDto::of); // 엔티티 → DTO 변환
-    }
-
-
-
-
 
 }

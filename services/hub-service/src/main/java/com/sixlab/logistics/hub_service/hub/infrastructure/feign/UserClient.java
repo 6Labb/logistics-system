@@ -15,9 +15,7 @@ public interface UserClient {
 
     @GetMapping("/users/{id}")
     UserResponseDto getUser(
-            @PathVariable(name = "id") Long userId,
-            @RequestHeader("X-User-Id") String userIdHeader,
-            @RequestHeader("X-User-Role") String userRoleHeader
+            @PathVariable(name = "id") Long userId
     );
 
 }

@@ -13,6 +13,7 @@ import com.sixlab.logistics.hub_service.hub.domain.model.Hub;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +28,7 @@ public class HubRouteController {
 
     private final HubRouteService hubRouteService;
 
+    @PreAuthorize("hasRole('MASTER')")
     @PostMapping
     public ApiResponse<HubRouteResponseDto> createHubRoute(@RequestBody HubRouteCreateRequestDto requestDto) {
         HubRouteResponseDto responseDto = hubRouteService.createHubRoute(requestDto);
@@ -39,6 +41,7 @@ public class HubRouteController {
         return ApiResponse.success(response, "허브 이동 경로가 정상적으로 조회되었습니다.");
     }
 
+    @PreAuthorize("hasRole('MASTER')")
     @PutMapping("/{id}")
     public ResponseEntity<HubRouteResponseDto> updateHubRoute(
             @PathVariable UUID id,
@@ -47,6 +50,7 @@ public class HubRouteController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasRole('MASTER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteHubRoute(
             @PathVariable UUID id,
