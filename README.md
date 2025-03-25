@@ -1,13 +1,6 @@
 # 대규모 AI 시스템 프로젝트 - 6Lab
 
-## 📋 목차
-1. [기술 스택](#기술-스택)
-2. [주요 라이브러리](#주요-라이브러리)
-3. [아키텍처](#아키텍처)
-4. [API Docs](#API-Docs)
-5. [ERD](#ERD)
- 
----
+
 
 ### 👥 팀원
 
@@ -192,13 +185,11 @@ cd infra/gateway-server
 
 ### ⚒️ 기술 스택
 - **Language:** Java 17
-- **Framework:** Spring Boot 3.4.2
-- **Build Tool:** Gradle 8.2.1
+- **Framework:** Spring Boot 3.4.3
+- **Build Tool:** Gradle 8.10
 - **Database:** PostgreSQL
 - **ORM:** Spring Data JPA
 - **Test:** JUnit 5 , Mockito
-- **CI/CD:** GitHub Actions, Docker
-- **Infra:** AWS EC2
 - **Security:** Spring Security, JWT
 
 
@@ -224,3 +215,7 @@ cd infra/gateway-server
 ![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)
 ![Notion](https://img.shields.io/badge/Notion-000000?style=flat&logo=notion&logoColor=white)
 ![Slack](https://img.shields.io/badge/Slack-4A154B?style=flat&logo=slack&logoColor=white)
+
+
+---
+
