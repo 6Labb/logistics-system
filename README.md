@@ -80,6 +80,7 @@ cd logistics-system
 - **PostgreSQL**
 - **Redis**
 - **Zipkin**
+- **RabbitMQ**
 
 ```bash
 docker-compose up -d
