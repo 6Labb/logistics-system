@@ -43,14 +43,14 @@ SET search_path TO deliveries;
 INSERT INTO p_delivery_agent (user_id, type, delivery_sequence, hub_id, slack_id) VALUES
 -- 서울특별시 센터
 -- 업체 배송 담당자 (COMPANY 타입)
-(3, 'COMPANY', 0, '11e98756-d7a2-f948-b1b1-0242ac120002', 'hu185@naver.com'),
+(3, 'COMPANY', 0, '11e98756-d7a2-f948-b1b1-0242ac120002', 'hu1852@naver.com'),
 -- 서울특별시 센터 허브 배송 담당자 (HUB 타입)
-(4, 'HUB', 0, '11e98756-d7a2-f948-b1b1-0242ac120001', 'hu185@naver.com'),
+(4, 'HUB', 0, '11e98756-d7a2-f948-b1b1-0242ac120001', 'hu1853@naver.com'),
 -- 경기 북부 센터
 -- 업체 배송 담당자 (COMPANY 타입)
-(5, 'COMPANY', 0, '11e98756-d7a2-f948-b1b1-0242ac141002', 'hu185@naver.com'),
+(5, 'COMPANY', 0, '11e98756-d7a2-f948-b1b1-0242ac141002', 'hu1854@naver.com'),
 -- 경기 북부 센터 허브 배송 담당자 (HUB 타입)
-(6, 'HUB', 0, '11e98756-d7a2-f948-b1b1-0242ac141002', 'hu185@naver.com');
+(6, 'HUB', 0, '11e98756-d7a2-f948-b1b1-0242ac141002', 'hu1855@naver.com');
 
 SET search_path TO users;
 ALTER SEQUENCE users.p_users_id_seq RESTART WITH 7;
