@@ -18,7 +18,14 @@ public class OrderCreateResponseDto {
     private final String message; // 요청사항
     private final Status status; // 주문 상태
     private final Long userId; // 주문자 고유 id
-    private final String receiverName; // 수령인
+    private final String receiverName; /**
+     * 주어진 Order 객체를 기반으로 OrderCreateResponseDto 객체를 초기화한다.
+     *
+     * <p>Order 객체에서 주문 ID, 공급자 ID, 수령자 ID, 배송 ID, 주소, 상품 ID, 수량, 메시지, 주문 상태,
+     * 사용자 ID, 수령자 이름 등의 정보를 추출하여 해당 DTO의 필드를 초기화한다.</p>
+     *
+     * @param order 주문 생성 관련 정보를 담고 있는 Order 객체
+     */
 
     public OrderCreateResponseDto(Order order) {
         this.orderId = order.getOrderId();

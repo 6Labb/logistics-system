@@ -30,6 +30,18 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class OrderController {
     private final OrderService orderService;
+    /**
+     * 새로운 주문을 등록하고 생성된 주문 정보를 반환한다.
+     *
+     * <p>주어진 주문 생성 요청 DTO와 인증된 사용자 정보에서 사용자 ID를 추출하여 주문 등록 서비스를 호출한다.
+     * 성공적으로 생성된 주문 정보와 함께 성공 메시지를 포함한 ApiResponse를 반환한다.
+     * </p>
+     *
+     * @param requestDto 주문 등록에 필요한 정보를 담은 요청 DTO
+     * @param userDetails 인증된 사용자 정보 객체로, 주문 생성 시 사용자 ID를 제공한다.
+     * @return 생성된 주문 정보를 포함한 ApiResponse 객체
+     * @throws Exception 주문 등록 처리 중 오류가 발생한 경우
+     */
     @Operation(summary = "주문 등록")
     @PostMapping
     // 모든 권한 접근 허용
@@ -44,7 +56,15 @@ public class OrderController {
     }
 
     // 실험용: 유저 객체
-    // public UserInfo user = new UserInfo(1L, UserInfo.Role.HUB_MANAGER);
+    /**
+     * 주문 전체 조회 API.
+     * 
+     * 현재 인증된 사용자 정보를 기반으로 사용자의 역할에 맞는 주문 목록을 반환한다.
+     * 조회된 주문 내역이 없으면 데이터는 null로 설정되고, 해당 메시지가 함께 반환된다.
+     *
+     * @param userDetails 인증된 사용자 정보를 담은 객체
+     * @return 주문 목록 및 조회 건수를 포함하는 ApiResponse 객체, 주문 내역이 없으면 null과 메시지가 포함됨
+     */
 
 
     @GetMapping
