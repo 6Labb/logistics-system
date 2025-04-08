@@ -54,7 +54,18 @@ public class OrderService {
     @Value("${message.queue.order}")
     private String queueOrder;
 
-    // 모든 권한 접근 허용, 주문 생성 메서드
+    /**
+     * 모든 권한에 대해 주문 생성을 수행한다.
+     *
+     * <p>주문 생성 요청 DTO를 기반으로 외부 서비스(상품, 회사, 배송 서비스)와 상호작용하여
+     * 상품 조회, 재고 확인 및 감소, 수령업체 정보 검증, 배송 등록을 순차적으로 처리하고,
+     * 최종적으로 주문 엔터티를 데이터베이스에 저장한 후 주문 생성 이벤트를 메시지 큐로 전송한다.
+     *
+     * @param dto 주문 생성에 필요한 정보(상품 ID, 수량, 배송 주소, 수령인 정보 등)를 담은 DTO
+     * @param userId 주문 생성 요청을 보낸 사용자의 ID
+     * @return 생성된 주문 정보를 포함하는 주문 생성 응답 DTO
+     * @throws Exception 주문 생성 과정에서 발생하는 상품 조회, 재고 부족, 수령업체 검증, 배송 등록 또는 주문 저장 관련 예외
+     */
     public OrderCreateResponseDto createOrder(OrderCreateRequestDto dto, Long userId) throws Exception{
         log.info("service 계층: createOrder() 호출됨");
 
@@ -139,7 +150,16 @@ public class OrderService {
         return new OrderCreateResponseDto(savedOrder);
     }
 
-    // FeignClient 호출시 반환 값 검증: 메서드 호출에 문제가 없었는지에 대한 확인 절차
+    /**
+     * FeignClient 호출 응답의 유효성을 검증하여 올바른 응답일 경우 ApiResponseDto 데이터를 반환한다.
+     * 
+     * <p>응답의 HTTP 상태 코드가 2xx가 아니거나, 본문이 null이거나, 응답 본문의 상태 코드가 2xx에 해당하지 않을 경우
+     * 런타임 예외를 발생시킨다.
+     *
+     * @param response FeignClient 호출 결과를 담고 있는 ResponseEntity 객체
+     * @return 응답 본문에 포함된 ApiResponseDto 데이터
+     * @throws RuntimeException 응답이 성공적이지 않은 경우
+     */
     private static <T> ApiResponseDto<T> checkFeignClientResponse(ResponseEntity<ApiResponseDto <T>> response) {
         log.info("checkFeignClientResponse() 메서드 호출");
         if(!response.getStatusCode().is2xxSuccessful() || response.getBody() == null || Integer.toString(response.getBody().getStatus()).charAt(0) != '2') {
@@ -168,6 +188,22 @@ public class OrderService {
         return new OrderFindOneResponseDto(findByIdOneOrderInfo(orderId, userDetails));
     }
 
+    /**
+     * 주문 정보를 수정한다. (마스터와 허브 매니저만 접근 가능)
+     * 
+     * <p>
+     * 지정된 주문 ID에 해당하는 주문을 조회한 후, 요청된 수정 정보(dto)를 반영하여 주문의 물품 요청 수량 및 메시지를 업데이트한다.
+     * 허브 매니저의 경우, 추가로 해당 허브의 담당자인지 확인하며,
+     * 주문 수량이 변경될 경우 상품의 재고 수준을 검사한다.
+     * </p>
+     *
+     * @param orderId 업데이트할 주문의 고유 식별자
+     * @param dto 주문 수정에 필요한 정보 (요청 수량과 메시지 포함)
+     * @param userDetails 요청 사용자의 정보 및 권한을 담은 객체
+     * @return 수정된 주문 정보를 포함하는 응답 DTO
+     * @throws UnauthorizedAccessException 사용자에게 주문 수정 권한이 없는 경우
+     * @throws RuntimeException Feign 클라이언트 호출 문제 등으로 인한 예외 발생 시
+     */
     @Transactional
     // 마스터와 허브 매니저만 호출 가능한 수정 메서드
     public OrderInfoUpdateResponseDto orderInfoUpdate(UUID orderId, OrderInfoUpdateRequestDto dto, UserDetailsImpl userDetails) {
@@ -242,7 +278,26 @@ public class OrderService {
         }
     }
 
-    // orderId 에 기반하여 주문정보 확인하는 메서드 -> 주문정보 존재한다면 Order 객체를 반환
+    /**
+     * 주어진 주문 ID와 사용자 정보를 기반으로 주문 정보를 조회하고, 사용자 권한에 따라 접근을 검증한 후 주문 객체를 반환한다.
+     * <p>
+     * 주문 정보가 데이터베이스에 존재하지 않을 경우 {@link ResourceNotFoundException}이 발생하며, 각 사용자 역할에 따라 접근 권한이 다음과 같이 검증된다:
+     * <ul>
+     *   <li>MASTER: 모든 주문에 접근 가능.</li>
+     *   <li>HUB_MANAGER: 주문의 제품 정보를 통해 해당 허브의 담당자를 확인하며, 일치하지 않을 경우 {@link UnauthorizedAccessException} 발생.</li>
+     *   <li>DELIVERY_AGENT, TRADE_PARTNER: 주문 생성자와 현재 사용자가 일치하지 않으면 {@link UnauthorizedAccessException} 발생.</li>
+     *   <li>그 외의 역할: {@link IllegalArgumentException} 발생.</li>
+     * </ul>
+     * 또한, FeignClient 호출 실패 시 {@link RuntimeException}이 발생할 수 있다.
+     *
+     * @param orderId 주문의 고유 식별자
+     * @param userDetails 현재 로그인한 사용자의 상세 정보
+     * @return 유효한 주문 정보가 존재할 경우 해당 Order 객체
+     * @throws ResourceNotFoundException 주문 정보가 존재하지 않을 경우
+     * @throws UnauthorizedAccessException 사용자가 주문 조회에 접근할 권한이 없을 경우
+     * @throws IllegalArgumentException 예상치 못한 사용자 역할이 전달될 경우
+     * @throws RuntimeException 허브 정보 조회 중 FeignClient 호출 실패 시
+     */
     private Order findByIdOneOrderInfo(UUID orderId, UserDetailsImpl userDetails) {
         UserInfo userInfo = userDetails.getUserInfo();
         // String authority = userInfo.getRole().getAuthority();
@@ -315,7 +370,24 @@ public class OrderService {
         return order;
     }
 
-    // 주문 삭제 메서드, 마스터와 담당! 허브 관리자만이 삭제를 할 수 있다.
+    /**
+     * 주문을 소프트 삭제 처리하여 주문을 취소한다.
+     * 
+     * <p>해당 메서드는 주어진 주문 ID를 기반으로 주문 정보를 조회하며, 존재하지 않을 경우
+     * {@link ResourceNotFoundException} 을 발생시킨다. 이후, 주문과 연관된 상품 정보를 조회하고,
+     * 해당 상품의 허브 정보를 통해 현재 사용자가 허브 담당자인지 검증한다. 사용자가 허브 담당자가 아니면
+     * {@link UnauthorizedAccessException} 이 발생한다.</p>
+     * 
+     * <p>승인이 완료되면 상품 재고 복원 요청과 배송 삭제 요청을 각각 수행하고, 이 과정에서 문제가 발생할 경우
+     * {@link RuntimeException} 이 발생한다. 최종적으로 주문은 소프트 삭제 처리되며 상태가 FAIL 로 변경된다.</p>
+     * 
+     * @param orderId 삭제할 주문의 고유 식별자 (UUID)
+     * @param userDetails 현재 요청자의 사용자 세부 정보
+     * @return 삭제된 주문 정보를 포함하는 OrderDeleteResponseDto 객체
+     * @throws ResourceNotFoundException 지정된 주문 정보를 찾을 수 없는 경우
+     * @throws UnauthorizedAccessException 현재 사용자가 해당 허브의 담당자가 아닌 경우
+     * @throws RuntimeException 상품 재고 복원 또는 배송 삭제 요청 중 오류가 발생한 경우
+     */
     @Transactional
     public OrderDeleteResponseDto deleteOrder(UUID orderId, UserDetailsImpl userDetails) {
         UserInfo userInfo = userDetails.getUserInfo();
@@ -402,7 +474,15 @@ public class OrderService {
         return new OrderDeleteResponseDto(order);
     }
 
-    // --------------------------------------------------------------
+    /**
+     * 사용자 역할에 따라 주문 목록을 조회하여 반환한다.
+     * 
+     * <p>사용자가 MASTER 역할인 경우 전체 주문 목록을 반환하고, 그 외의 역할(DELIVERY_AGENT, TRADE_PARTNER 및 현재 HUB_MANAGER도 포함)은
+     * 사용자 ID에 해당하는 주문 목록만 반환한다.</p>
+     *
+     * @param userDetails 사용자에 대한 상세 정보를 담은 객체
+     * @return 주문 정보를 포함한 DTO 리스트
+     */
     public List<OrderFindOneResponseDto> getOrderListByRole(UserDetailsImpl userDetails) {
         UserInfo user = userDetails.getUserInfo();
         Role role = user.getRole();
